@@ -62,7 +62,7 @@ async function get(url, tries = 3) {
 }
 
 // ---------- 리포트 하나 처리 ----------
-async function processSeq(seq, since = null) {
+async function processSeq(seq, since = null, force = false) {
   if (state.processed[seq]) return state.processed[seq];
   const r = await get(PDF_URL(seq));
   if (r.status === 404 || !r.buf || r.buf.length < 1000 || r.buf.subarray(0, 4).toString() !== '%PDF') {
@@ -80,6 +80,8 @@ async function processSeq(seq, since = null) {
     skipped: res.skipped.length ? res.skipped : undefined,
   };
   if (res.tables.length) {
+    // 재처리: 같은 기간 자료를 지우고 새로 넣는다
+    if (force) { const keys = new Set(res.tables.map((t) => t.key)); db.surveys = db.surveys.filter((s) => !keys.has(s.key)); }
     const m = mergeInto(db, res, `seq${seq}`);
     db = m.db;
     info.added = m.added; info.replaced = m.replaced;
@@ -97,6 +99,18 @@ const titles = titlesFromHtml(html);
 log(`게시판 최신 번호: ${latest} (저장된 마지막 번호: ${state.lastSeq})`);
 
 let changed = false;
+
+// 0) 재처리 목록: 파서를 고친 뒤 특정 번호를 다시 읽힌다 (state.reprocess = [번호, ...])
+for (const seq of state.reprocess || []) {
+  const src = `seq${seq}`;
+  delete state.processed[seq];
+  const info = await processSeq(seq, null, true);
+  const banners = (db.surveys.find((s) => s.source === src && s.type === 'weekly')?.rows || []).map((r) => r.banner);
+  log(`  재처리 ${seq} → ${info.kind} [${(info.tables || []).join(', ')}] 배너: ${[...new Set(banners)].join(' / ')}`);
+  changed = true;
+  await sleep(1500);
+}
+state.reprocess = [];
 
 // 1) 새 리포트
 const start = state.lastSeq ? state.lastSeq + 1 : latest;

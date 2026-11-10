@@ -230,14 +230,39 @@ function readTable(rows, t) {
   for (const f of frags) {
     const b = blocks[blocks.length - 1];
     const forceNew = b && startsKnown(f.s) && !prefixOfKnown(b.text);
-    if (b && !forceNew && f.y - b.y1 <= 1.7 * pitch && !/별$/.test(b.text) && f.y !== b.y1) { b.text += ' ' + f.s; b.y1 = f.y; }
-    else if (b && f.y === b.y1) { b.text += ' ' + f.s; }
-    else blocks.push({ text: f.s, y0: f.y, y1: f.y });
+    if (b && !forceNew && f.y - b.y1 <= 1.7 * pitch && !/별$/.test(b.text) && f.y !== b.y1) { b.text += ' ' + f.s; b.y1 = f.y; b.parts.push(f); }
+    else if (b && f.y === b.y1) { b.text += ' ' + f.s; b.parts.push(f); }
+    else blocks.push({ text: f.s, y0: f.y, y1: f.y, parts: [f] });
   }
-  for (const b of blocks) b.text = b.text.replace(/\s*\/\s*/g, '/').replace(/^(\S+\/)\s+/, '$1');
 
   // ---- 데이터 행 → 구간 → 배너 지정 ----
   const recs = dataRows.filter((r) => r.groupWords.length);
+
+  // 이름이 '…별'로 끝나지 않는 특별 배너 두 개가 붙어 버린 경우 나눈다:
+  // 앞쪽 그룹들의 사례수 합이 전체와 같아지는 지점 아래에도 배너 글자가 있으면 거기서 새 배너
+  const nCol0 = cols.slice(0, posIdx).find((c) => totalByCol.has(c) && !/%/.test(totalByCol.get(c)));
+  const totalN = nCol0 ? toNum(totalByCol.get(nCol0)) : null;
+  const rowN = (r) => { const w = r.values.find((v) => colOf(v) === nCol0); return w ? toNum(w.s) : null; };
+  if (totalN) {
+    for (let bi = 0; bi < blocks.length; bi++) {
+      const b = blocks[bi];
+      if (/별$/.test(b.text) || b.parts.length < 2) continue;
+      const nextY = blocks[bi + 1]?.y0 ?? Infinity;
+      const rows = recs.filter((r) => r.y >= b.y0 - 0.6 * pitch && r.y < nextY - 0.6 * pitch);
+      let cum = 0;
+      for (let i = 0; i < rows.length - 1; i++) {
+        cum += rowN(rows[i]) ?? NaN;
+        if (!(Math.abs(cum - totalN) <= Math.max(3, totalN * 0.015))) continue;
+        const cut = rows[i + 1].y - 0.6 * pitch;
+        const A = b.parts.filter((f) => f.y < cut), B = b.parts.filter((f) => f.y >= cut);
+        if (!A.length || !B.length) break;
+        const mk = (ps) => ({ text: ps.map((f) => f.s).join(' '), y0: ps[0].y, y1: ps[ps.length - 1].y, parts: ps });
+        blocks.splice(bi, 1, mk(A), mk(B));
+        break;
+      }
+    }
+  }
+  for (const b of blocks) b.text = b.text.replace(/\s*\/\s*/g, '/').replace(/^(\S+\/)\s+/, '$1');
   // 큰 간격으로 구간 나누기 (2012형: 배너가 그룹 가운데에 있음)
   const segs = [];
   recs.forEach((r, i) => {
