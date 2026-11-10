@@ -407,7 +407,7 @@ export async function parseGallupPdf(pdfjsLib, data, opts = {}) {
         continue;
       }
       // 대통령 직무 평가 표만 (당선인 평가, 국회·정당 평가 등은 제외)
-      if (!(/대통령/.test(head) && /직무/.test(head)) || /당선인/.test(head)) {
+      if (!(/대통령/.test(head) && /직무/.test(head)) || /당선인|권한대행/.test(head)) {
         continue;
       }
       const period = parsePeriod(head, pageText);

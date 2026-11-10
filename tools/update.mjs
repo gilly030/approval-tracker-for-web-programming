@@ -104,6 +104,7 @@ let changed = false;
 for (const seq of state.reprocess || []) {
   const src = `seq${seq}`;
   delete state.processed[seq];
+  db.surveys = db.surveys.filter((s) => s.source !== src); // 이번에 표가 안 나오면 이전 결과도 지운다
   const info = await processSeq(seq, null, true);
   const banners = (db.surveys.find((s) => s.source === src && s.type === 'weekly')?.rows || []).map((r) => r.banner);
   log(`  재처리 ${seq} → ${info.kind} [${(info.tables || []).join(', ')}] 배너: ${[...new Set(banners)].join(' / ')}`);
