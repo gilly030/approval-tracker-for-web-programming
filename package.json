@@ -1,0 +1,13 @@
+{
+  "name": "president-approval-tracker",
+  "version": "1.0.0",
+  "description": "한국갤럽 대통령 직무평가 특성별 트래커",
+  "scripts": {
+    "parse": "node tools/parse-node.mjs"
+  },
+  "dependencies": {
+    "pdfjs-dist": "4.10.38"
+  },
+  "type": "module",
+  "private": true
+}

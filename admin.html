@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>리포트 반영 · 대통령 직무평가 트래커</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+KR:wght@400;600;700&display=swap">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<main class="wrap">
+  <header class="masthead">
+    <div class="brand">리포트 반영<small>관리자</small></div>
+    <div class="source"><a href="./">공개 페이지 보기</a></div>
+  </header>
+
+  <section class="panel">
+    <div class="panel-head"><h2>1. 현재 데이터</h2><span class="status" id="db-status">불러오는 중…</span></div>
+    <div class="actions">
+      <label class="btn" for="db-file">다른 data.json 열기</label>
+      <input type="file" id="db-file" accept="application/json,.json" hidden>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head"><h2>2. 갤럽 리포트 PDF 올리기</h2><span class="hint">여러 개를 한꺼번에 올려도 됩니다</span></div>
+    <label class="drop" id="drop" for="pdf-file">
+      데일리 오피니언 PDF를 여기에 끌어다 놓거나 눌러서 고르세요
+      <input type="file" id="pdf-file" accept="application/pdf,.pdf" multiple>
+    </label>
+    <div class="status" id="parse-status"></div>
+    <div id="results" style="display:grid;gap:10px"></div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head"><h2>3. 반영하고 내려받기</h2></div>
+    <p class="hint" style="margin:0">체크한 조사만 반영됩니다. 같은 주간 조사가 이미 있으면 그대로 두고, 월간 통합은 더 최근 호에서 나온 것으로 바꿉니다. 내려받은 data.json을 사이트의 <code>data/</code> 폴더에 덮어쓰면 공개 페이지에 나타납니다.</p>
+    <div class="actions">
+      <button type="button" class="btn primary" id="apply" disabled>선택한 조사 반영</button>
+      <button type="button" class="btn" id="download" disabled>data.json 내려받기</button>
+      <button type="button" class="btn" id="copy" disabled>JSON 복사</button>
+      <span class="status" id="apply-status"></span>
+    </div>
+  </section>
+</main>
+<script type="module" src="js/admin.js"></script>
+</body>
+</html>
