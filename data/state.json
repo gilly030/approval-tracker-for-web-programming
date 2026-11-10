@@ -1,6 +1,648 @@
 {
  "lastSeq": 1666,
  "processed": {
+  "1485": {
+   "kind": "daily",
+   "issue": 585,
+   "month": "2024-05",
+   "tables": [
+    "2024-05-W5",
+    "2024-01-M",
+    "2024-02-M",
+    "2024-03-M",
+    "2024-04-M",
+    "2024-05-M"
+   ],
+   "warnings": 6,
+   "added": [
+    "2024-05-W5"
+   ],
+   "replaced": []
+  },
+  "1486": {
+   "kind": "none"
+  },
+  "1487": {
+   "kind": "none"
+  },
+  "1488": {
+   "kind": "daily",
+   "issue": 586,
+   "month": "2024-06",
+   "tables": [
+    "2024-06-W2"
+   ],
+   "warnings": 0,
+   "added": [
+    "2024-06-W2"
+   ],
+   "replaced": []
+  },
+  "1489": {
+   "kind": "none"
+  },
+  "1490": {
+   "kind": "daily",
+   "issue": 587,
+   "month": "2024-06",
+   "tables": [
+    "2024-06-W3"
+   ],
+   "warnings": 2,
+   "added": [
+    "2024-06-W3"
+   ],
+   "replaced": []
+  },
+  "1491": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "1492": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "1493": {
+   "kind": "daily",
+   "issue": 588,
+   "month": "2024-06",
+   "tables": [
+    "2024-06-W4",
+    "2024-01-M",
+    "2024-02-M",
+    "2024-03-M",
+    "2024-04-M",
+    "2024-05-M",
+    "2024-06-M"
+   ],
+   "warnings": 6,
+   "added": [
+    "2024-06-W4"
+   ],
+   "replaced": []
+  },
+  "1494": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "1495": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "1496": {
+   "kind": "daily",
+   "issue": 589,
+   "month": "2024-07",
+   "tables": [
+    "2024-07-W1"
+   ],
+   "warnings": 2,
+   "added": [
+    "2024-07-W1"
+   ],
+   "replaced": []
+  },
+  "1497": {
+   "kind": "other",
+   "issue": null,
+   "month": "2024-07",
+   "tables": [],
+   "warnings": 0
+  },
+  "1498": {
+   "kind": "daily",
+   "issue": 590,
+   "month": "2024-07",
+   "tables": [
+    "2024-07-W2"
+   ],
+   "warnings": 2,
+   "added": [
+    "2024-07-W2"
+   ],
+   "replaced": []
+  },
+  "1499": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "1500": {
+   "kind": "daily",
+   "issue": 591,
+   "month": "2024-07",
+   "tables": [
+    "2024-07-W3"
+   ],
+   "warnings": 1,
+   "added": [
+    "2024-07-W3"
+   ],
+   "replaced": []
+  },
+  "1501": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "1502": {
+   "kind": "daily",
+   "issue": 592,
+   "month": "2024-07",
+   "tables": [
+    "2024-07-W4",
+    "2024-01-M",
+    "2024-02-M",
+    "2024-03-M",
+    "2024-04-M",
+    "2024-05-M",
+    "2024-06-M",
+    "2024-07-M"
+   ],
+   "warnings": 9,
+   "added": [
+    "2024-07-W4"
+   ],
+   "replaced": []
+  },
+  "1503": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "1504": {
+   "kind": "daily",
+   "issue": 593,
+   "month": "2024-08",
+   "tables": [
+    "2024-08-W4"
+   ],
+   "warnings": 1,
+   "added": [
+    "2024-08-W4"
+   ],
+   "replaced": []
+  },
+  "1505": {
+   "kind": "daily",
+   "issue": 594,
+   "month": "2024-08",
+   "tables": [
+    "2024-08-W5",
+    "2024-01-M",
+    "2024-02-M",
+    "2024-03-M",
+    "2024-04-M",
+    "2024-05-M",
+    "2024-06-M",
+    "2024-07-M",
+    "2024-08-M"
+   ],
+   "warnings": 8,
+   "added": [
+    "2024-08-W5"
+   ],
+   "replaced": []
+  },
+  "1506": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "1507": {
+   "kind": "daily",
+   "issue": 595,
+   "month": "2024-09",
+   "tables": [
+    "2024-09-W1"
+   ],
+   "warnings": 1,
+   "added": [
+    "2024-09-W1"
+   ],
+   "replaced": []
+  },
+  "1508": {
+   "kind": "daily",
+   "issue": 596,
+   "month": "2024-09",
+   "tables": [
+    "2024-09-W2"
+   ],
+   "warnings": 3,
+   "added": [
+    "2024-09-W2"
+   ],
+   "replaced": []
+  },
+  "1509": {
+   "kind": "daily",
+   "issue": 597,
+   "month": "2024-09",
+   "tables": [
+    "2024-09-W4",
+    "2024-01-M",
+    "2024-02-M",
+    "2024-03-M",
+    "2024-04-M",
+    "2024-05-M",
+    "2024-06-M",
+    "2024-07-M",
+    "2024-08-M",
+    "2024-09-M"
+   ],
+   "warnings": 8,
+   "added": [
+    "2024-09-W4"
+   ],
+   "replaced": []
+  },
+  "1510": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "1511": {
+   "kind": "daily",
+   "issue": 598,
+   "month": "2024-10",
+   "tables": [
+    "2024-10-W3"
+   ],
+   "warnings": 4,
+   "added": [
+    "2024-10-W3"
+   ],
+   "replaced": []
+  },
+  "1512": {
+   "kind": "daily",
+   "issue": 599,
+   "month": "2024-10",
+   "tables": [
+    "2024-10-W4"
+   ],
+   "warnings": 3,
+   "added": [
+    "2024-10-W4"
+   ],
+   "replaced": []
+  },
+  "1513": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "1514": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "1515": {
+   "kind": "daily",
+   "issue": 600,
+   "month": "2024-10",
+   "tables": [
+    "2024-10-W5",
+    "2024-01-M",
+    "2024-02-M",
+    "2024-03-M",
+    "2024-04-M",
+    "2024-05-M",
+    "2024-06-M",
+    "2024-07-M",
+    "2024-08-M",
+    "2024-09-M",
+    "2024-10-M"
+   ],
+   "warnings": 11,
+   "added": [
+    "2024-10-W5"
+   ],
+   "replaced": []
+  },
+  "1516": {
+   "kind": "daily",
+   "issue": 601,
+   "month": "2024-11",
+   "tables": [
+    "2024-11-W1"
+   ],
+   "warnings": 2,
+   "added": [
+    "2024-11-W1"
+   ],
+   "replaced": []
+  },
+  "1517": {
+   "kind": "daily",
+   "issue": 602,
+   "month": "2024-11",
+   "tables": [
+    "2024-11-W2"
+   ],
+   "warnings": 1,
+   "added": [
+    "2024-11-W2"
+   ],
+   "replaced": []
+  },
+  "1518": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "1519": {
+   "kind": "daily",
+   "issue": 603,
+   "month": "2024-11",
+   "tables": [
+    "2024-11-W3"
+   ],
+   "warnings": 1,
+   "added": [
+    "2024-11-W3"
+   ],
+   "replaced": []
+  },
+  "1520": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "1521": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "1522": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "1523": {
+   "kind": "daily",
+   "issue": 604,
+   "month": "2024-11",
+   "tables": [
+    "2024-11-W4",
+    "2024-01-M",
+    "2024-02-M",
+    "2024-03-M",
+    "2024-04-M",
+    "2024-05-M",
+    "2024-06-M",
+    "2024-07-M",
+    "2024-08-M",
+    "2024-09-M",
+    "2024-10-M",
+    "2024-11-M"
+   ],
+   "warnings": 11,
+   "added": [
+    "2024-11-W4"
+   ],
+   "replaced": [
+    "2024-01-M",
+    "2024-02-M",
+    "2024-03-M",
+    "2024-04-M",
+    "2024-05-M",
+    "2024-06-M",
+    "2024-07-M",
+    "2024-08-M",
+    "2024-09-M",
+    "2024-10-M"
+   ]
+  },
+  "1524": {
+   "kind": "daily",
+   "issue": 605,
+   "month": "2024-12",
+   "tables": [
+    "2024-12-W1"
+   ],
+   "warnings": 1,
+   "added": [
+    "2024-12-W1"
+   ],
+   "replaced": []
+  },
+  "1525": {
+   "kind": "daily",
+   "issue": 606,
+   "month": "2024-12",
+   "tables": [
+    "2024-12-W2"
+   ],
+   "warnings": 2,
+   "added": [
+    "2024-12-W2"
+   ],
+   "replaced": []
+  },
+  "1526": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "1527": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "1528": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "1529": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "1530": {
+   "kind": "daily",
+   "issue": 607,
+   "month": "2024-12",
+   "tables": [],
+   "warnings": 0
+  },
+  "1531": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "1532": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "1533": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "1534": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [
+    "2024-01-M",
+    "2024-02-M",
+    "2024-03-M",
+    "2024-04-M",
+    "2024-05-M",
+    "2024-06-M",
+    "2024-07-M",
+    "2024-08-M",
+    "2024-09-M",
+    "2024-10-M",
+    "2024-11-M",
+    "2024-12-M"
+   ],
+   "warnings": 12,
+   "skipped": [
+    {
+     "page": 53,
+     "reason": "조사 기간을 읽지 못함",
+     "head": "조사완료 가중적용 윤석열 대통령 직무 수행 평가 2024년 1~12월 사례수 사례수 잘하고 잘못하고 어느 쪽도 모름/ 연간 통합 (명) (명) 있다 있다 아니다 응답거절"
+    }
+   ],
+   "added": [
+    "2024-01-M",
+    "2024-02-M",
+    "2024-03-M",
+    "2024-04-M",
+    "2024-05-M",
+    "2024-06-M",
+    "2024-07-M",
+    "2024-08-M",
+    "2024-09-M",
+    "2024-10-M",
+    "2024-11-M",
+    "2024-12-M"
+   ],
+   "replaced": []
+  },
+  "1535": {
+   "kind": "daily",
+   "issue": 608,
+   "month": "2025-01",
+   "tables": [],
+   "warnings": 0
+  },
+  "1536": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "1537": {
+   "kind": "daily",
+   "issue": 609,
+   "month": "2025-01",
+   "tables": [],
+   "warnings": 0
+  },
+  "1538": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "1539": {
+   "kind": "daily",
+   "issue": 610,
+   "month": "2025-01",
+   "tables": [],
+   "warnings": 0
+  },
+  "1540": {
+   "kind": "daily",
+   "issue": 611,
+   "month": "2025-02",
+   "tables": [],
+   "warnings": 0
+  },
+  "1541": {
+   "kind": "daily",
+   "issue": 612,
+   "month": "2025-02",
+   "tables": [],
+   "warnings": 0
+  },
+  "1542": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "1543": {
+   "kind": "daily",
+   "issue": 613,
+   "month": "2025-02",
+   "tables": [],
+   "warnings": 0
+  },
+  "1544": {
+   "kind": "daily",
+   "issue": 614,
+   "month": "2025-03",
+   "tables": [],
+   "warnings": 0
+  },
   "1545": {
    "kind": "daily",
    "issue": 615,
@@ -54,14 +696,8 @@
    "kind": "daily",
    "issue": 620,
    "month": "2025-04",
-   "tables": [
-    "2025-04-W3"
-   ],
-   "warnings": 0,
-   "added": [
-    "2025-04-W3"
-   ],
-   "replaced": []
+   "tables": [],
+   "warnings": 0
   },
   "1553": {
    "kind": "other",
@@ -1245,10 +1881,8 @@
  "backfill": {
   "since": "2012-01",
   "done": false,
-  "next": 1544,
-  "misses": 7
+  "next": 1484,
+  "misses": 0
  },
- "reprocess": [
-  1552
- ]
+ "reprocess": []
 }
