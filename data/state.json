@@ -1,0 +1,8 @@
+{
+ "lastSeq": 1666,
+ "processed": {
+  "1665": { "kind": "daily", "issue": 680, "month": "2026-10" },
+  "1666": { "kind": "daily", "issue": 681, "month": "2026-11" }
+ },
+ "backfill": { "since": "2025-06", "done": false, "next": 1664 }
+}

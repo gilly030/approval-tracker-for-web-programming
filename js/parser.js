@@ -403,6 +403,9 @@ export async function parseGallupPdf(pdfjsLib, data, opts = {}) {
     }
   }
   result.issue = +((firstText.match(/제\s*(\d+)\s*호/) || [])[1] || 0) || null;
+  // 리포트가 다루는 연·월 (대통령 평가 표가 없는 리포트도 날짜는 알 수 있게)
+  const rp = firstText.match(/제\s*\d+\s*호\s*\(?\s*(\d{4})\s*년\s*(\d{1,2})\s*월/) || firstText.match(/(\d{4})\s*년\s*(\d{1,2})\s*월\s*\d\s*주/);
+  result.reportMonth = rp ? `${rp[1]}-${String(rp[2]).padStart(2, '0')}` : null;
   // 같은 기간이 여러 번 나오면 첫 번째만
   const seen = new Set();
   result.tables = result.tables.filter((t) => (seen.has(t.key) ? false : seen.add(t.key)));

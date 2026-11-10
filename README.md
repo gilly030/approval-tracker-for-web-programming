@@ -9,15 +9,31 @@ index.html          공개 페이지 (외부 라이브러리 없음, 차트는 S
 admin.html          관리자 페이지: PDF를 올려 data.json에 반영
 css/style.css
 js/app.js           공개 페이지 로직
+js/linechart.js     Gallup 리포트식 선 그래프 (범례 강조, 점 주석, 데이터·이미지 내보내기)
 js/admin.js         관리자 페이지 로직 (pdf.js를 CDN에서 불러옴)
 js/parser.js        PDF → 표 추출기 (브라우저·Node 공용)
 js/normalize.js     시기마다 다른 배너·그룹 이름을 하나로 묶는 표
 js/merge.js         추출 결과를 data.json에 병합
 data/data.json      사이트가 읽는 데이터
+data/state.json     자동 갱신이 어디까지 처리했는지 기록
+tools/update.mjs    자동 갱신 스크립트 (GitHub Actions에서 실행)
 tools/parse-node.mjs  (선택) 같은 파서를 Node에서 돌리는 명령줄 도구
+.github/workflows/update.yml  매일 두 번 자동 갱신
 ```
 
-## 새 리포트 반영하기 (2주에 한 번 정도, 1~2분)
+## 자동 갱신 (기본)
+
+`.github/workflows/update.yml`이 매일 두 번(한국시간 11:23, 19:23) 실행됩니다.
+
+1. 갤럽 리포트 게시판에서 가장 큰 게시물 번호를 확인합니다.
+2. `data/state.json`의 `lastSeq`보다 큰 번호의 PDF를 받아 파싱하고 `data/data.json`에 반영합니다.
+3. `state.backfill`이 끝나지 않았으면 과거 번호로 내려가며 한 번에 최대 40개씩 채웁니다. 2025년 6월 이전 리포트를 만나면 멈춥니다.
+4. 데이터가 바뀌었을 때만 커밋하고 GitHub Pages를 다시 배포합니다.
+
+바로 돌려보려면 저장소의 **Actions → 갤럽 리포트 자동 반영 → Run workflow**를 누르세요. 실행 기록에 받은 리포트와 경고가 남습니다.
+게시판 구조가 바뀌어 번호를 못 찾으면 실행이 실패로 표시되고, GitHub이 저장소 주인에게 메일을 보냅니다.
+
+## 수동 반영 (자동 갱신이 막혔을 때)
 
 1. 갤럽 리포트 게시판에서 새 "데일리 오피니언" PDF를 받습니다.
 2. `admin.html`을 열고 PDF를 끌어다 놓습니다.

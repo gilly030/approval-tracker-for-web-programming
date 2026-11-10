@@ -4,10 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>대통령 직무평가 트래커</title>
+<meta name="description" content="한국갤럽 데일리 오피니언의 대통령 직무 수행 평가를 매주 자동으로 모아 응답자 특성별로 보여줍니다.">
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+KR:wght@400;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+KR:ital,wght@0,400;0,600;0,700;1,400&display=swap">
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -18,6 +19,25 @@
   </header>
 
   <section class="headline" id="headline" aria-live="polite"></section>
+
+  <section class="figure" id="main" aria-labelledby="main-title">
+    <h2 id="main-title" class="fig-title">대통령 직무 수행 평가</h2>
+    <p class="fig-q" id="main-q">귀하는 요즘 대통령이 대통령으로서의 직무를 잘 수행하고 있다고 보십니까, 아니면 잘못 수행하고 있다고 보십니까?</p>
+    <p class="fig-measure" id="main-measure">%</p>
+    <div class="lc-legend" id="main-legend"></div>
+    <div class="chart" id="main-chart"></div>
+    <p class="fig-note" id="main-note"></p>
+    <div class="fig-foot">
+      <span><a href="#" data-export="csv:main">데이터 받기</a> · <a href="#" data-export="png:main">이미지 저장</a></span>
+      <span class="fig-src">자료: 한국갤럽 데일리 오피니언</span>
+    </div>
+    <details class="tbl"><summary>조사별 수치</summary><div class="tbl-wrap" id="main-table"></div></details>
+  </section>
+
+  <div class="section-head">
+    <h2>응답자 특성별로 보기</h2>
+    <p class="hint">지역·성·연령·지지정당 같은 특성(배너)을 고르면 그 조사의 그룹별 평가와 추이를 보여줍니다. 배너 구성은 조사마다 다를 수 있어요.</p>
+  </div>
 
   <section class="controls" aria-label="조사 선택">
     <div class="seg" role="group" aria-label="조사 종류">
@@ -42,18 +62,25 @@
     <details class="tbl"><summary>표로 보기</summary><div class="tbl-wrap" id="snap-table"></div></details>
   </section>
 
-  <section class="panel" id="trend">
+  <section class="figure" id="trend" aria-labelledby="trend-title">
     <div class="panel-head">
-      <h2 id="trend-title">추이</h2>
+      <div>
+        <h2 id="trend-title" class="fig-title">추이</h2>
+        <p class="fig-measure" id="trend-sub"></p>
+      </div>
       <div class="seg" role="group" aria-label="지표">
         <button type="button" id="m-pos" data-metric="pos" aria-pressed="true">긍정률</button>
         <button type="button" id="m-neg" data-metric="neg" aria-pressed="false">부정률</button>
         <button type="button" id="m-net" data-metric="net" aria-pressed="false">긍정−부정</button>
       </div>
     </div>
-    <div class="legend" id="legend" aria-label="그룹 선택 (최대 6개)"></div>
+    <div class="legend" id="legend" aria-label="비교할 그룹 (최대 6개)"></div>
     <div class="chart" id="chart"></div>
-    <p class="hint" id="trend-hint"></p>
+    <p class="fig-note" id="trend-hint"></p>
+    <div class="fig-foot">
+      <span><a href="#" data-export="csv:trend">데이터 받기</a> · <a href="#" data-export="png:trend">이미지 저장</a></span>
+      <span class="fig-src">자료: 한국갤럽 데일리 오피니언</span>
+    </div>
   </section>
 
   <footer class="notes">
@@ -61,6 +88,7 @@
     <p>의견유보는 '어느 쪽도 아님'과 '모름/응답거절'의 합입니다. 2012~2013년 자료는 '보통'을 의견유보에 포함했습니다.</p>
     <p>표본오차는 무작위추출을 가정한 95% 신뢰수준 최대허용오차(±1.96·√(0.25/n))입니다. 사례수 100명 미만 그룹은 흐리게 표시하며, 갤럽이 수치를 공개하지 않은 소집단은 '미공개'로 둡니다.</p>
     <p>시기마다 그룹 이름이 다른 경우(예: 19~29세 → 18~29세, 블루칼라 → 기능노무/서비스) 같은 집단으로 묶어 이어 그렸습니다. 원래 표기는 그룹 이름 아래 작게 적었습니다.</p>
+    <p>데이터는 매일 두 번 갤럽 리포트 게시판을 확인해 새 리포트가 있으면 자동으로 갱신됩니다.</p>
   </footer>
 </main>
 <script type="module" src="js/app.js"></script>

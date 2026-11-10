@@ -1,18 +1,19 @@
-/* 레이아웃: 위에 최신 수치 한 줄, 아래로 '배너 선택 → 특성별 막대 → 추이선' 순서의 한 열 도구 화면 */
+/* 레이아웃: 맨 위 최신 수치 → Gallup 리포트식 메인 그래프 → 배너 선택 → 특성별 막대 → 배너별 추이. 한 열. */
 :root {
-  --bg: #f6f6f3;
-  --surface: #fcfcfb;
-  --ink: #111214;
-  --ink-2: #4f5157;
-  --muted: #85868a;
-  --line: #e2e1db;
-  --axis: #c3c2b7;
-  --pos: #2a78d6;      /* 잘하고 있다 */
-  --neg: #e34948;      /* 잘못하고 있다 */
-  --mid: #cfcec7;      /* 의견유보 */
+  --bg: #f2f5f0;        /* 옅은 초록빛 회색 바탕 */
+  --surface: #f9fbf7;
+  --ink: #141714;
+  --ink-2: #4b524b;
+  --muted: #7d847c;
+  --line: #dde3d9;
+  --axis: #b9c1b5;
+  --band: #e4ebe1;
+  --pos: #0b7a43;       /* 잘하고 있다: 초록 */
+  --neg: #2b4fa3;       /* 잘못하고 있다: 남색 */
+  --mid: #c8cfc4;       /* 의견유보 */
   --on-fill: #ffffff;
-  --chip: #ecebe6;
-  --focus: #2a78d6;
+  --chip: #e6ebe3;
+  --focus: #0b7a43;
   --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a; --s4: #eda100;
   --s5: #e87ba4; --s6: #6250d6;
   --font-body: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
@@ -21,17 +22,17 @@
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #0f0f10; --surface: #1a1a19; --ink: #f0efec; --ink-2: #c3c2b7; --muted: #8f8e88;
-    --line: #2c2c2a; --axis: #3a3a37; --pos: #3987e5; --neg: #e66767; --mid: #4a4a46;
-    --chip: #262624; --focus: #6da7ec;
+    --bg: #111411; --surface: #171a17; --ink: #eef1ec; --ink-2: #c1c8bf; --muted: #8b9389;
+    --line: #283028; --axis: #3b443a; --band: #1d231d; --pos: #2fa264; --neg: #6e91e2; --mid: #464f45;
+    --chip: #222822; --focus: #2fa264;
     --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --s5: #d55181; --s6: #9085e9;
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --bg: #0f0f10; --surface: #1a1a19; --ink: #f0efec; --ink-2: #c3c2b7; --muted: #8f8e88;
-  --line: #2c2c2a; --axis: #3a3a37; --pos: #3987e5; --neg: #e66767; --mid: #4a4a46;
-  --chip: #262624; --focus: #6da7ec;
+  --bg: #111411; --surface: #171a17; --ink: #eef1ec; --ink-2: #c1c8bf; --muted: #8b9389;
+  --line: #283028; --axis: #3b443a; --band: #1d231d; --pos: #2fa264; --neg: #6e91e2; --mid: #464f45;
+  --chip: #222822; --focus: #2fa264;
   --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --s5: #d55181; --s6: #9085e9;
   color-scheme: dark;
 }
@@ -124,15 +125,6 @@ select { font: inherit; font-size: 14px; color: var(--ink); background: var(--su
 .legend button:disabled { cursor: not-allowed; opacity: 0.5; }
 .chart { position: relative; min-width: 0; }
 .chart svg { display: block; width: 100%; height: auto; overflow: visible; }
-.chart text { font-family: var(--font-num); font-size: 11px; fill: var(--muted); }
-.chart .grid { stroke: var(--line); stroke-width: 1; }
-.chart .base { stroke: var(--axis); stroke-width: 1; }
-.chart .endlabel { font-family: var(--font-body); font-size: 12px; fill: var(--ink-2); }
-.tip { position: absolute; pointer-events: none; background: var(--surface); border: 1px solid var(--line); box-shadow: 0 4px 16px rgb(0 0 0 / 0.12); border-radius: 6px; padding: 8px 10px; font-size: 12.5px; min-width: 170px; z-index: 2; }
-.tip b { display: block; font-size: 12.5px; margin-bottom: 4px; }
-.tip .tr { display: flex; align-items: center; gap: 6px; justify-content: space-between; }
-.tip .tr span:first-child { display: inline-flex; align-items: center; gap: 6px; color: var(--ink-2); }
-.tip i { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
 .empty { font-size: 14px; color: var(--ink-2); padding: 18px; border: 1px dashed var(--line); border-radius: 6px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
 .btn { font: inherit; font-size: 13.5px; border: 1px solid var(--axis); background: var(--surface); color: var(--ink); padding: 6px 12px; border-radius: 6px; cursor: pointer; }
 .btn.primary { background: var(--ink); color: var(--bg); border-color: var(--ink); }
@@ -174,3 +166,47 @@ td:first-child { font-family: var(--font-body); }
 .warns { margin: 0; padding-left: 18px; font-size: 13px; color: var(--ink-2); }
 .actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 textarea { width: 100%; min-height: 120px; font: 12px/1.4 var(--font-num); background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: 6px; padding: 8px; }
+
+/* ---------- Gallup식 그래프 ---------- */
+.figure { display: grid; gap: 10px; min-width: 0; border-top: 2px solid var(--ink); padding-top: 18px; }
+.fig-title { font-size: clamp(20px, 3.2vw, 26px); font-weight: 700; letter-spacing: -0.015em; line-height: 1.25; }
+.fig-q { margin: 0; font-style: italic; color: var(--ink-2); font-size: 15.5px; max-width: 62ch; line-height: 1.5; }
+.fig-measure { margin: 0; font-weight: 700; font-size: 15px; }
+.fig-note { margin: 0; font-size: 12.5px; color: var(--muted); max-width: 80ch; }
+.fig-foot { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 16px; font-size: 13px; color: var(--ink-2); }
+.fig-foot a { color: var(--ink-2); text-decoration: none; border-bottom: 1px solid var(--axis); }
+.fig-foot a:hover { color: var(--ink); border-color: var(--ink); }
+.fig-src { font-family: var(--font-display); font-weight: 700; letter-spacing: 0.02em; color: var(--ink-2); }
+.section-head { display: grid; gap: 4px; margin-top: 12px; }
+.section-head h2 { font-size: 20px; }
+.section-head .hint { margin: 0; max-width: 72ch; }
+
+.lc-legend { display: flex; flex-wrap: wrap; gap: 4px 22px; }
+.lc-key { font: inherit; font-size: 15px; background: none; border: 0; padding: 2px 0; color: var(--ink); display: inline-flex; align-items: center; gap: 8px; cursor: pointer; transition: opacity .15s; }
+.lc-key i { width: 18px; height: 3px; border-radius: 2px; background: var(--c); }
+.lc-key.dim { opacity: 0.35; }
+.lc-key[aria-pressed="true"] { text-decoration: underline; text-underline-offset: 4px; }
+
+.chart svg:focus { outline: none; }
+.chart svg:focus-visible { outline: 2px solid var(--focus); outline-offset: 4px; border-radius: 4px; }
+.lc-grid { stroke: var(--line); stroke-width: 1; }
+.lc-zero, .lc-axis { stroke: var(--axis); stroke-width: 1; }
+.lc-tickline { stroke: var(--axis); }
+.lc-tick { font-family: var(--font-body); font-size: 12.5px; fill: var(--ink-2); }
+.lc-year { font-size: 11.5px; fill: var(--muted); }
+.lc-series { transition: opacity .15s; }
+.lc-series.dim { opacity: 0.2; }
+.lc-line { fill: none; stroke: var(--c); stroke-width: 2.5; stroke-linejoin: round; stroke-linecap: round; }
+.lc-dot { fill: var(--c); stroke: var(--bg); stroke-width: 1.5; }
+.lc-dot.hollow { fill: var(--bg); stroke: var(--c); stroke-width: 1.8; }
+.lc-end { transition: opacity .15s; }
+.lc-end.dim { opacity: 0.25; }
+.lc-enddot { fill: var(--c); stroke: var(--bg); stroke-width: 2; }
+.lc-endval { font-family: var(--font-body); font-size: 15px; fill: var(--ink); font-variant-numeric: tabular-nums; }
+.lc-ring { fill: var(--bg); stroke: var(--c); stroke-width: 2; }
+.lc-ann { font-family: var(--font-body); font-size: 13px; fill: var(--ink); paint-order: stroke; stroke: var(--bg); stroke-width: 5px; stroke-linejoin: round; }
+.lc-ann-name { font-weight: 700; }
+.lc-ann-val { font-variant-numeric: tabular-nums; }
+.lc-ann-n { fill: var(--muted); }
+#trend .legend { margin-top: 2px; }
+@media (prefers-reduced-motion: reduce) { .lc-series, .lc-end, .lc-key { transition: none; } }
