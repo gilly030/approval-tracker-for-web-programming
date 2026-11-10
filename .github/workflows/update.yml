@@ -4,11 +4,14 @@ on:
   schedule:
     # 매일 11:23, 19:23 (한국시간). 갤럽은 보통 금요일 오후에 새 리포트를 올린다.
     - cron: "23 2,10 * * *"
+  push:
+    # 관리자 페이지에서 받은 data.json을 올렸을 때도 사이트용 파일을 다시 만든다
+    paths: ["data/data.json"]
   workflow_dispatch:
     inputs:
       max:
         description: "과거 채우기 때 한 번에 받을 리포트 수"
-        default: "40"
+        default: "60"
 
 permissions:
   contents: write
@@ -21,7 +24,7 @@ concurrency:
 jobs:
   update:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
 
@@ -33,12 +36,17 @@ jobs:
         run: npm install --no-audit --no-fund
 
       - name: 새 리포트 확인·반영
-        run: node tools/update.mjs --max "${{ github.event.inputs.max || '40' }}"
+        if: github.event_name != 'push'
+        run: node tools/update.mjs --max "${{ github.event.inputs.max || '60' }}"
+
+      - name: 사이트용 파일 만들기 (index.json, years/)
+        if: always()
+        run: node tools/build-data.mjs
 
       - name: 바뀐 데이터 커밋
         id: commit
         run: |
-          if git diff --quiet -- data/; then
+          if [ -z "$(git status --porcelain -- data/)" ]; then
             echo "바뀐 데이터 없음"
             echo "pushed=false" >> "$GITHUB_OUTPUT"
             exit 0
@@ -47,6 +55,7 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add data/
           git commit -m "데이터 갱신: $(date -u +%Y-%m-%d)"
+          git pull --rebase -q origin "${GITHUB_REF_NAME}"
           git push
           echo "pushed=true" >> "$GITHUB_OUTPUT"
 

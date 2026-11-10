@@ -23,7 +23,22 @@
   <section class="figure" id="main" aria-labelledby="main-title">
     <h2 id="main-title" class="fig-title">대통령 직무 수행 평가</h2>
     <p class="fig-q" id="main-q">귀하는 요즘 대통령이 대통령으로서의 직무를 잘 수행하고 있다고 보십니까, 아니면 잘못 수행하고 있다고 보십니까?</p>
-    <p class="fig-measure" id="main-measure">%</p>
+    <p class="fig-measure">% · 매주 조사</p>
+    <div class="range" role="group" aria-label="기간">
+      <div class="seg">
+        <button type="button" id="r-3m" data-range="3m" aria-pressed="false">3개월</button>
+        <button type="button" id="r-6m" data-range="6m" aria-pressed="false">6개월</button>
+        <button type="button" id="r-1y" data-range="1y" aria-pressed="false">1년</button>
+        <button type="button" id="r-term" data-range="term" aria-pressed="true">현 임기</button>
+        <button type="button" id="r-all" data-range="all" aria-pressed="false">전체</button>
+      </div>
+      <span class="range-custom" id="range-custom">
+        <label for="range-from">시작</label><input type="month" id="range-from">
+        <label for="range-to">끝</label><input type="month" id="range-to">
+      </span>
+      <span class="range-info" id="range-info"></span>
+    </div>
+    <p class="backfill" id="backfill" hidden></p>
     <div class="lc-legend" id="main-legend"></div>
     <div class="chart" id="main-chart"></div>
     <p class="fig-note" id="main-note"></p>
@@ -31,12 +46,12 @@
       <span><a href="#" data-export="csv:main">데이터 받기</a> · <a href="#" data-export="png:main">이미지 저장</a></span>
       <span class="fig-src">자료: 한국갤럽 데일리 오피니언</span>
     </div>
-    <details class="tbl"><summary>조사별 수치</summary><div class="tbl-wrap" id="main-table"></div></details>
+    <details class="tbl"><summary>조사별 수치 <span id="main-table-count"></span></summary><div class="tbl-wrap" id="main-table"></div></details>
   </section>
 
   <div class="section-head">
     <h2>응답자 특성별로 보기</h2>
-    <p class="hint">지역·성·연령·지지정당 같은 특성(배너)을 고르면 그 조사의 그룹별 평가와 추이를 보여줍니다. 배너 구성은 조사마다 다를 수 있어요.</p>
+    <p class="hint">지역·성·연령·지지정당 같은 특성(배너)을 고르면 그 조사의 그룹별 평가를 보여주고, 아래 추이 그래프는 위에서 고른 기간을 따릅니다. 배너 구성은 조사마다 다를 수 있어요.</p>
   </div>
 
   <section class="controls" aria-label="조사 선택">
@@ -88,7 +103,7 @@
     <p>의견유보는 '어느 쪽도 아님'과 '모름/응답거절'의 합입니다. 2012~2013년 자료는 '보통'을 의견유보에 포함했습니다.</p>
     <p>표본오차는 무작위추출을 가정한 95% 신뢰수준 최대허용오차(±1.96·√(0.25/n))입니다. 사례수 100명 미만 그룹은 흐리게 표시하며, 갤럽이 수치를 공개하지 않은 소집단은 '미공개'로 둡니다.</p>
     <p>시기마다 그룹 이름이 다른 경우(예: 19~29세 → 18~29세, 블루칼라 → 기능노무/서비스) 같은 집단으로 묶어 이어 그렸습니다. 원래 표기는 그룹 이름 아래 작게 적었습니다.</p>
-    <p>데이터는 매일 두 번 갤럽 리포트 게시판을 확인해 새 리포트가 있으면 자동으로 갱신됩니다.</p>
+    <p>데이터는 매일 두 번 갤럽 리포트 게시판을 확인해 새 리포트가 있으면 자동으로 갱신됩니다. 조사가 없던 기간(대통령 직무 정지·궐위 등)은 선을 끊어 표시합니다.</p>
   </footer>
 </main>
 <script type="module" src="js/app.js"></script>

@@ -14,7 +14,10 @@ js/admin.js         관리자 페이지 로직 (pdf.js를 CDN에서 불러옴)
 js/parser.js        PDF → 표 추출기 (브라우저·Node 공용)
 js/normalize.js     시기마다 다른 배너·그룹 이름을 하나로 묶는 표
 js/merge.js         추출 결과를 data.json에 병합
-data/data.json      사이트가 읽는 데이터
+data/data.json      원본 데이터 (자동 갱신·관리자 페이지가 고침)
+data/index.json     사이트가 먼저 읽는 요약: 모든 조사의 전체 수치와 배너 목록 (자동 생성)
+data/years/*.json   연도별 응답자 특성별 상세, 배너를 볼 때만 읽음 (자동 생성)
+tools/build-data.mjs  data.json → index.json, years/ 생성
 data/state.json     자동 갱신이 어디까지 처리했는지 기록
 tools/update.mjs    자동 갱신 스크립트 (GitHub Actions에서 실행)
 tools/parse-node.mjs  (선택) 같은 파서를 Node에서 돌리는 명령줄 도구
@@ -27,8 +30,11 @@ tools/parse-node.mjs  (선택) 같은 파서를 Node에서 돌리는 명령줄 �
 
 1. 갤럽 리포트 게시판에서 가장 큰 게시물 번호를 확인합니다.
 2. `data/state.json`의 `lastSeq`보다 큰 번호의 PDF를 받아 파싱하고 `data/data.json`에 반영합니다.
-3. `state.backfill`이 끝나지 않았으면 과거 번호로 내려가며 한 번에 최대 40개씩 채웁니다. 2025년 6월 이전 리포트를 만나면 멈춥니다.
-4. 데이터가 바뀌었을 때만 커밋하고 GitHub Pages를 다시 배포합니다.
+3. `state.backfill`이 끝나지 않았으면 과거 번호로 내려가며 한 번에 최대 60개씩 채웁니다. 2012년 1월(데일리 오피니언 시작) 이전에 닿거나 평가 표가 있는 리포트가 더 나오지 않으면 멈춥니다. 하루 두 번이라 2012년까지 다 채우는 데 1주일쯤 걸립니다.
+4. `tools/build-data.mjs`가 `data/index.json`(요약)과 `data/years/연도.json`(배너 상세)을 만듭니다.
+5. 데이터가 바뀌었을 때만 커밋하고 GitHub Pages를 다시 배포합니다.
+
+관리자 페이지에서 받은 `data.json`을 올려도 같은 워크플로가 4~5번을 실행합니다.
 
 바로 돌려보려면 저장소의 **Actions → 갤럽 리포트 자동 반영 → Run workflow**를 누르세요. 실행 기록에 받은 리포트와 경고가 남습니다.
 게시판 구조가 바뀌어 번호를 못 찾으면 실행이 실패로 표시되고, GitHub이 저장소 주인에게 메일을 보냅니다.

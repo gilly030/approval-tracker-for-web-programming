@@ -23,7 +23,7 @@ export function lineChart(el, o) {
   const W = Math.max(300, Math.round(el.clientWidth || 800));
   const narrow = W < 560;
   const H = o.height ?? (narrow ? 300 : 380);
-  const m = { t: 18, r: narrow ? 34 : 46, b: 44, l: 40 };
+  const m = { t: o.bands?.length ? 26 : 18, r: narrow ? 34 : 46, b: 44, l: 40 };
   const iw = W - m.l - m.r, ih = H - m.t - m.b;
 
   // ---- 눈금 ----
@@ -40,6 +40,13 @@ export function lineChart(el, o) {
   const Y = (v) => m.t + ih - ((v - lo) / (hi - lo)) * ih;
 
   let s = `<svg viewBox="0 0 ${W} ${H}" role="img" tabindex="0" aria-label="${esc(o.ariaLabel || '선 그래프')}">`;
+  // 구간 띠 (예: 대통령 임기). 번갈아 음영, 폭이 넉넉하면 위에 이름
+  (o.bands || []).forEach((b, i) => {
+    const x0 = Math.max(m.l, X(b.x0)), x1 = Math.min(m.l + iw, X(b.x1));
+    if (x1 - x0 < 1) return;
+    if (i % 2 === (o.bands.length % 2 === 0 ? 1 : 0)) s += `<rect class="lc-band" x="${x0}" y="${m.t}" width="${x1 - x0}" height="${ih}"/>`;
+    if (x1 - x0 > 46) s += `<text class="lc-bandlabel" x="${x0 + 6}" y="${m.t + 14}">${esc(b.label)}</text>`;
+  });
   for (let v = lo; v <= hi; v += step) {
     s += `<line class="lc-grid${v === 0 ? ' lc-zero' : ''}" x1="${m.l}" x2="${m.l + iw}" y1="${Y(v)}" y2="${Y(v)}"/>`;
     s += `<text class="lc-tick" x="${m.l - 8}" y="${Y(v) + 4}" text-anchor="end">${v}${v === hi ? esc(o.unit || '') : ''}</text>`;
@@ -47,19 +54,23 @@ export function lineChart(el, o) {
   // x축: 월 단위 눈금, 1월과 첫 눈금에는 연도
   const d0 = new Date(t0), d1 = new Date(t1);
   const months = (d1.getFullYear() - d0.getFullYear()) * 12 + d1.getMonth() - d0.getMonth() + 1;
-  const every = [1, 2, 3, 4, 6, 12].find((k) => months / k <= (narrow ? 5 : 9)) || 12;
+  const every = [1, 2, 3, 4, 6, 12, 24, 36, 60].find((k) => months / k <= (narrow ? 5 : 9)) || 60;
   const ticks = [];
-  for (let i = 0; i <= months; i++) {
+  for (let i = 0; i <= months + 1; i++) {
     const d = new Date(d0.getFullYear(), d0.getMonth() + i, 1);
     if (+d < t0 - pad || +d > t1 + pad) continue;
-    if ((d.getMonth()) % every !== 0 && every !== 1) continue;
+    if (every >= 12 ? d.getMonth() !== 0 || d.getFullYear() % (every / 12) !== 0 : d.getMonth() % every !== 0) continue;
     ticks.push(d);
   }
   if (!ticks.length) ticks.push(new Date(t0));
   ticks.forEach((d, i) => {
     const x = X(d);
-    const yr = i === 0 || d.getMonth() === 0;
     s += `<line class="lc-tickline" x1="${x}" x2="${x}" y1="${m.t + ih}" y2="${m.t + ih + 5}"/>`;
+    if (every >= 12) {
+      s += `<text class="lc-tick" x="${x}" y="${m.t + ih + 19}" text-anchor="middle">${d.getFullYear()}</text>`;
+      return;
+    }
+    const yr = i === 0 || d.getMonth() === 0;
     s += `<text class="lc-tick" x="${x}" y="${m.t + ih + 19}" text-anchor="middle">${d.getMonth() + 1}월</text>`;
     if (yr) s += `<text class="lc-tick lc-year" x="${x}" y="${m.t + ih + 34}" text-anchor="middle">${d.getFullYear()}</text>`;
   });

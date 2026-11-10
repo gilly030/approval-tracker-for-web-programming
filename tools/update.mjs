@@ -26,7 +26,7 @@ const PDF_OPTS = { cMapUrl: PDFJS + '/cmaps/', cMapPacked: true, standardFontDat
 
 const args = process.argv.slice(2);
 const DRY = args.includes('--dry-run');
-const BACKFILL_PER_RUN = Number(args[args.indexOf('--max') + 1]) || 40;
+const BACKFILL_PER_RUN = Number(args[args.indexOf('--max') + 1]) || 60;
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const log = (...a) => console.log(...a);
 
@@ -119,6 +119,9 @@ if (bf && !bf.done) {
     count++;
     log(`  과거 번호 ${seq} → ${info.kind}${info.issue ? ` 제${info.issue}호 ${info.month ?? ''}` : ''}${info.tables?.length ? ` [${info.tables.join(', ')}]` : ''}`);
     if (info.added?.length || info.replaced?.length) changed = true;
+    // 대통령 평가 표가 없는 번호가 오래 이어지면(데일리 오피니언 이전 시기) 끝낸다
+    bf.misses = info.tables?.length ? 0 : (bf.misses || 0) + 1;
+    if (bf.misses >= 80) { bf.done = true; log('  평가 표가 있는 리포트가 더 나오지 않아 과거 채우기를 마쳤어요.'); break; }
     if (info.kind === 'daily' && info.month && info.month < bf.since) {
       bf.olderSeen = (bf.olderSeen || 0) + 1;
       if (bf.olderSeen >= 2) { bf.done = true; log(`  ${bf.since} 이전 리포트에 도달해 과거 채우기를 마쳤어요.`); break; }
