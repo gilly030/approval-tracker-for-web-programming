@@ -47,16 +47,18 @@ export function titlesFromHtml(html) {
   return out;
 }
 
-async function get(url, tries = 3) {
+// 갤럽 서버가 가끔 응답하지 않는다: 간격을 늘려 가며 5번까지 다시 시도
+async function get(url, tries = 5) {
   for (let i = 1; i <= tries; i++) {
     try {
-      const res = await fetch(url, { headers: { 'User-Agent': UA, 'Accept-Language': 'ko-KR,ko;q=0.9' }, redirect: 'follow' });
+      const res = await fetch(url, { headers: { 'User-Agent': UA, 'Accept-Language': 'ko-KR,ko;q=0.9' }, redirect: 'follow', signal: AbortSignal.timeout(60000) });
       if (res.status === 404) return { status: 404 };
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       return { status: res.status, buf: Buffer.from(await res.arrayBuffer()), type: res.headers.get('content-type') || '' };
     } catch (err) {
       if (i === tries) throw err;
-      await sleep(2000 * i);
+      log(`  (접속 실패 ${i}/${tries}: ${err.cause?.code || err.message}, ${5 * 2 ** (i - 1)}초 뒤 다시 시도)`);
+      await sleep(5000 * 2 ** (i - 1));
     }
   }
 }
@@ -91,65 +93,81 @@ async function processSeq(seq, since = null, force = false) {
 }
 
 // ---------- 실행 ----------
-const listRes = await get(LIST_URL);
-const html = listRes.buf.toString('utf8');
-const latest = latestSeqFromHtml(html);
-if (!latest) { console.error('게시판에서 게시물 번호를 찾지 못했어요. 페이지 구조가 바뀌었을 수 있어요.'); process.exit(1); }
-const titles = titlesFromHtml(html);
-log(`게시판 최신 번호: ${latest} (저장된 마지막 번호: ${state.lastSeq})`);
-
+// 접속이 중간에 끊겨도 그때까지 받은 것은 저장한다.
 let changed = false;
+let structureError = false;
+async function run() {
+  const listRes = await get(LIST_URL);
+  const html = listRes.buf.toString('utf8');
+  const latest = latestSeqFromHtml(html);
+  if (!latest) { structureError = true; throw new Error('게시판에서 게시물 번호를 찾지 못했어요. 페이지 구조가 바뀌었을 수 있어요.'); }
+  const titles = titlesFromHtml(html);
+  log(`게시판 최신 번호: ${latest} (저장된 마지막 번호: ${state.lastSeq})`);
 
-// 0) 재처리 목록: 파서를 고친 뒤 특정 번호를 다시 읽힌다 (state.reprocess = [번호, ...])
-for (const seq of state.reprocess || []) {
-  const src = `seq${seq}`;
-  delete state.processed[seq];
-  db.surveys = db.surveys.filter((s) => s.source !== src); // 이번에 표가 안 나오면 이전 결과도 지운다
-  const info = await processSeq(seq, null, true);
-  const banners = (db.surveys.find((s) => s.source === src && s.type === 'weekly')?.rows || []).map((r) => r.banner);
-  log(`  재처리 ${seq} → ${info.kind} [${(info.tables || []).join(', ')}] 배너: ${[...new Set(banners)].join(' / ')}`);
-  changed = true;
-  await sleep(1500);
-}
-state.reprocess = [];
 
-// 1) 새 리포트
-const start = state.lastSeq ? state.lastSeq + 1 : latest;
-for (let seq = start; seq <= latest; seq++) {
-  const info = await processSeq(seq);
-  log(`  새 번호 ${seq} ${titles[seq] ?? ''} → ${info.kind}${info.tables?.length ? ` [${info.tables.join(', ')}]` : ''}${info.added?.length ? ` 추가 ${info.added.length}` : ''}${info.warnings ? ` ⚠${info.warnings}` : ''}`);
-  if (info.added?.length || info.replaced?.length) changed = true;
-  await sleep(1500);
-}
-if (latest > state.lastSeq) { state.lastSeq = latest; changed = true; }
-
-// 2) 과거 채우기
-const bf = state.backfill;
-if (bf && !bf.done) {
-  let seq = bf.next ?? (Math.min(latest, ...Object.keys(state.processed).map(Number)) - 1);
-  let count = 0;
-  log(`과거 채우기: ${bf.since} 이후 리포트, ${seq}번부터 최대 ${BACKFILL_PER_RUN}개`);
-  while (count < BACKFILL_PER_RUN && seq > 0) {
-    const info = await processSeq(seq, bf.since);
-    count++;
-    log(`  과거 번호 ${seq} → ${info.kind}${info.issue ? ` 제${info.issue}호 ${info.month ?? ''}` : ''}${info.tables?.length ? ` [${info.tables.join(', ')}]` : ''}`);
-    if (info.added?.length || info.replaced?.length) changed = true;
-    // 대통령 평가 표가 없는 번호가 오래 이어지면(데일리 오피니언 이전 시기) 끝낸다
-    bf.misses = info.tables?.length ? 0 : (bf.misses || 0) + 1;
-    if (bf.misses >= 80) { bf.done = true; log('  평가 표가 있는 리포트가 더 나오지 않아 과거 채우기를 마쳤어요.'); break; }
-    if (info.kind === 'daily' && info.month && info.month < bf.since) {
-      bf.olderSeen = (bf.olderSeen || 0) + 1;
-      if (bf.olderSeen >= 2) { bf.done = true; log(`  ${bf.since} 이전 리포트에 도달해 과거 채우기를 마쳤어요.`); break; }
-    }
-    seq--;
+  // 0) 재처리 목록: 파서를 고친 뒤 특정 번호를 다시 읽힌다 (state.reprocess = [번호, ...])
+  for (const seq of [...(state.reprocess || [])]) {
+    const src = `seq${seq}`;
+    delete state.processed[seq];
+    db.surveys = db.surveys.filter((s) => s.source !== src); // 이번에 표가 안 나오면 이전 결과도 지운다
+    const info = await processSeq(seq, null, true);
+    const banners = (db.surveys.find((s) => s.source === src && s.type === 'weekly')?.rows || []).map((r) => r.banner);
+    log(`  재처리 ${seq} → ${info.kind} [${(info.tables || []).join(', ')}] 배너: ${[...new Set(banners)].join(' / ')}`);
+    changed = true;
     await sleep(1500);
   }
-  bf.next = seq;
-  changed = true;
+  state.reprocess = [];
+
+  // 1) 새 리포트
+  const start = state.lastSeq ? state.lastSeq + 1 : latest;
+  for (let seq = start; seq <= latest; seq++) {
+    const info = await processSeq(seq);
+    log(`  새 번호 ${seq} ${titles[seq] ?? ''} → ${info.kind}${info.tables?.length ? ` [${info.tables.join(', ')}]` : ''}${info.added?.length ? ` 추가 ${info.added.length}` : ''}${info.warnings ? ` ⚠${info.warnings}` : ''}`);
+    if (info.added?.length || info.replaced?.length) changed = true;
+    await sleep(1500);
+  }
+  if (latest > state.lastSeq) { state.lastSeq = latest; changed = true; }
+
+  // 2) 과거 채우기
+  const bf = state.backfill;
+  if (bf && !bf.done) {
+    let seq = bf.next ?? (Math.min(latest, ...Object.keys(state.processed).map(Number)) - 1);
+    let count = 0;
+    log(`과거 채우기: ${bf.since} 이후 리포트, ${seq}번부터 최대 ${BACKFILL_PER_RUN}개`);
+    while (count < BACKFILL_PER_RUN && seq > 0) {
+      const info = await processSeq(seq, bf.since);
+      count++;
+      log(`  과거 번호 ${seq} → ${info.kind}${info.issue ? ` 제${info.issue}호 ${info.month ?? ''}` : ''}${info.tables?.length ? ` [${info.tables.join(', ')}]` : ''}`);
+      if (info.added?.length || info.replaced?.length) changed = true;
+      // 대통령 평가 표가 없는 번호가 오래 이어지면(데일리 오피니언 이전 시기) 끝낸다
+      bf.misses = info.tables?.length ? 0 : (bf.misses || 0) + 1;
+      if (bf.misses >= 80) { bf.done = true; log('  평가 표가 있는 리포트가 더 나오지 않아 과거 채우기를 마쳤어요.'); break; }
+      if (info.kind === 'daily' && info.month && info.month < bf.since) {
+        bf.olderSeen = (bf.olderSeen || 0) + 1;
+        if (bf.olderSeen >= 2) { bf.done = true; log(`  ${bf.since} 이전 리포트에 도달해 과거 채우기를 마쳤어요.`); break; }
+      }
+      seq--;
+      bf.next = seq;
+      changed = true;
+      await sleep(1500);
+    }
+  }
+}
+
+let failure = null;
+try {
+  await run();
+  state.failStreak = 0;
+} catch (err) {
+  failure = err;
+  state.failStreak = (state.failStreak || 0) + 1;
+  console.log(`::warning::갤럽 사이트 처리 중 멈춤 (연속 ${state.failStreak}회): ${err.cause?.code || err.message}`);
 }
 
 if (DRY) { log('(dry-run: 파일을 쓰지 않음)'); process.exit(0); }
 if (changed) db.updated = new Date().toISOString().slice(0, 10);
 fs.writeFileSync(DATA, JSON.stringify(db));
 fs.writeFileSync(STATE, JSON.stringify(state, null, 1));
-log(`완료: 조사 ${db.surveys.length}건`);
+log(`완료: 조사 ${db.surveys.length}건${failure ? ' (중간에 멈춤, 받은 만큼 저장)' : ''}`);
+// 페이지 구조가 바뀌었거나 하루 넘게(3시간 간격 8회) 계속 실패하면 실패로 끝내 GitHub이 메일을 보내게 한다
+if (failure && (structureError || state.failStreak >= 8)) process.exit(1);
