@@ -1884,5 +1884,6 @@
   "next": 1484,
   "misses": 0
  },
- "reprocess": []
+ "reprocess": [],
+ "failStreak": 1
 }
