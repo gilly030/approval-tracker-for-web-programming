@@ -12,7 +12,7 @@ on:
     inputs:
       max:
         description: "과거 채우기 때 한 번에 받을 리포트 수"
-        default: "60"
+        default: "25"
 
 permissions:
   contents: write
@@ -38,7 +38,7 @@ jobs:
 
       - name: 새 리포트 확인·반영
         if: github.event_name != 'push'
-        run: node tools/update.mjs --max "${{ github.event.inputs.max || '60' }}"
+        run: node tools/update.mjs --max "${{ github.event.inputs.max || '25' }}"
 
       - name: 사이트용 파일 만들기 (index.json, years/)
         if: always()

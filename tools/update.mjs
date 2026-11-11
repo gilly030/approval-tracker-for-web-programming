@@ -26,7 +26,8 @@ const PDF_OPTS = { cMapUrl: PDFJS + '/cmaps/', cMapPacked: true, standardFontDat
 
 const args = process.argv.slice(2);
 const DRY = args.includes('--dry-run');
-const BACKFILL_PER_RUN = Number(args[args.indexOf('--max') + 1]) || 60;
+const BACKFILL_PER_RUN = Number(args[args.indexOf('--max') + 1]) || 25;
+const PAUSE = 6000; // 요청 사이 간격 (갤럽 서버에 부담을 주지 않게)
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const log = (...a) => console.log(...a);
 
@@ -114,7 +115,7 @@ async function run() {
     const banners = (db.surveys.find((s) => s.source === src && s.type === 'weekly')?.rows || []).map((r) => r.banner);
     log(`  재처리 ${seq} → ${info.kind} [${(info.tables || []).join(', ')}] 배너: ${[...new Set(banners)].join(' / ')}`);
     changed = true;
-    await sleep(1500);
+    await sleep(PAUSE);
   }
   state.reprocess = [];
 
@@ -124,7 +125,7 @@ async function run() {
     const info = await processSeq(seq);
     log(`  새 번호 ${seq} ${titles[seq] ?? ''} → ${info.kind}${info.tables?.length ? ` [${info.tables.join(', ')}]` : ''}${info.added?.length ? ` 추가 ${info.added.length}` : ''}${info.warnings ? ` ⚠${info.warnings}` : ''}`);
     if (info.added?.length || info.replaced?.length) changed = true;
-    await sleep(1500);
+    await sleep(PAUSE);
   }
   if (latest > state.lastSeq) { state.lastSeq = latest; changed = true; }
 
@@ -149,7 +150,7 @@ async function run() {
       seq--;
       bf.next = seq;
       changed = true;
-      await sleep(1500);
+      await sleep(PAUSE);
     }
   }
 }
