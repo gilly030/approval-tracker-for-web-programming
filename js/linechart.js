@@ -23,7 +23,7 @@ export function lineChart(el, o) {
   const W = Math.max(300, Math.round(el.clientWidth || 800));
   const narrow = W < 560;
   const H = o.height ?? (narrow ? 300 : 380);
-  const m = { t: o.bands?.length ? 26 : 18, r: narrow ? 34 : 46, b: 44, l: 40 };
+  const m = { t: o.bands?.length || o.onSelect ? 30 : 18, r: narrow ? 34 : 46, b: 44, l: 40 };
   const iw = W - m.l - m.r, ih = H - m.t - m.b;
 
   // ---- 눈금 ----
@@ -103,6 +103,19 @@ export function lineChart(el, o) {
     s += `<g class="lc-end" data-i="${e.si}"><circle class="lc-enddot" cx="${e.x}" cy="${Y(series[e.si].points.filter((p) => p.y != null).pop().y)}" r="4" style="--c:${series[e.si].color}"/>`;
     s += `<text class="lc-endval" x="${e.x + 9}" y="${e.y + 4.5}">${e.v}</text></g>`;
   }
+  // 선택된 시점: 세로선과 진한 점
+  if (o.selectedX != null && xs.includes(+o.selectedX)) {
+    const sx = X(o.selectedX);
+    s += `<line class="lc-sel" x1="${sx}" x2="${sx}" y1="${m.t}" y2="${m.t + ih}"/>`;
+    series.forEach((sr) => {
+      const p = sr.points.find((q) => +q.x === +o.selectedX && q.y != null);
+      if (p) s += `<circle class="lc-seldot" cx="${sx}" cy="${Y(p.y)}" r="5" style="--c:${sr.color}"/>`;
+    });
+    if (o.selectedLabel) {
+      const anchor = sx < m.l + 60 ? 'start' : sx > m.l + iw - 60 ? 'end' : 'middle';
+      s += `<text class="lc-sellabel" x="${sx}" y="${m.t - 6}" text-anchor="${anchor}">${esc(o.selectedLabel)}</text>`;
+    }
+  }
   s += `<g class="lc-note" visibility="hidden"><circle class="lc-ring" r="7"/><text class="lc-ann"></text></g>`;
   s += `<rect class="lc-hit" x="0" y="0" width="${W}" height="${H}" fill="transparent"/>`;
   s += `</svg>`;
@@ -139,8 +152,10 @@ export function lineChart(el, o) {
       `<tspan>${esc(p.label)}</tspan>`,
       `<tspan class="lc-ann-val">${p.y}${esc(o.unit || '')}${p.n ? `<tspan class="lc-ann-n"> · ${p.n.toLocaleString('ko-KR')}명</tspan>` : ''}</tspan>`,
     ];
-    const above = py - 60 > m.t;
-    const baseY = above ? py - 52 : py + 24;
+    if (o.onSelect && +o.selectedX !== xs[xi]) lines.push(`<tspan class="lc-ann-n">눌러서 특성별 보기</tspan>`);
+    const h = lines.length * 15 + 8;
+    const above = py - h - 8 > m.t;
+    const baseY = above ? py - h : py + 24;
     const anchor = px < m.l + 70 ? 'start' : px > m.l + iw - 70 ? 'end' : 'middle';
     ann.setAttribute('text-anchor', anchor);
     ann.innerHTML = lines.map((l, i) => l.replace('<tspan', `<tspan x="${px}" y="${baseY + i * 15}"`)).join('');
@@ -172,6 +187,10 @@ export function lineChart(el, o) {
     showPoint(si, xi);
   }
   const hit = svg.querySelector('.lc-hit');
+  if (o.onSelect) {
+    hit.style.cursor = 'pointer';
+    hit.addEventListener('click', (ev) => { onMove(ev); if (state.focus) o.onSelect(new Date(xs[state.focus.xi])); });
+  }
   hit.addEventListener('pointermove', onMove);
   hit.addEventListener('pointerdown', onMove);
   hit.addEventListener('pointerleave', hidePoint);
@@ -181,6 +200,7 @@ export function lineChart(el, o) {
     else if (e.key === 'ArrowRight') showPoint(f.si, Math.min(xs.length - 1, f.xi + 1));
     else if (e.key === 'ArrowUp' || e.key === 'ArrowDown') showPoint((f.si + (e.key === 'ArrowUp' ? series.length - 1 : 1)) % series.length, f.xi);
     else if (e.key === 'Escape') hidePoint();
+    else if ((e.key === 'Enter' || e.key === ' ') && o.onSelect && state.focus) o.onSelect(new Date(xs[state.focus.xi]));
     else return;
     e.preventDefault();
   });

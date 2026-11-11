@@ -207,6 +207,9 @@ textarea { width: 100%; min-height: 120px; font: 12px/1.4 var(--font-num); backg
 .lc-end.dim { opacity: 0.25; }
 .lc-enddot { fill: var(--c); stroke: var(--bg); stroke-width: 2; }
 .lc-endval { font-family: var(--font-body); font-size: 15px; fill: var(--ink); font-variant-numeric: tabular-nums; }
+.lc-sel { stroke: var(--ink); stroke-width: 1; stroke-dasharray: 3 3; }
+.lc-seldot { fill: var(--c); stroke: var(--bg); stroke-width: 2.5; }
+.lc-sellabel { font-family: var(--font-body); font-size: 12px; font-weight: 700; fill: var(--ink); }
 .lc-ring { fill: var(--bg); stroke: var(--c); stroke-width: 2; }
 .lc-ann { font-family: var(--font-body); font-size: 13px; fill: var(--ink); paint-order: stroke; stroke: var(--bg); stroke-width: 5px; stroke-linejoin: round; }
 .lc-ann-name { font-weight: 700; }
@@ -221,3 +224,11 @@ textarea { width: 100%; min-height: 120px; font: 12px/1.4 var(--font-num); backg
 .range-custom input { font: inherit; font-size: 14px; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 4px 8px; }
 .range-info { font-size: 13px; color: var(--ink-2); }
 .backfill { font-size: 12.5px; color: var(--ink-2); background: var(--chip); border-radius: 6px; padding: 6px 10px; justify-self: start; }
+
+/* 선택한 주 */
+.snap-heading { display: grid; gap: 2px; }
+.snap-when { margin: 0; font-size: 15px; font-weight: 600; color: var(--pos); }
+.stepper { display: inline-flex; gap: 6px; }
+.stepper .btn { font-size: 13px; padding: 5px 10px; }
+.stepper .btn:disabled { opacity: 0.4; cursor: default; }
+.trend-tools { display: flex; flex-wrap: wrap; gap: 8px; }

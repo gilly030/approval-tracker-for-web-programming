@@ -19,7 +19,7 @@ const state = {
   index: null,
   years: new Map(),     // 연도 → Promise<surveys>
   detail: new Map(),    // key → survey(상세)
-  type: store.get('type') || 'weekly',
+  type: store.get('type') || 'weekly', // 배너별 추이에만 쓰임
   surveyKey: null,
   banner: store.get('banner') || '지역별',
   metric: 'pos',
@@ -167,12 +167,16 @@ function renderMain() {
     { id: 'pos', name: '잘하고 있다', color: css('--pos'), points: withBreaks(list, pt('pos')) },
     { id: 'neg', name: '잘못하고 있다', color: css('--neg'), points: withBreaks(list, pt('neg')) },
   ];
+  const sel = list.find((s) => s.key === state.surveyKey);
   state.charts.main = lineChart($('#main-chart'), {
     series, legendEl: $('#main-legend'), unit: '%', yMin: 0, bands: presidentBands(list),
+    selectedX: sel ? dateOf(sel) : null,
+    selectedLabel: sel ? shortLabel(sel) : null,
+    onSelect: (x) => { const s = list.find((q) => +dateOf(q) === +x); if (s) selectSurvey(s.key, true); },
     ariaLabel: `대통령 직무 긍정률과 부정률 추이, ${list[0].label}부터 ${list[list.length - 1].label}까지`,
   });
   state.mainData = { list, series, title: $('#main-title').textContent };
-  $('#main-note').textContent = '매주 조사(전국 만 18세 이상 약 1,000명). 의견유보(어느 쪽도 아님·모름/응답거절)는 그리지 않았습니다.'
+  $('#main-note').textContent = '점을 누르면 그 주의 응답자 특성별 결과가 아래에 나옵니다. 매주 조사(전국 만 18세 이상 약 1,000명), 의견유보(어느 쪽도 아님·모름/응답거절)는 그리지 않았습니다.'
     + (one ? '' : ' 음영은 대통령 임기 구분이고, 대통령이 바뀌거나 조사가 한 달 넘게 비면 선을 끊었습니다.');
   renderMainTable(list);
 }
@@ -198,21 +202,51 @@ function renderBackfill() {
   el.textContent = `과거 주간 조사를 매일 자동으로 채우는 중이에요 (${ymLabel(bf.since)}까지). 지금은 주간 조사 ${w.length}회가 있고, 채워지는 대로 그래프가 길어집니다.`;
 }
 
-// ---------- 조사 선택 (배너) ----------
+// ---------- 선택한 조사 ----------
 const surveysOf = (type) => all().filter((s) => s.type === type);
-function renderSurveySelect() {
-  const list = surveysOf(state.type).sort((a, b) => byDate(b, a));
-  if (!list.find((s) => s.key === state.surveyKey)) state.surveyKey = list[0]?.key;
-  const byPres = [];
-  for (const s of list) {
-    let g = byPres.find((x) => x.p === s.president);
-    if (!g) byPres.push((g = { p: s.president, items: [] }));
-    g.items.push(s);
-  }
-  $('#survey').innerHTML = byPres.map((g) => `<optgroup label="${esc(g.p || '대통령 미상')}">${g.items.map((s) => `<option value="${s.key}"${s.key === state.surveyKey ? ' selected' : ''}>${esc(s.label)}</option>`).join('')}</optgroup>`).join('');
-  document.querySelectorAll('[data-type]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.type === state.type)));
-}
 const currentMeta = () => all().find((s) => s.key === state.surveyKey);
+const shortLabel = (s) => s.label.replace(/^\d{4}년 /, '').replace(/\s*\(.*\)$/, '');
+
+// 선택이 없거나 기간 밖이면 기간 안의 가장 최근 주로
+function ensureSurvey() {
+  const inR = weekly().filter(inRange);
+  const cur = currentMeta();
+  if (!cur || (cur.type === 'weekly' && !inR.includes(cur))) state.surveyKey = (inR[inR.length - 1] || latest()).key;
+}
+function selectSurvey(key, fromChart = false) {
+  if (key === state.surveyKey) return;
+  state.surveyKey = key;
+  renderMain();
+  renderBanners();
+  renderSnapshot();
+  renderTrend();
+  if (fromChart) {
+    const el = $('#snapshot');
+    const r = el.getBoundingClientRect();
+    if (r.top > innerHeight * 0.85) el.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
+  }
+}
+function stepSurvey(dir) {
+  const w = weekly();
+  const i = w.findIndex((s) => s.key === state.surveyKey);
+  const next = w[i + dir];
+  if (!next) return;
+  // 기간 밖으로 넘어가면 기간을 직접 설정으로 넓힌다
+  if (!inRange(next)) {
+    const [a, b] = rangeDates();
+    const d = dateOf(next);
+    state.range = { preset: 'custom', from: ym(d < a ? d : a), to: ym(d > b ? d : b) };
+    renderRange();
+  }
+  state.surveyKey = null; // selectSurvey가 항상 다시 그리도록
+  selectSurvey(next.key);
+}
+function renderStepper() {
+  const w = weekly();
+  const i = w.findIndex((s) => s.key === state.surveyKey);
+  $('#prev-week').disabled = i <= 0;
+  $('#next-week').disabled = i < 0 || i >= w.length - 1;
+}
 
 function renderBanners() {
   const list = currentMeta().banners;
@@ -224,7 +258,8 @@ function renderBanners() {
 function rowHTML(r, isTotal = false) {
   const small = r.n != null && r.n < SMALL_N;
   const m = moe(r.n);
-  const raw = r.raw ? `<span class="raw">${esc(r.raw.split('|')[1])}</span>` : '';
+  const rawG = r.raw?.split('|')[1];
+  const raw = rawG && rawG !== r.group ? `<span class="raw">${esc(rawG)}</span>` : '';
   const label = `<div class="g">${esc(isTotal ? '전체' : r.group)}${small ? '<span class="pill">표본 적음</span>' : ''}${raw}</div>`;
   const nn = `<div class="nn"><span class="num">${fmtN(r.n)}</span>명${m ? `<br>±<span class="num">${m.toFixed(1)}</span>%p` : ''}</div>`;
   if (r.pos == null) return `<div class="row">${label}<div class="na">표본이 적어 수치 미공개</div>${nn}</div>`;
@@ -240,7 +275,9 @@ function rowHTML(r, isTotal = false) {
 }
 async function renderSnapshot() {
   const meta = currentMeta();
-  $('#snap-title').textContent = `${state.banner} 평가 · ${meta.label}`;
+  $('#snap-when').textContent = `${meta.label}${meta.president ? ` · ${meta.president} 대통령` : ''}`;
+  $('#snap-title').textContent = `${state.banner} 평가`;
+  renderStepper();
   const [s] = await details([meta]);
   if (!s || s.key !== state.surveyKey) return;
   const rows = s.rows.filter((r) => r.banner === state.banner);
@@ -323,8 +360,12 @@ async function renderTrend() {
     return;
   }
   const series = trendSeries(list);
+  const sel = list.find((s) => s.key === state.surveyKey);
   state.charts.trend = lineChart($('#chart'), {
     series, unit: state.metric === 'net' ? '%p' : '%',
+    selectedX: sel ? dateOf(sel) : null,
+    selectedLabel: sel ? shortLabel(sel) : null,
+    onSelect: (x) => { const s = list.find((q) => +dateOf(q) === +x); if (s) selectSurvey(s.key); },
     yMin: state.metric === 'net' ? undefined : 0, bands: presidentBands(list),
     ariaLabel: `${state.banner} ${metricName()} 추이`,
   });
@@ -359,7 +400,7 @@ function exportPNG(which) {
 
 // ---------- 이벤트 ----------
 function renderBannerSection() {
-  renderSurveySelect();
+  document.querySelectorAll('[data-type]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.type === state.type)));
   renderBanners();
   renderSnapshot();
   renderTrend();
@@ -368,7 +409,7 @@ function setRange(preset) {
   state.range.preset = preset;
   if (preset !== 'custom') { state.range.from = null; state.range.to = null; }
   store.set('range', preset);
-  renderRange(); renderMain(); renderTrend();
+  renderRange(); ensureSurvey(); renderMain(); renderBanners(); renderSnapshot(); renderTrend();
 }
 
 document.addEventListener('click', (e) => {
@@ -376,8 +417,13 @@ document.addEventListener('click', (e) => {
   if (!t) return;
   if (t.dataset.export) { e.preventDefault(); const [kind, which] = t.dataset.export.split(':'); kind === 'csv' ? exportCSV(which) : exportPNG(which); return; }
   if (t.dataset.range) setRange(t.dataset.range);
-  else if (t.dataset.type) { state.type = t.dataset.type; store.set('type', state.type); state.surveyKey = null; renderBannerSection(); }
-  else if (t.dataset.switch) { state.type = t.dataset.switch; store.set('type', state.type); state.surveyKey = null; renderBannerSection(); }
+  else if (t.dataset.type || t.dataset.switch) {
+    state.type = t.dataset.type || t.dataset.switch; store.set('type', state.type);
+    document.querySelectorAll('[data-type]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.type === state.type)));
+    state.slots.clear(); renderTrend();
+  }
+  else if (t.id === 'prev-week') stepSurvey(-1);
+  else if (t.id === 'next-week') stepSurvey(1);
   else if (t.dataset.banner) { state.banner = t.dataset.banner; store.set('banner', state.banner); state.slots.clear(); renderBanners(); renderSnapshot(); renderTrend(); }
   else if (t.dataset.metric) {
     state.metric = t.dataset.metric;
@@ -394,7 +440,7 @@ for (const id of ['#range-from', '#range-to']) {
     let from = $('#range-from').value, to = $('#range-to').value;
     if (from && to && from > to) [from, to] = [to, from];
     state.range = { preset: 'custom', from, to };
-    renderRange(); renderMain(); renderTrend();
+    renderRange(); ensureSurvey(); renderMain(); renderBanners(); renderSnapshot(); renderTrend();
   });
 }
 $('#legend').addEventListener('pointerover', (e) => {
@@ -403,7 +449,6 @@ $('#legend').addEventListener('pointerover', (e) => {
   state.charts.trend.highlight(state.trendData.series.findIndex((s) => s.id === b.dataset.group));
 });
 $('#legend').addEventListener('pointerleave', () => state.charts.trend?.highlight(null));
-$('#survey').addEventListener('change', (e) => { state.surveyKey = e.target.value; renderBanners(); renderSnapshot(); renderTrend(); });
 
 const widths = new Map();
 let rz;
@@ -432,6 +477,7 @@ async function start() {
   renderHeadline();
   renderBackfill();
   renderRange();
+  ensureSurvey();
   renderMain();
   renderBannerSection();
   for (const id of ['#main-chart', '#chart']) { widths.set($(id), Math.round($(id).clientWidth)); ro.observe($(id)); }

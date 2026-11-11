@@ -51,27 +51,27 @@
 
   <div class="section-head">
     <h2>응답자 특성별로 보기</h2>
-    <p class="hint">지역·성·연령·지지정당 같은 특성(배너)을 고르면 그 조사의 그룹별 평가를 보여주고, 아래 추이 그래프는 위에서 고른 기간을 따릅니다. 배너 구성은 조사마다 다를 수 있어요.</p>
+    <p class="hint">위 그래프에서 점을 누르면 그 주의 결과로 바뀝니다. 지역·성·연령·지지정당 같은 특성(배너)을 고르세요. 배너 구성은 조사마다 조금씩 다를 수 있어요.</p>
   </div>
 
-  <section class="controls" aria-label="조사 선택">
-    <div class="seg" role="group" aria-label="조사 종류">
-      <button type="button" id="type-weekly" data-type="weekly" aria-pressed="true">주간</button>
-      <button type="button" id="type-monthly" data-type="monthly" aria-pressed="false">월간 통합</button>
-    </div>
-    <label class="field" for="survey">조사 시점 <select id="survey"></select></label>
-  </section>
 
   <nav class="banners" id="banners" aria-label="응답자 특성(배너)"></nav>
 
-  <section class="panel" id="snapshot">
+  <section class="panel" id="snapshot" aria-live="polite">
     <div class="panel-head">
-      <h2 id="snap-title">특성별 평가</h2>
-      <div class="split-legend">
-        <span class="key"><i style="background:var(--pos)"></i>잘하고 있다</span>
-        <span class="key"><i style="background:var(--mid)"></i>의견유보</span>
-        <span class="key"><i style="background:var(--neg)"></i>잘못하고 있다</span>
+      <div class="snap-heading">
+        <h2 id="snap-title">특성별 평가</h2>
+        <p class="snap-when" id="snap-when"></p>
       </div>
+      <div class="stepper" role="group" aria-label="조사 주 옮기기">
+        <button type="button" class="btn" id="prev-week">◀ 이전 주</button>
+        <button type="button" class="btn" id="next-week">다음 주 ▶</button>
+      </div>
+    </div>
+    <div class="split-legend">
+      <span class="key"><i style="background:var(--pos)"></i>잘하고 있다</span>
+      <span class="key"><i style="background:var(--mid)"></i>의견유보</span>
+      <span class="key"><i style="background:var(--neg)"></i>잘못하고 있다</span>
     </div>
     <div class="rows" id="rows"></div>
     <details class="tbl"><summary>표로 보기</summary><div class="tbl-wrap" id="snap-table"></div></details>
@@ -83,10 +83,16 @@
         <h2 id="trend-title" class="fig-title">추이</h2>
         <p class="fig-measure" id="trend-sub"></p>
       </div>
+      <div class="trend-tools">
+      <div class="seg" role="group" aria-label="조사 단위">
+        <button type="button" id="type-weekly" data-type="weekly" aria-pressed="true">주간</button>
+        <button type="button" id="type-monthly" data-type="monthly" aria-pressed="false">월간 통합</button>
+      </div>
       <div class="seg" role="group" aria-label="지표">
         <button type="button" id="m-pos" data-metric="pos" aria-pressed="true">긍정률</button>
         <button type="button" id="m-neg" data-metric="neg" aria-pressed="false">부정률</button>
         <button type="button" id="m-net" data-metric="net" aria-pressed="false">긍정−부정</button>
+      </div>
       </div>
     </div>
     <div class="legend" id="legend" aria-label="비교할 그룹 (최대 6개)"></div>
