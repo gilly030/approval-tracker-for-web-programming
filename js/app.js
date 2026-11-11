@@ -1,5 +1,6 @@
 // 공개 페이지. data/index.json(요약)을 먼저 읽고, 배너 상세는 data/years/YYYY.json 을 필요할 때 읽는다.
 import { lineChart, downloadCSV, downloadPNG } from './linechart.js';
+import { regionMap } from './tilemap.js';
 
 const $ = (s) => document.querySelector(s);
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -324,6 +325,10 @@ async function renderSnapshot() {
   const rows = s.rows.filter((r) => r.banner === state.banner);
   const total = s.rows.find((r) => r.banner === '전체');
   $('#rows').innerHTML = rowHTML(total, true) + rows.map((r) => rowHTML(r)).join('');
+  // 지역별이면 위에 타일 지도
+  const mapEl = $('#regionmap');
+  mapEl.hidden = state.banner !== '지역별';
+  if (state.banner === '지역별') regionMap(mapEl, rows);
   const detailKeys = Object.keys(rows.find((r) => r.detail)?.detail || {});
   const hasW = rows.some((r) => r.nWeighted != null);
   $('#snap-table').innerHTML = `<table><thead><tr><th>${esc(state.banner)}</th><th>사례수</th>${hasW ? '<th>가중 사례수</th>' : ''}<th>잘하고 있다</th><th>잘못하고 있다</th><th>의견유보</th>${detailKeys.map((k) => `<th>${esc(k)}</th>`).join('')}<th>표본오차</th></tr></thead><tbody>${

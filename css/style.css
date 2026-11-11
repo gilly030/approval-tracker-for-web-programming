@@ -16,6 +16,11 @@
   --focus: #0b7a43;
   --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a; --s4: #eda100;
   --s5: #e87ba4; --s6: #6250d6;
+  /* 지역 지도용 갈림 색: 남색(부정 우세) ← 회색 → 초록(긍정 우세) */
+  --dv-n4: #1d3a82; --dv-n3: #3c5ca8; --dv-n2: #7c92c9; --dv-n1: #aebde3;
+  --dv-0: #e1e5dd;
+  --dv-p1: #a5d3b4; --dv-p2: #6fb787; --dv-p3: #24894f; --dv-p4: #0a6436;
+  --dv-na: #eef1eb;
   --font-body: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
   --font-num: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
   --font-display: "Gowun Batang", "Nanum Myeongjo", "AppleMyungjo", serif;
@@ -26,6 +31,10 @@
     --line: #283028; --axis: #3b443a; --band: #1d231d; --pos: #2fa264; --neg: #6e91e2; --mid: #464f45;
     --chip: #222822; --focus: #2fa264;
     --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --s5: #d55181; --s6: #9085e9;
+    --dv-n4: #8eaaf0; --dv-n3: #5f7fcf; --dv-n2: #3d5594; --dv-n1: #2b3858;
+    --dv-0: #343a33;
+    --dv-p1: #23452f; --dv-p2: #2d6e46; --dv-p3: #3e9e64; --dv-p4: #6fd096;
+    --dv-na: #1d211d;
     color-scheme: dark;
   }
 }
@@ -34,6 +43,10 @@
   --line: #283028; --axis: #3b443a; --band: #1d231d; --pos: #2fa264; --neg: #6e91e2; --mid: #464f45;
   --chip: #222822; --focus: #2fa264;
   --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --s5: #d55181; --s6: #9085e9;
+  --dv-n4: #8eaaf0; --dv-n3: #5f7fcf; --dv-n2: #3d5594; --dv-n1: #2b3858;
+  --dv-0: #343a33;
+  --dv-p1: #23452f; --dv-p2: #2d6e46; --dv-p3: #3e9e64; --dv-p4: #6fd096;
+  --dv-na: #1d211d;
   color-scheme: dark;
 }
 
@@ -237,3 +250,40 @@ textarea { width: 100%; min-height: 120px; font: 12px/1.4 var(--font-num); backg
 .stepper .btn { font-size: 13px; padding: 5px 10px; }
 .stepper .btn:disabled { opacity: 0.4; cursor: default; }
 .trend-tools { display: flex; flex-wrap: wrap; gap: 8px; }
+
+/* 지역 타일 지도 */
+.regionmap { border-bottom: 1px solid var(--line); padding-bottom: 16px; margin-bottom: 4px; }
+.tm-wrap { display: flex; flex-wrap: wrap; gap: 20px 36px; align-items: flex-start; }
+.tm-map { position: relative; flex: 0 1 280px; min-width: 0; }
+.tm-map svg { display: block; width: 100%; height: auto; }
+.tm-cell { cursor: pointer; transition: opacity .15s; outline: none; }
+.tm-cell.dim { opacity: 0.35; }
+.tm-cell:focus-visible rect:first-child { stroke: var(--focus); stroke-width: 3; }
+.tm-name { font-family: var(--font-body); font-size: 13px; font-weight: 600; fill: var(--ink); pointer-events: none; }
+.tm-name.on-dark { fill: #ffffff; }
+:root[data-theme="dark"] .tm-name.on-dark { fill: #0f120f; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .tm-name.on-dark { fill: #0f120f; } }
+.tm-edge { stroke: var(--ink); stroke-width: 2.2; stroke-linecap: square; pointer-events: none; }
+.tm-hatch { fill: url(#tm-stripes); }
+.tm-stripe { stroke: var(--axis); stroke-width: 2; }
+.tm-tip { position: absolute; z-index: 2; pointer-events: none; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; box-shadow: 0 4px 14px rgb(0 0 0 / 0.12); padding: 7px 10px; font-size: 13px; min-width: 140px; }
+.tm-tip b { display: block; margin-bottom: 2px; }
+.tm-tip .tm-n { color: var(--muted); font-size: 12px; margin-top: 2px; }
+.tm-side { flex: 1 1 260px; display: grid; gap: 14px; min-width: 0; align-content: start; }
+.tm-legend { display: grid; gap: 4px; max-width: 340px; }
+.tm-legend-heads { display: flex; justify-content: space-between; font-size: 13px; }
+.tm-legend-heads .neg { color: var(--neg); }
+.tm-legend-heads .pos { color: var(--pos); }
+.tm-scale { display: grid; grid-template-columns: repeat(9, 1fr); height: 14px; gap: 1px; }
+.tm-scale span:first-child { border-radius: 3px 0 0 3px; }
+.tm-scale span:last-child { border-radius: 0 3px 3px 0; }
+.tm-ticks { display: grid; grid-template-columns: repeat(9, 1fr); font-size: 11.5px; color: var(--ink-2); }
+.tm-ticks span:nth-child(-n+4) { text-align: right; transform: translateX(50%); }
+.tm-ticks span:nth-child(5) { text-align: center; }
+.tm-ticks span:nth-child(n+6) { text-align: left; transform: translateX(-50%); }
+.tm-legend-note { font-size: 12px; color: var(--muted); }
+.tm-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; max-width: 340px; }
+.tm-list li { display: grid; grid-template-columns: 12px 1fr auto; gap: 8px; align-items: center; font-size: 14px; padding: 3px 6px; border-radius: 4px; cursor: default; }
+.tm-list li i { width: 12px; height: 12px; border-radius: 2px; }
+.tm-list li.on { background: var(--chip); }
+.tm-v { font-size: 13.5px; }
