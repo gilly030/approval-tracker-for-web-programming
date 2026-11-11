@@ -1,29 +1,27 @@
-// 지역별 순평가(긍정 − 부정) 타일 지도. 17개 시도를 칸으로 그리고 갤럽 권역별로 색과 굵은 테두리로 묶는다.
+// 지역별 순평가(긍정 − 부정) 지도. 실제 시도 경계(울릉도·독도 포함)를 갤럽 권역별 색으로 칠한다.
+import { VIEWBOX, PATHS, DOKDO } from './korea-paths.js';
 
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
-// [시도, 열, 행, 권역을 찾을 때 쓸 낱말들]
-const TILES = [
-  ['서울', 1, 0, ['서울']],
-  ['강원', 2, 0, ['강원']],
-  ['인천', 0, 1, ['인천']],
-  ['경기', 1, 1, ['경기']],
-  ['충북', 2, 1, ['충북', '충청']],
-  ['경북', 3, 1, ['경북']],
-  ['충남', 0, 2, ['충남', '충청']],
-  ['세종', 1, 2, ['세종', '충청']],
-  ['대전', 2, 2, ['대전']],
-  ['대구', 3, 2, ['대구']],
-  ['전북', 0, 3, ['전북', '전라']],
-  ['광주', 1, 3, ['광주']],
-  ['경남', 2, 3, ['경남']],
-  ['울산', 3, 3, ['울산']],
-  ['전남', 1, 4, ['전남', '전라']],
-  ['부산', 2, 4, ['부산']],
-  ['제주', 0, 5, ['제주']],
+// 시도 → 권역을 찾을 때 쓸 낱말
+const SIDO = {
+  서울: ['서울'], 인천: ['인천'], 경기: ['경기'], 강원: ['강원'],
+  충북: ['충북', '충청'], 충남: ['충남', '충청'], 세종: ['세종', '충청'], 대전: ['대전'],
+  전북: ['전북', '전라'], 전남: ['전남', '전라'], 광주: ['광주'],
+  경북: ['경북'], 대구: ['대구'], 경남: ['경남'], 울산: ['울산'], 부산: ['부산'], 제주: ['제주'],
+};
+// 권역 라벨을 둘 시도와 위치 조정 (지도 좌표). 서울은 작아서 바다 쪽으로 빼고 선을 잇는다.
+const ANCHOR = [
+  { words: ['서울'], sido: '서울', dx: -78, dy: -30, callout: true },
+  { words: ['경기', '인천'], sido: '경기', dx: 14, dy: 22 },
+  { words: ['강원'], sido: '강원', dx: 0, dy: 0 },
+  { words: ['충청', '대전', '세종'], sido: '충북', dx: -34, dy: 18 },
+  { words: ['경북', '대구'], sido: '경북', dx: -74, dy: 14 }, // 울릉도·독도 때문에 가운데가 동쪽으로 밀려 있어 본토 쪽으로
+  { words: ['전라', '광주'], sido: '전북', dx: -6, dy: 30 },
+  { words: ['경남', '부산', '울산'], sido: '경남', dx: 10, dy: 2 },
+  { words: ['제주'], sido: '제주', dx: 0, dy: 0 },
 ];
 
-// 순평가 → 색 단계 (-4 … +4). |값| 5 미만은 가운데 회색
 export const STEPS = [5, 10, 20, 40];
 export function stepOf(v) {
   if (v == null) return null;
@@ -33,53 +31,38 @@ export function stepOf(v) {
   return v < 0 ? -k : k;
 }
 const fillVar = (k) => (k == null ? 'var(--dv-na)' : k === 0 ? 'var(--dv-0)' : `var(--dv-${k < 0 ? 'n' : 'p'}${Math.abs(k)})`);
-const darkText = (k) => k != null && Math.abs(k) <= 2; // 옅은 칸은 진한 글자
+const fmt = (v) => (v == null ? '–' : v > 0 ? `+${v}` : v < 0 ? `−${-v}` : '0');
 
-/**
- * @param {HTMLElement} el
- * @param {Array} rows  지역별 배너의 행들 ({ group, n, pos, neg, rest })
- * @param {(row) => void} [onHover]
- */
 export function regionMap(el, rows) {
   const regionOf = (words) => rows.find((r) => words.some((w) => r.group.includes(w)));
-  const T = 58, G = 4; // 칸 크기, 간격
-  const cols = 4, rowsN = 6;
-  const W = cols * (T + G) + G, H = rowsN * (T + G) + G;
-  const cells = TILES.map(([name, c, r, words]) => {
+  const sidos = Object.entries(SIDO).map(([name, words]) => {
     const reg = regionOf(words);
     const v = reg && reg.pos != null ? reg.pos - reg.neg : null;
-    return { name, c, r, reg, v, k: stepOf(v), x: G + c * (T + G), y: G + r * (T + G) };
+    return { name, reg, v, k: stepOf(v) };
   });
-  const at = (c, r) => cells.find((q) => q.c === c && q.r === r);
+  const regOfSido = (n) => sidos.find((s) => s.name === n)?.reg;
 
-  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="지역별 대통령 직무 순평가 지도">`;
-  for (const q of cells) {
-    const label = q.reg ? `${q.reg.group}: 잘하고 있다 ${q.reg.pos ?? '–'}%, 잘못하고 있다 ${q.reg.neg ?? '–'}%` : `${q.name}: 자료 없음`;
+  let s = `<svg viewBox="${VIEWBOX}" role="img" aria-label="지역별 대통령 직무 순평가 지도 (울릉도·독도 포함)">`;
+  s += `<defs><pattern id="tm-stripes" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="5" class="tm-stripe"/></pattern></defs>`;
+  for (const q of sidos) {
+    const label = q.reg ? `${q.name} (${q.reg.group}): 잘하고 있다 ${q.reg.pos ?? '–'}%, 잘못하고 있다 ${q.reg.neg ?? '–'}%` : `${q.name}: 자료 없음`;
     s += `<g class="tm-cell" tabindex="0" data-name="${esc(q.name)}" aria-label="${esc(label)}">`;
-    s += `<rect x="${q.x}" y="${q.y}" width="${T}" height="${T}" rx="3" style="fill:${fillVar(q.k)}"/>`;
-    if (q.k == null && q.reg) s += `<rect x="${q.x}" y="${q.y}" width="${T}" height="${T}" rx="3" class="tm-hatch"/>`;
-    s += `<text x="${q.x + T / 2}" y="${q.y + T / 2 + 5}" text-anchor="middle" class="tm-name${darkText(q.k) || q.k == null ? '' : ' on-dark'}">${esc(q.name)}</text>`;
+    s += `<path class="tm-area" d="${PATHS[q.name]}" style="fill:${fillVar(q.k)}"/>`;
+    if (q.k == null && q.reg) s += `<path class="tm-hatch" d="${PATHS[q.name]}"/>`;
     s += `</g>`;
   }
-  // 같은 권역끼리 묶는 굵은 테두리: 이웃 칸이 다른 권역(또는 없음)인 변만 긋는다
-  const half = G / 2;
-  for (const q of cells) {
-    const same = (o) => o && o.reg && q.reg && o.reg === q.reg;
-    const x0 = q.x - half, x1 = q.x + T + half, y0 = q.y - half, y1 = q.y + T + half;
-    if (!same(at(q.c, q.r - 1))) s += `<line class="tm-edge" x1="${x0}" y1="${y0}" x2="${x1}" y2="${y0}"/>`;
-    if (!same(at(q.c, q.r + 1))) s += `<line class="tm-edge" x1="${x0}" y1="${y1}" x2="${x1}" y2="${y1}"/>`;
-    if (!same(at(q.c - 1, q.r))) s += `<line class="tm-edge" x1="${x0}" y1="${y0}" x2="${x0}" y2="${y1}"/>`;
-    if (!same(at(q.c + 1, q.r))) s += `<line class="tm-edge" x1="${x1}" y1="${y0}" x2="${x1}" y2="${y1}"/>`;
+  // 독도: 실제로는 점보다 작아서 표시를 덧붙인다
+  if (DOKDO) {
+    const g = regOfSido('경북');
+    const k = g && g.pos != null ? stepOf(g.pos - g.neg) : null;
+    s += `<g class="tm-cell tm-dokdo" tabindex="0" data-name="경북" aria-label="독도 (경상북도 울릉군)">`;
+    s += `<circle cx="${DOKDO[0]}" cy="${DOKDO[1]}" r="3.6" style="fill:${fillVar(k)}"/>`;
+    s += `<text class="tm-islet" x="${DOKDO[0]}" y="${DOKDO[1] + 16}" text-anchor="end">독도</text></g>`;
   }
-  s += `<defs><pattern id="tm-stripes" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="6" class="tm-stripe"/></pattern></defs>`;
-  s += `</svg>`;
+  s += `<g class="tm-labels"></g></svg>`;
 
-  // 권역 목록 (값 순)
-  const regs = [...new Set(cells.map((q) => q.reg).filter(Boolean))];
-  const list = regs.map((r) => ({ r, v: r.pos != null ? r.pos - r.neg : null }))
-    .sort((a, b) => (b.v ?? -999) - (a.v ?? -999));
-  const fmt = (v) => (v == null ? '–' : v > 0 ? `+${v}` : v < 0 ? `−${-v}` : '0');
-
+  const regs = [...new Set(sidos.map((q) => q.reg).filter(Boolean))];
+  const list = regs.map((r) => ({ r, v: r.pos != null ? r.pos - r.neg : null })).sort((a, b) => (b.v ?? -999) - (a.v ?? -999));
   el.innerHTML = `
     <div class="tm-wrap">
       <div class="tm-map">${s}<div class="tm-tip" hidden></div></div>
@@ -89,12 +72,31 @@ export function regionMap(el, rows) {
       </div>
     </div>`;
 
-  // 칸에 올리면 그 권역 수치를 보여주고, 같은 권역 칸과 목록을 강조
-  const tip = el.querySelector('.tm-tip');
+  // 권역 라벨: 기준 시도의 가운데에 '이름 값'
   const svg = el.querySelector('svg');
-  const show = (name) => {
-    const q = cells.find((c) => c.name === name);
-    el.querySelectorAll('.tm-cell').forEach((g) => g.classList.toggle('dim', !!q?.reg && cells.find((c) => c.name === g.dataset.name)?.reg !== q.reg));
+  const lab = svg.querySelector('.tm-labels');
+  let L = '';
+  for (const a of ANCHOR) {
+    const reg = regionOf(a.words);
+    if (!reg) continue;
+    const path = svg.querySelector(`.tm-cell[data-name="${a.sido}"] .tm-area`);
+    if (!path) continue;
+    const b = path.getBBox();
+    const cx = b.x + b.width / 2, cy = b.y + b.height / 2;
+    const x = cx + a.dx, y = cy + a.dy;
+    const v = reg.pos != null ? reg.pos - reg.neg : null;
+    const short = reg.group.split('/')[0] === reg.group ? reg.group : reg.group.replace(/\//g, '·');
+    if (a.callout) L += `<line class="tm-callout" x1="${cx}" y1="${cy}" x2="${x + 18}" y2="${y + 2}"/><circle class="tm-callout-dot" cx="${cx}" cy="${cy}" r="1.8"/>`;
+    L += `<text class="tm-lab" x="${x}" y="${y}" text-anchor="middle"><tspan class="tm-lab-name" x="${x}">${esc(short)}</tspan><tspan class="tm-lab-val" x="${x}" dy="14">${v == null ? '미공개' : fmt(v)}</tspan></text>`;
+  }
+  lab.innerHTML = L;
+
+  // 올리면 그 권역 수치를 보여주고 같은 권역만 진하게
+  const tip = el.querySelector('.tm-tip');
+  const [, , VW] = VIEWBOX.split(' ').map(Number);
+  const show = (name, ev) => {
+    const q = sidos.find((c) => c.name === name);
+    el.querySelectorAll('.tm-cell').forEach((g) => g.classList.toggle('dim', !!q?.reg && regOfSido(g.dataset.name) !== q.reg));
     el.querySelectorAll('.tm-list li').forEach((li) => li.classList.toggle('on', q?.reg?.group === li.dataset.group));
     if (!q) { tip.hidden = true; return; }
     const r = q.reg;
@@ -102,21 +104,26 @@ export function regionMap(el, rows) {
       ? `<b>${esc(r.group)}</b>${r.pos == null ? '<div>표본이 적어 미공개</div>' : `<div>잘하고 있다 <span class="num">${r.pos}%</span></div><div>잘못하고 있다 <span class="num">${r.neg}%</span></div><div class="tm-n">순평가 ${fmt(r.pos - r.neg)} · ${r.n?.toLocaleString('ko-KR')}명</div>`}`
       : `<b>${esc(q.name)}</b><div>자료 없음</div>`;
     tip.hidden = false;
-    const box = svg.getBoundingClientRect(), sc = box.width / W;
-    const left = (q.x + T) * sc + 8, top = q.y * sc;
-    tip.style.left = `${Math.min(left, box.width - tip.offsetWidth)}px`;
-    tip.style.top = `${top}px`;
+    const box = svg.getBoundingClientRect();
+    let x, y;
+    if (ev && ev.clientX != null) { x = ev.clientX - box.left + 14; y = ev.clientY - box.top + 10; }
+    else {
+      const bb = svg.querySelector(`.tm-cell[data-name="${name}"]`).getBBox(), sc = box.width / VW;
+      x = (bb.x + bb.width) * sc + 6; y = bb.y * sc;
+    }
+    tip.style.left = `${Math.max(0, Math.min(x, box.width - tip.offsetWidth))}px`;
+    tip.style.top = `${Math.max(0, Math.min(y, box.height - tip.offsetHeight))}px`;
   };
   const clear = () => show(null);
   el.querySelectorAll('.tm-cell').forEach((g) => {
-    g.addEventListener('pointerenter', () => show(g.dataset.name));
+    g.addEventListener('pointermove', (ev) => show(g.dataset.name, ev));
+    g.addEventListener('pointerdown', (ev) => show(g.dataset.name, ev));
     g.addEventListener('focus', () => show(g.dataset.name));
-    g.addEventListener('pointerdown', () => show(g.dataset.name));
     g.addEventListener('blur', clear);
   });
   svg.addEventListener('pointerleave', clear);
   el.querySelectorAll('.tm-list li').forEach((li) => {
-    li.addEventListener('pointerenter', () => { const q = cells.find((c) => c.reg?.group === li.dataset.group); if (q) show(q.name); });
+    li.addEventListener('pointerenter', () => { const q = sidos.find((c) => c.reg?.group === li.dataset.group); if (q) show(q.name); });
     li.addEventListener('pointerleave', clear);
   });
 }

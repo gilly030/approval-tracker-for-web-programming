@@ -251,21 +251,25 @@ textarea { width: 100%; min-height: 120px; font: 12px/1.4 var(--font-num); backg
 .stepper .btn:disabled { opacity: 0.4; cursor: default; }
 .trend-tools { display: flex; flex-wrap: wrap; gap: 8px; }
 
-/* 지역 타일 지도 */
+/* 지역 지도 */
 .regionmap { border-bottom: 1px solid var(--line); padding-bottom: 16px; margin-bottom: 4px; }
 .tm-wrap { display: flex; flex-wrap: wrap; gap: 20px 36px; align-items: flex-start; }
-.tm-map { position: relative; flex: 0 1 280px; min-width: 0; }
-.tm-map svg { display: block; width: 100%; height: auto; }
+.tm-map { position: relative; flex: 1 1 380px; max-width: 520px; min-width: 0; }
+.tm-map svg { display: block; width: 100%; height: auto; overflow: visible; }
 .tm-cell { cursor: pointer; transition: opacity .15s; outline: none; }
-.tm-cell.dim { opacity: 0.35; }
-.tm-cell:focus-visible rect:first-child { stroke: var(--focus); stroke-width: 3; }
-.tm-name { font-family: var(--font-body); font-size: 13px; font-weight: 600; fill: var(--ink); pointer-events: none; }
-.tm-name.on-dark { fill: #ffffff; }
-:root[data-theme="dark"] .tm-name.on-dark { fill: #0f120f; }
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .tm-name.on-dark { fill: #0f120f; } }
-.tm-edge { stroke: var(--ink); stroke-width: 2.2; stroke-linecap: square; pointer-events: none; }
-.tm-hatch { fill: url(#tm-stripes); }
-.tm-stripe { stroke: var(--axis); stroke-width: 2; }
+.tm-cell.dim { opacity: 0.3; }
+.tm-area { stroke: var(--bg); stroke-width: 0.8; stroke-linejoin: round; }
+.tm-cell:focus-visible .tm-area { stroke: var(--focus); stroke-width: 2; }
+.tm-hatch { fill: url(#tm-stripes); pointer-events: none; }
+.tm-stripe { stroke: var(--axis); stroke-width: 1.6; }
+.tm-dokdo circle { stroke: var(--ink); stroke-width: 1.2; }
+.tm-islet { font-family: var(--font-body); font-size: 11px; font-weight: 600; fill: var(--ink-2); paint-order: stroke; stroke: var(--surface); stroke-width: 3px; }
+.tm-labels { pointer-events: none; }
+.tm-lab { font-family: var(--font-body); paint-order: stroke; stroke: var(--surface); stroke-width: 3.5px; stroke-linejoin: round; }
+.tm-lab-name { font-size: 12px; font-weight: 600; fill: var(--ink-2); }
+.tm-lab-val { font-size: 14px; font-weight: 700; fill: var(--ink); font-variant-numeric: tabular-nums; }
+.tm-callout { stroke: var(--ink-2); stroke-width: 1; }
+.tm-callout-dot { fill: var(--ink); }
 .tm-tip { position: absolute; z-index: 2; pointer-events: none; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; box-shadow: 0 4px 14px rgb(0 0 0 / 0.12); padding: 7px 10px; font-size: 13px; min-width: 140px; }
 .tm-tip b { display: block; margin-bottom: 2px; }
 .tm-tip .tm-n { color: var(--muted); font-size: 12px; margin-top: 2px; }
