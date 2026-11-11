@@ -248,8 +248,10 @@ function renderStepper() {
   $('#next-week').disabled = i < 0 || i >= w.length - 1;
 }
 
+// 화면에 보여줄 기본 배너 (회차마다 붙는 특별 배너는 데이터에만 두고 숨긴다)
+const STANDARD_BANNERS = ['지역별', '성별', '연령별', '지지정당별', '직업별', '생활수준별', '이념성향별', '정치관심도별'];
 function renderBanners() {
-  const list = currentMeta().banners;
+  const list = STANDARD_BANNERS.filter((b) => currentMeta().banners.includes(b));
   if (!list.includes(state.banner)) state.banner = list[0];
   $('#banners').innerHTML = list.map((b, i) => `<button type="button" id="banner-${i}" data-banner="${esc(b)}" aria-pressed="${b === state.banner}">${esc(b)}</button>`).join('');
 }
