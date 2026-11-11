@@ -96,9 +96,54 @@ function renderRange() {
   const { first, last } = bounds();
   document.querySelectorAll('[data-range]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.range === state.range.preset)));
   const [a, b] = rangeDates();
-  for (const id of ['#range-from', '#range-to']) { $(id).min = ym(first); $(id).max = ym(last); }
+  // 갤럽 데일리 오피니언은 2012년 1월부터. 아직 수집 전인 기간도 고를 수 있게 한다.
+  for (const id of ['#range-from', '#range-to']) { $(id).min = EARLIEST; $(id).max = ym(last); }
   $('#range-from').value = state.range.from || ym(a);
   $('#range-to').value = state.range.to || ym(b);
+  setPending(false);
+}
+const EARLIEST = '2012-01';
+
+// 날짜 칸을 고쳤지만 아직 적용하지 않은 상태
+function setPending(on) {
+  state.rangePending = on;
+  $('#range-apply').classList.toggle('idle', !on);
+  $('#range-info').classList.toggle('pending', on);
+  if (on) $('#range-info').textContent = '적용을 누르면 이 기간으로 바뀝니다';
+}
+function applyCustomRange() {
+  let from = $('#range-from').value, to = $('#range-to').value;
+  if (!from || !to) { $('#range-info').textContent = '시작과 끝 월을 모두 골라 주세요'; return; }
+  if (from > to) [from, to] = [to, from];
+  state.range = { preset: 'custom', from, to };
+  renderRange(); ensureSurvey(); renderMain(); renderBanners(); renderSnapshot(); renderTrend();
+}
+
+// 그래프 가로축: 고른 기간 그대로 (끝은 최신 조사까지만)
+function axisRange() {
+  const [a, b] = rangeDates();
+  const last = bounds().last;
+  return [a < monthStart(EARLIEST) ? monthStart(EARLIEST) : a, b > last ? last : b];
+}
+// 고른 기간 앞부분에 자료가 없으면 알려준다
+function renderGap(list) {
+  const el = $('#range-gap');
+  const [a] = axisRange();
+  const bf = state.index.backfill;
+  const collecting = bf && !bf.done ? ' 과거 자료를 자동으로 모으는 중이라, 며칠 안에 채워집니다.' : '';
+  if (!list.length) { el.hidden = false; el.textContent = `이 기간에는 아직 자료가 없어요.${collecting}`; return; }
+  const firstD = dateOf(list[0]);
+  if ((firstD - a) / 864e5 > GAP_DAYS) {
+    el.hidden = false;
+    el.textContent = `${ymLabel(ym(a))}부터 ${ymLabel(ym(firstD))} 전까지는 아직 자료가 없어요.${collecting}`;
+    return;
+  }
+  // 수집 중에는 중간에 1년 넘게 빈 구간이 생길 수 있다
+  const hole = list.findIndex((s, i) => i && (dateOf(s) - dateOf(list[i - 1])) / 864e5 > 365);
+  if (hole > 0 && collecting) {
+    el.hidden = false;
+    el.textContent = `${ymLabel(ym(dateOf(list[hole - 1])))}부터 ${ymLabel(ym(dateOf(list[hole])))} 사이는 아직 자료가 없어요.${collecting}`;
+  } else el.hidden = true;
 }
 
 // ---------- 최신 수치 ----------
@@ -154,7 +199,8 @@ function renderMain() {
   $('#main-title').textContent = one ? `${pres[0]} 대통령 직무 수행 평가` : '대통령 직무 수행 평가';
   $('#main-q').textContent = `귀하는 요즘 ${one ? pres[0] : '○○○'} 대통령이 대통령으로서의 직무를 잘 수행하고 있다고 보십니까, 아니면 잘못 수행하고 있다고 보십니까?`;
   const [a, b] = rangeDates();
-  $('#range-info').textContent = list.length ? `${list[0].label} ~ ${list[list.length - 1].label} · 주간 조사 ${list.length}회` : `${ymLabel(ym(a))} ~ ${ymLabel(ym(b))}`;
+  if (!state.rangePending) $('#range-info').textContent = list.length ? `자료: ${list[0].label} ~ ${list[list.length - 1].label} · 주간 조사 ${list.length}회` : `${ymLabel(ym(a))} ~ ${ymLabel(ym(b))}`;
+  renderGap(list);
   if (list.length < 2) {
     $('#main-legend').innerHTML = '';
     $('#main-chart').innerHTML = `<div class="empty">이 기간에는 주간 조사 자료가 ${list.length ? '1회뿐' : '없'}이에요. 기간을 넓혀 보세요.</div>`;
@@ -170,6 +216,7 @@ function renderMain() {
   const sel = list.find((s) => s.key === state.surveyKey);
   state.charts.main = lineChart($('#main-chart'), {
     series, legendEl: $('#main-legend'), unit: '%', yMin: 0, bands: presidentBands(list),
+    xMin: axisRange()[0], xMax: axisRange()[1],
     selectedX: sel ? dateOf(sel) : null,
     selectedLabel: sel ? shortLabel(sel) : null,
     onSelect: (x) => { const s = list.find((q) => +dateOf(q) === +x); if (s) selectSurvey(s.key, true); },
@@ -193,14 +240,6 @@ function renderMainTable(list) {
   }</tbody></table>`;
 }
 
-function renderBackfill() {
-  const bf = state.index.backfill;
-  const el = $('#backfill');
-  const w = weekly();
-  if (!bf || bf.done || !w.length) { el.hidden = true; return; }
-  el.hidden = false;
-  el.textContent = `과거 주간 조사를 매일 자동으로 채우는 중이에요 (${ymLabel(bf.since)}까지). 지금은 주간 조사 ${w.length}회가 있고, 채워지는 대로 그래프가 길어집니다.`;
-}
 
 // ---------- 선택한 조사 ----------
 const surveysOf = (type) => all().filter((s) => s.type === type);
@@ -369,6 +408,7 @@ async function renderTrend() {
     selectedLabel: sel ? shortLabel(sel) : null,
     onSelect: (x) => { const s = list.find((q) => +dateOf(q) === +x); if (s) selectSurvey(s.key); },
     yMin: state.metric === 'net' ? undefined : 0, bands: presidentBands(list),
+    xMin: axisRange()[0], xMax: axisRange()[1],
     ariaLabel: `${state.banner} ${metricName()} 추이`,
   });
   state.trendData = { list, series, title: $('#trend-title').textContent };
@@ -438,13 +478,11 @@ document.addEventListener('click', (e) => {
   }
 });
 for (const id of ['#range-from', '#range-to']) {
-  $(id).addEventListener('change', () => {
-    let from = $('#range-from').value, to = $('#range-to').value;
-    if (from && to && from > to) [from, to] = [to, from];
-    state.range = { preset: 'custom', from, to };
-    renderRange(); ensureSurvey(); renderMain(); renderBanners(); renderSnapshot(); renderTrend();
-  });
+  $(id).addEventListener('input', () => setPending(true));
+  $(id).addEventListener('change', () => setPending(true));
+  $(id).addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); applyCustomRange(); } });
 }
+$('#range-apply').addEventListener('click', applyCustomRange);
 $('#legend').addEventListener('pointerover', (e) => {
   const b = e.target.closest('[data-group]');
   if (!b || !state.charts.trend || !state.trendData || !state.slots.has(b.dataset.group)) return;
@@ -477,7 +515,6 @@ async function start() {
   $('#updated').textContent = `${state.index.updated} 갱신`;
   if (!surveysOf(state.type).length) state.type = all()[0]?.type || 'weekly';
   renderHeadline();
-  renderBackfill();
   renderRange();
   ensureSurvey();
   renderMain();

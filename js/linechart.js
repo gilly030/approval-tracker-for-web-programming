@@ -34,8 +34,10 @@ export function lineChart(el, o) {
   const step = hi - lo > 60 ? 20 : 10;
   hi = lo + Math.ceil((hi - lo) / step) * step;
   const xs = [...new Set(series.flatMap((s) => s.points.filter((p) => p.y != null).map((p) => +p.x)))].sort((a, b) => a - b);
-  const t0 = xs[0], t1 = xs[xs.length - 1];
-  const pad = (t1 - t0) * 0.02 || 86400000 * 15;
+  // 가로축 범위: 고른 기간(xMin~xMax)이 있으면 그대로, 없으면 자료 범위. 자료가 없는 구간은 비워 둔다.
+  const t0 = o.xMin != null ? Math.min(+o.xMin, xs[0]) : xs[0];
+  const t1 = o.xMax != null ? Math.max(+o.xMax, xs[xs.length - 1]) : xs[xs.length - 1];
+  const pad = (t1 - t0) * (o.xMin != null ? 0.01 : 0.02) || 86400000 * 15;
   const X = (t) => m.l + ((+t - (t0 - pad)) / (t1 - t0 + 2 * pad)) * iw;
   const Y = (v) => m.t + ih - ((v - lo) / (hi - lo)) * ih;
 

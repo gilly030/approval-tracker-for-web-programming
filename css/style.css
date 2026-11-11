@@ -223,6 +223,11 @@ textarea { width: 100%; min-height: 120px; font: 12px/1.4 var(--font-num); backg
 .range-custom { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: 13px; color: var(--ink-2); }
 .range-custom input { font: inherit; font-size: 14px; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 4px 8px; }
 .range-info { font-size: 13px; color: var(--ink-2); }
+.rf { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+.range-info.pending { color: var(--pos); font-weight: 600; }
+#range-apply { padding: 5px 14px; }
+#range-apply.idle { background: var(--surface); color: var(--ink-2); border-color: var(--axis); }
+.range-gap { margin: 0; font-size: 13px; color: var(--ink); background: color-mix(in srgb, #fab219 22%, transparent); border-radius: 6px; padding: 6px 10px; justify-self: start; }
 .backfill { font-size: 12.5px; color: var(--ink-2); background: var(--chip); border-radius: 6px; padding: 6px 10px; justify-self: start; }
 
 /* 선택한 주 */

@@ -33,12 +33,14 @@
         <button type="button" id="r-all" data-range="all" aria-pressed="false">전체</button>
       </div>
       <span class="range-custom" id="range-custom">
-        <label for="range-from">시작</label><input type="month" id="range-from">
-        <label for="range-to">끝</label><input type="month" id="range-to">
+        <span class="rf"><label for="range-from">시작</label><input type="month" id="range-from"></span>
+        <span aria-hidden="true">~</span>
+        <span class="rf"><label for="range-to">끝</label><input type="month" id="range-to"></span>
+        <button type="button" class="btn primary" id="range-apply">적용</button>
       </span>
       <span class="range-info" id="range-info"></span>
     </div>
-    <p class="backfill" id="backfill" hidden></p>
+    <p class="range-gap" id="range-gap" hidden></p>
     <div class="lc-legend" id="main-legend"></div>
     <div class="chart" id="main-chart"></div>
     <p class="fig-note" id="main-note"></p>
