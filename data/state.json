@@ -1,6 +1,569 @@
 {
  "lastSeq": 1666,
  "processed": {
+  "1410": {
+   "kind": "daily",
+   "issue": 552,
+   "month": "2023-07",
+   "tables": [
+    "2023-07-W4",
+    "2023-01-M",
+    "2023-02-M",
+    "2023-03-M",
+    "2023-04-M",
+    "2023-05-M",
+    "2023-06-M",
+    "2023-07-M"
+   ],
+   "warnings": 2,
+   "added": [
+    "2023-07-W4"
+   ],
+   "replaced": []
+  },
+  "1411": {
+   "kind": "daily",
+   "issue": 553,
+   "month": "2023-08",
+   "tables": [
+    "2023-08-W1"
+   ],
+   "warnings": 0,
+   "added": [
+    "2023-08-W1"
+   ],
+   "replaced": []
+  },
+  "1412": {
+   "kind": "daily",
+   "issue": 554,
+   "month": "2023-08",
+   "tables": [
+    "2023-08-W2"
+   ],
+   "warnings": 3,
+   "added": [
+    "2023-08-W2"
+   ],
+   "replaced": []
+  },
+  "1413": {
+   "kind": "daily",
+   "issue": 555,
+   "month": "2023-08",
+   "tables": [
+    "2023-08-W4"
+   ],
+   "warnings": 0,
+   "added": [
+    "2023-08-W4"
+   ],
+   "replaced": []
+  },
+  "1414": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "1415": {
+   "kind": "daily",
+   "issue": 556,
+   "month": "2023-08",
+   "tables": [
+    "2023-08-W5",
+    "2023-01-M",
+    "2023-02-M",
+    "2023-03-M",
+    "2023-04-M",
+    "2023-05-M",
+    "2023-06-M",
+    "2023-07-M",
+    "2023-08-M"
+   ],
+   "warnings": 3,
+   "added": [
+    "2023-08-W5"
+   ],
+   "replaced": []
+  },
+  "1416": {
+   "kind": "daily",
+   "issue": 557,
+   "month": "2023-09",
+   "tables": [
+    "2023-09-W1"
+   ],
+   "warnings": 0,
+   "added": [
+    "2023-09-W1"
+   ],
+   "replaced": []
+  },
+  "1417": {
+   "kind": "daily",
+   "issue": 558,
+   "month": "2023-09",
+   "tables": [
+    "2023-09-W2"
+   ],
+   "warnings": 4,
+   "added": [
+    "2023-09-W2"
+   ],
+   "replaced": []
+  },
+  "1418": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "1419": {
+   "kind": "daily",
+   "issue": 559,
+   "month": "2023-09",
+   "tables": [
+    "2023-09-W3",
+    "2023-01-M",
+    "2023-02-M",
+    "2023-03-M",
+    "2023-04-M",
+    "2023-05-M",
+    "2023-06-M",
+    "2023-07-M",
+    "2023-08-M",
+    "2023-09-M"
+   ],
+   "warnings": 3,
+   "added": [
+    "2023-09-W3"
+   ],
+   "replaced": []
+  },
+  "1420": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "1421": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "1422": {
+   "kind": "daily",
+   "issue": 560,
+   "month": "2023-10",
+   "tables": [
+    "2023-10-W2"
+   ],
+   "warnings": 1,
+   "added": [
+    "2023-10-W2"
+   ],
+   "replaced": []
+  },
+  "1423": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "1424": {
+   "kind": "daily",
+   "issue": 561,
+   "month": "2023-10",
+   "tables": [
+    "2023-10-W3"
+   ],
+   "warnings": 4,
+   "added": [
+    "2023-10-W3"
+   ],
+   "replaced": []
+  },
+  "1425": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "1426": {
+   "kind": "daily",
+   "issue": 562,
+   "month": "2023-10",
+   "tables": [
+    "2023-10-W4",
+    "2023-01-M",
+    "2023-02-M",
+    "2023-03-M",
+    "2023-04-M",
+    "2023-05-M",
+    "2023-06-M",
+    "2023-07-M",
+    "2023-08-M",
+    "2023-09-M",
+    "2023-10-M"
+   ],
+   "warnings": 2,
+   "added": [
+    "2023-10-W4"
+   ],
+   "replaced": []
+  },
+  "1427": {
+   "kind": "daily",
+   "issue": 563,
+   "month": "2023-11",
+   "tables": [
+    "2023-11-W1"
+   ],
+   "warnings": 0,
+   "added": [
+    "2023-11-W1"
+   ],
+   "replaced": []
+  },
+  "1428": {
+   "kind": "none"
+  },
+  "1429": {
+   "kind": "daily",
+   "issue": 564,
+   "month": "2023-11",
+   "tables": [
+    "2023-11-W2"
+   ],
+   "warnings": 2,
+   "added": [
+    "2023-11-W2"
+   ],
+   "replaced": []
+  },
+  "1430": {
+   "kind": "none"
+  },
+  "1431": {
+   "kind": "daily",
+   "issue": 565,
+   "month": "2023-11",
+   "tables": [
+    "2023-11-W3"
+   ],
+   "warnings": 2,
+   "added": [
+    "2023-11-W3"
+   ],
+   "replaced": []
+  },
+  "1432": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "1433": {
+   "kind": "none"
+  },
+  "1434": {
+   "kind": "none"
+  },
+  "1435": {
+   "kind": "daily",
+   "issue": 566,
+   "month": "2023-11",
+   "tables": [
+    "2023-11-W4"
+   ],
+   "warnings": 3,
+   "added": [
+    "2023-11-W4"
+   ],
+   "replaced": []
+  },
+  "1436": {
+   "kind": "none"
+  },
+  "1437": {
+   "kind": "daily",
+   "issue": 567,
+   "month": "2023-11",
+   "tables": [
+    "2023-11-W5",
+    "2023-01-M",
+    "2023-02-M",
+    "2023-03-M",
+    "2023-04-M",
+    "2023-05-M",
+    "2023-06-M",
+    "2023-07-M",
+    "2023-08-M",
+    "2023-09-M",
+    "2023-10-M",
+    "2023-11-M"
+   ],
+   "warnings": 2,
+   "added": [
+    "2023-11-W5"
+   ],
+   "replaced": [
+    "2023-01-M",
+    "2023-02-M",
+    "2023-03-M",
+    "2023-04-M",
+    "2023-05-M",
+    "2023-06-M",
+    "2023-07-M",
+    "2023-08-M",
+    "2023-09-M",
+    "2023-10-M"
+   ]
+  },
+  "1438": {
+   "kind": "none"
+  },
+  "1439": {
+   "kind": "daily",
+   "issue": 5,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "1440": {
+   "kind": "daily",
+   "issue": 568,
+   "month": "2023-12",
+   "tables": [
+    "2023-12-W1"
+   ],
+   "warnings": 1,
+   "added": [
+    "2023-12-W1"
+   ],
+   "replaced": []
+  },
+  "1441": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "1442": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "1443": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "1444": {
+   "kind": "daily",
+   "issue": 569,
+   "month": "2023-12",
+   "tables": [
+    "2023-12-W2"
+   ],
+   "warnings": 3,
+   "added": [
+    "2023-12-W2"
+   ],
+   "replaced": []
+  },
+  "1445": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "1446": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "1447": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "1448": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "1449": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [
+    "2023-01-M",
+    "2023-02-M",
+    "2023-03-M",
+    "2023-04-M",
+    "2023-05-M",
+    "2023-06-M",
+    "2023-07-M",
+    "2023-08-M",
+    "2023-09-M",
+    "2023-10-M",
+    "2023-11-M",
+    "2023-12-M"
+   ],
+   "warnings": 4,
+   "skipped": [
+    {
+     "page": 48,
+     "reason": "조사 기간을 읽지 못함",
+     "head": "조사완료 가중적용 윤석열 대통령 직무 수행 평가 2023년 1~12월 조사완료 가중적용 정당 지지도 사례수 사례수 잘하고 잘못하고 어느 쪽도 모름/ 2023년 1~12월 연간 통합 사례수 사례수 더불어 무당층 (명)"
+    }
+   ],
+   "added": [
+    "2023-01-M",
+    "2023-02-M",
+    "2023-03-M",
+    "2023-04-M",
+    "2023-05-M",
+    "2023-06-M",
+    "2023-07-M",
+    "2023-08-M",
+    "2023-09-M",
+    "2023-10-M",
+    "2023-11-M"
+   ],
+   "replaced": []
+  },
+  "1450": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "1451": {
+   "kind": "daily",
+   "issue": 570,
+   "month": "2024-01",
+   "tables": [
+    "2024-01-W2"
+   ],
+   "warnings": 0,
+   "added": [
+    "2024-01-W2"
+   ],
+   "replaced": []
+  },
+  "1452": {
+   "kind": "daily",
+   "issue": 571,
+   "month": "2024-01",
+   "tables": [
+    "2024-01-W3"
+   ],
+   "warnings": 2,
+   "added": [
+    "2024-01-W3"
+   ],
+   "replaced": []
+  },
+  "1453": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "1454": {
+   "kind": "daily",
+   "issue": 572,
+   "month": "2024-01",
+   "tables": [
+    "2024-01-W4",
+    "2023-12-M",
+    "2024-01-M"
+   ],
+   "warnings": 8,
+   "added": [
+    "2024-01-W4",
+    "2023-12-M"
+   ],
+   "replaced": []
+  },
+  "1455": {
+   "kind": "daily",
+   "issue": 573,
+   "month": "2024-02",
+   "tables": [
+    "2024-02-W1"
+   ],
+   "warnings": 1,
+   "added": [
+    "2024-02-W1"
+   ],
+   "replaced": []
+  },
+  "1456": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "1457": {
+   "kind": "daily",
+   "issue": 574,
+   "month": "2024-02",
+   "tables": [
+    "2024-02-W3"
+   ],
+   "warnings": 2,
+   "added": [
+    "2024-02-W3"
+   ],
+   "replaced": []
+  },
+  "1458": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "1459": {
+   "kind": "daily",
+   "issue": 575,
+   "month": "2024-02",
+   "tables": [
+    "2024-02-W4"
+   ],
+   "warnings": 0,
+   "added": [
+    "2024-02-W4"
+   ],
+   "replaced": []
+  },
   "1460": {
    "kind": "other",
    "issue": null,
@@ -2093,9 +2656,9 @@
  "backfill": {
   "since": "2012-01",
   "done": false,
-  "next": 1459,
-  "misses": 1
+  "next": 1409,
+  "misses": 0
  },
  "reprocess": [],
- "failStreak": 1
+ "failStreak": 0
 }
