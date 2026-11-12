@@ -1,6 +1,447 @@
 {
  "lastSeq": 1666,
  "processed": {
+  "1060": {
+   "kind": "none"
+  },
+  "1061": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "1062": {
+   "kind": "none"
+  },
+  "1063": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "1064": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "1065": {
+   "kind": "daily",
+   "issue": 380,
+   "month": "2019-11",
+   "tables": [],
+   "warnings": 0
+  },
+  "1066": {
+   "kind": "daily",
+   "issue": 381,
+   "month": "2019-12",
+   "tables": [],
+   "warnings": 0
+  },
+  "1067": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "1068": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "1069": {
+   "kind": "daily",
+   "issue": 382,
+   "month": "2019-12",
+   "tables": [],
+   "warnings": 0
+  },
+  "1070": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "1071": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "1072": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "1073": {
+   "kind": "daily",
+   "issue": 383,
+   "month": "2019-12",
+   "tables": [],
+   "warnings": 0
+  },
+  "1074": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "1075": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "1076": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "1077": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "1078": {
+   "kind": "daily",
+   "issue": 384,
+   "month": "2020-01",
+   "tables": [],
+   "warnings": 0
+  },
+  "1079": {
+   "kind": "daily",
+   "issue": 385,
+   "month": "2020-01",
+   "tables": [],
+   "warnings": 0
+  },
+  "1080": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "1081": {
+   "kind": "daily",
+   "issue": 386,
+   "month": "2020-01",
+   "tables": [],
+   "warnings": 0
+  },
+  "1082": {
+   "kind": "daily",
+   "issue": 387,
+   "month": "2020-02",
+   "tables": [],
+   "warnings": 0
+  },
+  "1083": {
+   "kind": "daily",
+   "issue": 388,
+   "month": "2020-02",
+   "tables": [
+    "2020-02-W2"
+   ],
+   "warnings": 1,
+   "added": [
+    "2020-02-W2"
+   ],
+   "replaced": []
+  },
+  "1084": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "1085": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "1086": {
+   "kind": "daily",
+   "issue": 389,
+   "month": "2020-02",
+   "tables": [
+    "2020-02-W3"
+   ],
+   "warnings": 1,
+   "added": [
+    "2020-02-W3"
+   ],
+   "replaced": []
+  },
+  "1087": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "1088": {
+   "kind": "daily",
+   "issue": 390,
+   "month": "2020-02",
+   "tables": [
+    "2020-02-W4",
+    "2020-01-M",
+    "2020-02-M"
+   ],
+   "warnings": 1,
+   "added": [
+    "2020-02-W4"
+   ],
+   "replaced": []
+  },
+  "1089": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "1090": {
+   "kind": "daily",
+   "issue": 391,
+   "month": "2020-03",
+   "tables": [
+    "2020-03-W1"
+   ],
+   "warnings": 0,
+   "added": [
+    "2020-03-W1"
+   ],
+   "replaced": []
+  },
+  "1091": {
+   "kind": "daily",
+   "issue": 392,
+   "month": "2020-03",
+   "tables": [
+    "2020-03-W2"
+   ],
+   "warnings": 1,
+   "added": [
+    "2020-03-W2"
+   ],
+   "replaced": []
+  },
+  "1092": {
+   "kind": "daily",
+   "issue": 393,
+   "month": "2020-03",
+   "tables": [
+    "2020-03-W3"
+   ],
+   "warnings": 0,
+   "added": [
+    "2020-03-W3"
+   ],
+   "replaced": []
+  },
+  "1093": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "1094": {
+   "kind": "daily",
+   "issue": 394,
+   "month": "2020-03",
+   "tables": [
+    "2020-03-W4",
+    "2020-01-M",
+    "2020-02-M",
+    "2020-03-M"
+   ],
+   "warnings": 3,
+   "added": [
+    "2020-03-W4",
+    "2020-03-M"
+   ],
+   "replaced": []
+  },
+  "1095": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "1096": {
+   "kind": "daily",
+   "issue": 395,
+   "month": "2020-04",
+   "tables": [
+    "2020-04-W1"
+   ],
+   "warnings": 1,
+   "added": [
+    "2020-04-W1"
+   ],
+   "replaced": []
+  },
+  "1097": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "1098": {
+   "kind": "daily",
+   "issue": 396,
+   "month": "2020-04",
+   "tables": [
+    "2020-04-W2"
+   ],
+   "warnings": 3,
+   "added": [
+    "2020-04-W2"
+   ],
+   "replaced": []
+  },
+  "1099": {
+   "kind": "daily",
+   "issue": 397,
+   "month": "2020-04",
+   "tables": [
+    "2020-04-W3"
+   ],
+   "warnings": 0,
+   "added": [
+    "2020-04-W3"
+   ],
+   "replaced": []
+  },
+  "1100": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "1101": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "1102": {
+   "kind": "daily",
+   "issue": 398,
+   "month": "2020-04",
+   "tables": [
+    "2020-04-W4"
+   ],
+   "warnings": 0,
+   "added": [
+    "2020-04-W4"
+   ],
+   "replaced": []
+  },
+  "1103": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "1104": {
+   "kind": "daily",
+   "issue": 399,
+   "month": "2020-04",
+   "tables": [
+    "2020-04-W5",
+    "2020-01-M",
+    "2020-02-M",
+    "2020-04-M"
+   ],
+   "warnings": 3,
+   "added": [
+    "2020-04-W5"
+   ],
+   "replaced": []
+  },
+  "1105": {
+   "kind": "daily",
+   "issue": 399,
+   "month": "2020-04",
+   "tables": [],
+   "warnings": 0
+  },
+  "1106": {
+   "kind": "daily",
+   "issue": 400,
+   "month": "2020-05",
+   "tables": [
+    "2020-05-W1"
+   ],
+   "warnings": 1,
+   "added": [
+    "2020-05-W1"
+   ],
+   "replaced": []
+  },
+  "1107": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "1108": {
+   "kind": "daily",
+   "issue": 401,
+   "month": "2020-05",
+   "tables": [
+    "2020-05-W2"
+   ],
+   "warnings": 0,
+   "added": [
+    "2020-05-W2"
+   ],
+   "replaced": []
+  },
+  "1109": {
+   "kind": "daily",
+   "issue": 402,
+   "month": "2020-05",
+   "tables": [
+    "2020-05-W3"
+   ],
+   "warnings": 2,
+   "added": [
+    "2020-05-W3"
+   ],
+   "replaced": []
+  },
   "1110": {
    "kind": "other",
    "issue": null,
@@ -5870,8 +6311,8 @@
  "backfill": {
   "since": "2012-01",
   "done": false,
-  "next": 1109,
-  "misses": 2
+  "next": 1059,
+  "misses": 23
  },
  "reprocess": [],
  "failStreak": 0
