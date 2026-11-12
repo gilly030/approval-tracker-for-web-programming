@@ -12,11 +12,12 @@ on:
     inputs:
       max:
         description: "과거 채우기 때 한 번에 받을 리포트 수"
-        default: "25"
+        default: "50"
 
 permissions:
   contents: write
   pages: write
+  actions: write   # 과거 채우기를 이어서 실행하려고
 
 concurrency:
   group: gallup-update
@@ -27,18 +28,19 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
-          node-version: 20
+          node-version: 22
 
       - name: pdf.js 설치
         run: npm install --no-audit --no-fund
 
       - name: 새 리포트 확인·반영
+        id: update
         if: github.event_name != 'push'
-        run: node tools/update.mjs --max "${{ github.event.inputs.max || '25' }}"
+        run: node tools/update.mjs --max "${{ github.event.inputs.max || '50' }}"
 
       - name: 사이트용 파일 만들기 (index.json, years/)
         if: always()
@@ -65,3 +67,12 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh api -X POST "repos/${{ github.repository }}/pages/builds" || echo "Pages 재배포 요청 실패 (다음 푸시 때 반영됨)"
+
+      # 접속이 잘 되는 동안에는 10분 쉬고 다음 과거 채우기를 이어서 건다 (실패하면 멈추고 예약 실행만 따름)
+      - name: 과거 채우기 이어서 실행
+        if: steps.update.outputs.chain == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          sleep 600
+          gh workflow run update.yml --repo "${{ github.repository }}" --ref "${GITHUB_REF_NAME}" -f max=50

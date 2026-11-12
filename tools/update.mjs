@@ -26,7 +26,7 @@ const PDF_OPTS = { cMapUrl: PDFJS + '/cmaps/', cMapPacked: true, standardFontDat
 
 const args = process.argv.slice(2);
 const DRY = args.includes('--dry-run');
-const BACKFILL_PER_RUN = Number(args[args.indexOf('--max') + 1]) || 25;
+const BACKFILL_PER_RUN = Number(args[args.indexOf('--max') + 1]) || 50;
 const PAUSE = 6000; // 요청 사이 간격 (갤럽 서버에 부담을 주지 않게)
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const log = (...a) => console.log(...a);
@@ -170,5 +170,10 @@ if (changed) db.updated = new Date().toISOString().slice(0, 10);
 fs.writeFileSync(DATA, JSON.stringify(db));
 fs.writeFileSync(STATE, JSON.stringify(state, null, 1));
 log(`완료: 조사 ${db.surveys.length}건${failure ? ' (중간에 멈춤, 받은 만큼 저장)' : ''}`);
+// GitHub Actions: 실패 없이 끝났고 과거 채우기가 남았으면 다음 실행을 이어 걸라고 알린다
+if (process.env.GITHUB_OUTPUT) {
+  const more = !failure && state.backfill && !state.backfill.done;
+  fs.appendFileSync(process.env.GITHUB_OUTPUT, `chain=${more ? 'true' : 'false'}\n`);
+}
 // 페이지 구조가 바뀌었거나 하루 넘게(3시간 간격 8회) 계속 실패하면 실패로 끝내 GitHub이 메일을 보내게 한다
 if (failure && (structureError || state.failStreak >= 8)) process.exit(1);
