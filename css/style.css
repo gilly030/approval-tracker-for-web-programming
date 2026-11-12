@@ -21,6 +21,7 @@
   --dv-0: #e1e5dd;
   --dv-p1: #a5d3b4; --dv-p2: #6fb787; --dv-p3: #24894f; --dv-p4: #0a6436;
   --dv-na: #eef1eb;
+  --island: #c9cdc6;    /* 울릉도·독도 (권역 색을 칠하지 않음) */
   --font-body: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
   --font-num: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
   --font-display: "Gowun Batang", "Nanum Myeongjo", "AppleMyungjo", serif;
@@ -34,7 +35,7 @@
     --dv-n4: #8eaaf0; --dv-n3: #5f7fcf; --dv-n2: #3d5594; --dv-n1: #2b3858;
     --dv-0: #343a33;
     --dv-p1: #23452f; --dv-p2: #2d6e46; --dv-p3: #3e9e64; --dv-p4: #6fd096;
-    --dv-na: #1d211d;
+    --dv-na: #1d211d; --island: #4c534b;
     color-scheme: dark;
   }
 }
@@ -46,7 +47,7 @@
   --dv-n4: #8eaaf0; --dv-n3: #5f7fcf; --dv-n2: #3d5594; --dv-n1: #2b3858;
   --dv-0: #343a33;
   --dv-p1: #23452f; --dv-p2: #2d6e46; --dv-p3: #3e9e64; --dv-p4: #6fd096;
-  --dv-na: #1d211d;
+  --dv-na: #1d211d; --island: #4c534b;
   color-scheme: dark;
 }
 
@@ -262,7 +263,10 @@ textarea { width: 100%; min-height: 120px; font: 12px/1.4 var(--font-num); backg
 .tm-cell:focus-visible .tm-area { stroke: var(--focus); stroke-width: 2; }
 .tm-hatch { fill: url(#tm-stripes); pointer-events: none; }
 .tm-stripe { stroke: var(--axis); stroke-width: 1.6; }
-.tm-dokdo circle { stroke: var(--ink); stroke-width: 1.2; }
+.tm-islands { fill: var(--island); stroke: var(--ink-2); stroke-width: 0.4; stroke-linejoin: round; }
+.tm-na { font-size: 14px; color: var(--ink-2); }
+.hatch-swatch { background: repeating-linear-gradient(45deg, var(--axis) 0 1.5px, var(--dv-na) 1.5px 4px) !important; box-shadow: inset 0 0 0 1px var(--axis); }
+.legend-foot { margin: -6px 0 0; font-size: 12.5px; color: var(--muted); }
 .tm-islet { font-family: var(--font-body); font-size: 11px; font-weight: 600; fill: var(--ink-2); paint-order: stroke; stroke: var(--surface); stroke-width: 3px; }
 .tm-labels { pointer-events: none; }
 .tm-lab { font-family: var(--font-body); paint-order: stroke; stroke: var(--surface); stroke-width: 3.5px; stroke-linejoin: round; }

@@ -1,5 +1,5 @@
 // 지역별 순평가(긍정 − 부정) 지도. 실제 시도 경계(울릉도·독도 포함)를 갤럽 권역별 색으로 칠한다.
-import { VIEWBOX, PATHS, DOKDO } from './korea-paths.js';
+import { VIEWBOX, PATHS, DOKDO, ULLEUNG } from './korea-paths.js';
 
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
@@ -16,7 +16,7 @@ const ANCHOR = [
   { words: ['경기', '인천'], sido: '경기', dx: 14, dy: 22 },
   { words: ['강원'], sido: '강원', dx: 0, dy: 0 },
   { words: ['충청', '대전', '세종'], sido: '충북', dx: -34, dy: 18 },
-  { words: ['경북', '대구'], sido: '경북', dx: -74, dy: 14 }, // 울릉도·독도 때문에 가운데가 동쪽으로 밀려 있어 본토 쪽으로
+  { words: ['경북', '대구'], sido: '경북', dx: 4, dy: -4 },
   { words: ['전라', '광주'], sido: '전북', dx: -6, dy: 30 },
   { words: ['경남', '부산', '울산'], sido: '경남', dx: 10, dy: 2 },
   { words: ['제주'], sido: '제주', dx: 0, dy: 0 },
@@ -51,13 +51,11 @@ export function regionMap(el, rows) {
     if (q.k == null && q.reg) s += `<path class="tm-hatch" d="${PATHS[q.name]}"/>`;
     s += `</g>`;
   }
-  // 독도: 실제로는 점보다 작아서 표시를 덧붙인다
-  if (DOKDO) {
-    const g = regOfSido('경북');
-    const k = g && g.pos != null ? stepOf(g.pos - g.neg) : null;
-    s += `<g class="tm-cell tm-dokdo" tabindex="0" data-name="경북" aria-label="독도 (경상북도 울릉군)">`;
-    s += `<circle cx="${DOKDO[0]}" cy="${DOKDO[1]}" r="3.6" style="fill:${fillVar(k)}"/>`;
-    s += `<text class="tm-islet" x="${DOKDO[0]}" y="${DOKDO[1] + 16}" text-anchor="end">독도</text></g>`;
+  // 울릉도·독도: 권역 색을 칠하지 않고 회색, 실제 크기 그대로
+  if (PATHS['울릉도·독도']) {
+    s += `<path class="tm-islands" d="${PATHS['울릉도·독도']}"><title>울릉도·독도</title></path>`;
+    if (ULLEUNG) s += `<text class="tm-islet" x="${ULLEUNG[0]}" y="${ULLEUNG[1] + 15}" text-anchor="middle">울릉도</text>`;
+    if (DOKDO) s += `<text class="tm-islet" x="${DOKDO[0] - 2}" y="${DOKDO[1] + 13}" text-anchor="end">독도</text>`;
   }
   s += `<g class="tm-labels"></g></svg>`;
 
@@ -68,7 +66,7 @@ export function regionMap(el, rows) {
       <div class="tm-map">${s}<div class="tm-tip" hidden></div></div>
       <div class="tm-side">
         ${legendHTML()}
-        <ol class="tm-list">${list.map(({ r, v }) => `<li data-group="${esc(r.group)}"><i style="background:${fillVar(stepOf(v))}"></i><span class="tm-g">${esc(r.group)}</span><span class="tm-v num">${v == null ? '미공개' : fmt(v)}</span></li>`).join('')}</ol>
+        <ol class="tm-list">${list.map(({ r, v }) => `<li data-group="${esc(r.group)}"><i${v == null ? ' class="hatch-swatch"' : ` style="background:${fillVar(stepOf(v))}"`}></i><span class="tm-g">${esc(r.group)}</span>${v == null ? '<span class="tm-v tm-na">미공개</span>' : `<span class="tm-v num">${fmt(v)}</span>`}</li>`).join('')}</ol>
       </div>
     </div>`;
 
@@ -87,7 +85,7 @@ export function regionMap(el, rows) {
     const v = reg.pos != null ? reg.pos - reg.neg : null;
     const short = reg.group.split('/')[0] === reg.group ? reg.group : reg.group.replace(/\//g, '·');
     if (a.callout) L += `<line class="tm-callout" x1="${cx}" y1="${cy}" x2="${x + 18}" y2="${y + 2}"/><circle class="tm-callout-dot" cx="${cx}" cy="${cy}" r="1.8"/>`;
-    L += `<text class="tm-lab" x="${x}" y="${y}" text-anchor="middle"><tspan class="tm-lab-name" x="${x}">${esc(short)}</tspan><tspan class="tm-lab-val" x="${x}" dy="14">${v == null ? '미공개' : fmt(v)}</tspan></text>`;
+    L += `<text class="tm-lab" x="${x}" y="${y}" text-anchor="middle"><tspan class="tm-lab-name" x="${x}">${esc(short)}</tspan>${v == null ? '' : `<tspan class="tm-lab-val" x="${x}" dy="14">${fmt(v)}</tspan>`}</text>`;
   }
   lab.innerHTML = L;
 
@@ -135,6 +133,6 @@ function legendHTML() {
     <div class="tm-legend-heads"><b class="neg">부정 우세</b><b class="pos">긍정 우세</b></div>
     <div class="tm-scale">${neg}<span class="mid" style="background:var(--dv-0)"></span>${pos}</div>
     <div class="tm-ticks num"><span>40</span><span>20</span><span>10</span><span></span><span>0</span><span></span><span>10</span><span>20</span><span>40</span></div>
-    <div class="tm-legend-note">순평가 = 잘하고 있다 − 잘못하고 있다 (%p). 가운데 회색은 차이 5%p 미만, 빗금은 표본이 적어 미공개.</div>
+    <div class="tm-legend-note">순평가 = 잘하고 있다 − 잘못하고 있다 (%p)</div>
   </div>`;
 }
