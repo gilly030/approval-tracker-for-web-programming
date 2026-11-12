@@ -1,5 +1,8 @@
 # 대통령 직무평가 트래커
 
+**사이트 바로 가기 → [gilly030.github.io/approval-tracker-for-web-programming](https://gilly030.github.io/approval-tracker-for-web-programming/)**
+
+
 한국갤럽 데일리 오피니언 PDF에서 **대통령 직무 수행 평가의 응답자 특성별 표**를 뽑아,
 배너(지역·성·연령·지지정당·직업·이념성향 등)를 골라 볼 수 있게 보여주는 정적 사이트입니다.
 HTML·CSS·JavaScript만 씁니다. 서버나 빌드 도구가 필요 없습니다.
