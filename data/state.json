@@ -1,6 +1,409 @@
 {
  "lastSeq": 1667,
  "processed": {
+  "360": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "361": {
+   "kind": "daily",
+   "issue": 45,
+   "month": "2012-11",
+   "tables": [],
+   "warnings": 0
+  },
+  "362": {
+   "kind": "none"
+  },
+  "363": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "364": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "365": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "366": {
+   "kind": "daily",
+   "issue": 46,
+   "month": "2012-11",
+   "tables": [
+    "2012-11-W5"
+   ],
+   "warnings": 1,
+   "added": [
+    "2012-11-W5"
+   ],
+   "replaced": []
+  },
+  "367": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "368": {
+   "kind": "none"
+  },
+  "369": {
+   "kind": "daily",
+   "issue": 47,
+   "month": "2012-12",
+   "tables": [
+    "2012-12-W1"
+   ],
+   "warnings": 0,
+   "added": [
+    "2012-12-W1"
+   ],
+   "replaced": []
+  },
+  "370": {
+   "kind": "daily",
+   "issue": 48,
+   "month": "2012-12",
+   "tables": [],
+   "warnings": 0,
+   "skipped": [
+    {
+     "page": 11,
+     "reason": "조사 기간을 읽지 못함",
+     "head": "지표 / 최근 2주 일일(Daily) 지표 / 최근 1주 상세 결과 보십니까, 혹은 잘못 수행하고 있다고 보십니까? 있다’ 중 어느 쪽입니까? 대통령 직무 수행 평가 2012년 12월 10~12일 잘하고 잘못하고 모"
+    }
+   ]
+  },
+  "371": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "372": {
+   "kind": "daily",
+   "issue": 49,
+   "month": "2012-12",
+   "tables": [],
+   "warnings": 0
+  },
+  "373": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "374": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "375": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "376": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "377": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "378": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "379": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "380": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "381": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "382": {
+   "kind": "none"
+  },
+  "383": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "384": {
+   "kind": "daily",
+   "issue": 50,
+   "month": "2013-01",
+   "tables": [
+    "2013-01-W3"
+   ],
+   "warnings": 0,
+   "added": [],
+   "replaced": []
+  },
+  "385": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "386": {
+   "kind": "daily",
+   "issue": 51,
+   "month": "2013-01",
+   "tables": [
+    "2013-01-W4"
+   ],
+   "warnings": 0,
+   "added": [
+    "2013-01-W4"
+   ],
+   "replaced": []
+  },
+  "387": {
+   "kind": "daily",
+   "issue": 52,
+   "month": "2013-01",
+   "tables": [
+    "2013-01-W5"
+   ],
+   "warnings": 0,
+   "added": [
+    "2013-01-W5"
+   ],
+   "replaced": []
+  },
+  "388": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "389": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "390": {
+   "kind": "daily",
+   "issue": 53,
+   "month": "2013-02",
+   "tables": [
+    "2013-02-W1"
+   ],
+   "warnings": 0,
+   "added": [
+    "2013-02-W1"
+   ],
+   "replaced": []
+  },
+  "391": {
+   "kind": "daily",
+   "issue": 54,
+   "month": "2013-02",
+   "tables": [],
+   "warnings": 0
+  },
+  "392": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "393": {
+   "kind": "daily",
+   "issue": 55,
+   "month": "2013-02",
+   "tables": [],
+   "warnings": 0
+  },
+  "394": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "395": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "396": {
+   "kind": "daily",
+   "issue": 56,
+   "month": "2013-02",
+   "tables": [],
+   "warnings": 0
+  },
+  "397": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "398": {
+   "kind": "daily",
+   "issue": 57,
+   "month": "2013-03",
+   "tables": [],
+   "warnings": 0
+  },
+  "399": {
+   "kind": "daily",
+   "issue": 58,
+   "month": "2013-03",
+   "tables": [],
+   "warnings": 0
+  },
+  "400": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "401": {
+   "kind": "daily",
+   "issue": 59,
+   "month": "2013-03",
+   "tables": [
+    "2013-03-W3"
+   ],
+   "warnings": 0,
+   "added": [
+    "2013-03-W3"
+   ],
+   "replaced": []
+  },
+  "402": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "403": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "404": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "405": {
+   "kind": "daily",
+   "issue": 60,
+   "month": "2013-03",
+   "tables": [
+    "2013-03-W4"
+   ],
+   "warnings": 0,
+   "added": [
+    "2013-03-W4"
+   ],
+   "replaced": []
+  },
+  "406": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "407": {
+   "kind": "daily",
+   "issue": 61,
+   "month": "2013-04",
+   "tables": [
+    "2013-04-W1"
+   ],
+   "warnings": 0,
+   "added": [
+    "2013-04-W1"
+   ],
+   "replaced": []
+  },
+  "408": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
+  },
+  "409": {
+   "kind": "daily",
+   "issue": 62,
+   "month": "2013-04",
+   "tables": [
+    "2013-04-W2"
+   ],
+   "warnings": 0,
+   "added": [
+    "2013-04-W2"
+   ],
+   "replaced": []
+  },
   "410": {
    "kind": "other",
    "issue": null,
@@ -12860,9 +13263,9 @@
  "backfill": {
   "since": "2012-01",
   "done": false,
-  "next": 409,
-  "misses": 3
+  "next": 359,
+  "misses": 6
  },
  "reprocess": [],
- "failStreak": 1
+ "failStreak": 0
 }
