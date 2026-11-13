@@ -39,7 +39,8 @@ function itemsToWords(items, pageHeight) {
     const x = it.transform[4];
     const y = pageHeight - it.transform[5];
     const w = it.width;
-    const str = it.str;
+    // 일부 리포트(2019~2020년 등)는 '48%'가 '4 8 %'처럼 글자 사이에 공백이 든 채 저장돼 있다
+    const str = /^\d(?:\s+\d)+\s*%$|^\d\s+%$/.test(it.str.trim()) ? it.str.replace(/\s+/g, '') : it.str;
     // 조각 안에 공백이 있으면 글자 수 비례로 나눈다
     const parts = str.split(/(\s+)/);
     let off = 0;
