@@ -141,7 +141,13 @@ function readTable(rows, t) {
   // 배너 열 / 그룹 열 경계
   const labelXs = body.flatMap((r) => r.labels.map((w) => w.x0));
   const bannerX = Math.min(...labelXs);
-  const split = bannerX < groupX - 15 ? (bannerX + groupX) / 2 : -Infinity;
+  // 2012년 일부 표는 '전체'가 그룹 칸이 아니라 배너 칸에 있다 → 그룹 칸은 그 오른쪽 첫 라벨 열
+  let groupColX = groupX;
+  if (Math.abs(bannerX - groupX) < 15) {
+    const right = labelXs.filter((x) => x > groupX + 15);
+    if (right.length) groupColX = Math.min(...right);
+  }
+  const split = bannerX < groupColX - 15 ? (bannerX + groupColX) / 2 : -Infinity;
   for (const r of body) {
     r.bannerWords = r.labels.filter((w) => w.x0 < split);
     r.groupWords = r.labels.filter((w) => w.x0 >= split);
@@ -407,6 +413,11 @@ function parsePeriod(headText, pageText) {
   if ((m = h.match(/(\d{4})\s*년\s*(\d{1,2})\s*월\s*(\d)\s*주/))) {
     const days = (h.match(/\(([\d/~\s-]+일?)\)/) || [])[1];
     return { type: 'weekly', year: +m[1], month: +m[2], week: +m[3], label: `${m[1]}년 ${+m[2]}월 ${m[3]}주${days ? ` (${days.replace(/\s/g, '')})` : ''}` };
+  }
+  // 주차 없이 날짜만 적힌 경우 (예: 2012년 12월 10~12일)
+  if ((m = h.match(/(\d{4})\s*년\s*(\d{1,2})\s*월\s*(\d{1,2})\s*~\s*(\d{1,2})\s*일/))) {
+    const week = Math.ceil(+m[3] / 7);
+    return { type: 'weekly', year: +m[1], month: +m[2], week, label: `${m[1]}년 ${+m[2]}월 ${week}주 (${+m[3]}~${+m[4]}일)` };
   }
   return null;
 }

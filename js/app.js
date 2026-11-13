@@ -95,7 +95,11 @@ const inRange = (s) => { const [a, b] = rangeDates(); const d = dateOf(s); retur
 
 function renderRange() {
   const { first, last } = bounds();
-  document.querySelectorAll('[data-range]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.range === state.range.preset)));
+  // '기간 설정'을 누르면 시작~끝 칸이 열리고, 적용을 눌러야 그래프가 바뀐다
+  const custom = state.customOpen || state.range.preset === 'custom';
+  const pressed = custom ? 'custom' : state.range.preset;
+  document.querySelectorAll('[data-range]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.range === pressed)));
+  $('#range-custom').hidden = !custom;
   const [a, b] = rangeDates();
   // 갤럽 데일리 오피니언은 2012년 1월부터. 아직 수집 전인 기간도 고를 수 있게 한다.
   for (const id of ['#range-from', '#range-to']) { $(id).min = EARLIEST; $(id).max = ym(last); }
@@ -463,7 +467,8 @@ document.addEventListener('click', (e) => {
   const t = e.target.closest('button, a[data-export]');
   if (!t) return;
   if (t.dataset.export) { e.preventDefault(); const [kind, which] = t.dataset.export.split(':'); kind === 'csv' ? exportCSV(which) : exportPNG(which); return; }
-  if (t.dataset.range) setRange(t.dataset.range);
+  if (t.dataset.range === 'custom') { state.customOpen = true; renderRange(); $('#range-from').focus(); }
+  else if (t.dataset.range) { state.customOpen = false; setRange(t.dataset.range); }
   else if (t.dataset.type || t.dataset.switch) {
     state.type = t.dataset.type || t.dataset.switch; store.set('type', state.type);
     document.querySelectorAll('[data-type]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.type === state.type)));

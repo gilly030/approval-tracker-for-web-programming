@@ -1,53 +1,53 @@
 /* 레이아웃: 맨 위 최신 수치 → Gallup 리포트식 메인 그래프 → 배너 선택 → 특성별 막대 → 배너별 추이. 한 열. */
 :root {
-  --bg: #ffffff;        /* 옅은 초록빛 회색 바탕 */
-  --surface: #f9fbf7;
-  --ink: #141714;
-  --ink-2: #4b524b;
-  --muted: #7d847c;
-  --line: #dde3d9;
-  --axis: #b9c1b5;
-  --band: #e4ebe1;
-  --pos: #0b7a43;       /* 잘하고 있다: 초록 */
-  --neg: #2b4fa3;       /* 잘못하고 있다: 남색 */
-  --mid: #c8cfc4;       /* 의견유보 */
+  --bg: #ffffff;        /* 흰 바탕 */
+  --surface: #ffffff;
+  --ink: #16181b;
+  --ink-2: #4a4f57;
+  --muted: #7b818a;
+  --line: #e1e4e8;
+  --axis: #b8bdc4;
+  --band: #f0f2f5;      /* 그래프의 대통령 임기 음영 */
+  --pos: #1f5fc4;       /* 잘하고 있다: 파랑 */
+  --neg: #d93a35;       /* 잘못하고 있다: 빨강 */
+  --mid: #c9cdd2;       /* 의견유보 */
   --on-fill: #ffffff;
-  --chip: #e6ebe3;
-  --focus: #0b7a43;
+  --chip: #eceef1;
+  --focus: #1f5fc4;
   --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a; --s4: #eda100;
   --s5: #e87ba4; --s6: #6250d6;
-  /* 지역 지도용 갈림 색: 남색(부정 우세) ← 회색 → 초록(긍정 우세) */
-  --dv-n4: #1d3a82; --dv-n3: #3c5ca8; --dv-n2: #7c92c9; --dv-n1: #aebde3;
-  --dv-0: #e1e5dd;
-  --dv-p1: #a5d3b4; --dv-p2: #6fb787; --dv-p3: #24894f; --dv-p4: #0a6436;
-  --dv-na: #eef1eb;
-  --island: #c9cdc6;    /* 울릉도·독도 (권역 색을 칠하지 않음) */
+  /* 지역 지도용 갈림 색: 빨강(부정 우세) ← 회색 → 파랑(긍정 우세) */
+  --dv-n4: #a3201c; --dv-n3: #d2463f; --dv-n2: #eb8f88; --dv-n1: #f7c6c2;
+  --dv-0: #e6e8eb;
+  --dv-p1: #c3d6f4; --dv-p2: #86aeea; --dv-p3: #3f78d6; --dv-p4: #1a4fa8;
+  --dv-na: #f1f2f4;
+  --island: #c9cdd2;    /* 울릉도·독도 (권역 색을 칠하지 않음) */
   --font-body: "Nanum Gothic", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
   --font-num: "Nanum Gothic", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
   --font-display: "Nanum Gothic", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #111411; --surface: #171a17; --ink: #eef1ec; --ink-2: #c1c8bf; --muted: #8b9389;
-    --line: #283028; --axis: #3b443a; --band: #1d231d; --pos: #2fa264; --neg: #6e91e2; --mid: #464f45;
-    --chip: #222822; --focus: #2fa264;
+    --bg: #121417; --surface: #181b1f; --ink: #eef0f3; --ink-2: #c3c8cf; --muted: #8b929b;
+    --line: #2a2e34; --axis: #3d434b; --band: #1e2228; --pos: #4a86e8; --neg: #e5504b; --mid: #4a4f57;
+    --chip: #23272d; --focus: #4a86e8;
     --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --s5: #d55181; --s6: #9085e9;
-    --dv-n4: #8eaaf0; --dv-n3: #5f7fcf; --dv-n2: #3d5594; --dv-n1: #2b3858;
-    --dv-0: #343a33;
-    --dv-p1: #23452f; --dv-p2: #2d6e46; --dv-p3: #3e9e64; --dv-p4: #6fd096;
-    --dv-na: #1d211d; --island: #4c534b;
+    --dv-n4: #ff8f86; --dv-n3: #e0605a; --dv-n2: #a5403b; --dv-n1: #5b2a28;
+    --dv-0: #33373d;
+    --dv-p1: #233a5e; --dv-p2: #35609f; --dv-p3: #4f86de; --dv-p4: #93baf5;
+    --dv-na: #1d2025; --island: #4d535b;
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --bg: #111411; --surface: #171a17; --ink: #eef1ec; --ink-2: #c1c8bf; --muted: #8b9389;
-  --line: #283028; --axis: #3b443a; --band: #1d231d; --pos: #2fa264; --neg: #6e91e2; --mid: #464f45;
-  --chip: #222822; --focus: #2fa264;
+  --bg: #121417; --surface: #181b1f; --ink: #eef0f3; --ink-2: #c3c8cf; --muted: #8b929b;
+  --line: #2a2e34; --axis: #3d434b; --band: #1e2228; --pos: #4a86e8; --neg: #e5504b; --mid: #4a4f57;
+  --chip: #23272d; --focus: #4a86e8;
   --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --s5: #d55181; --s6: #9085e9;
-  --dv-n4: #8eaaf0; --dv-n3: #5f7fcf; --dv-n2: #3d5594; --dv-n1: #2b3858;
-  --dv-0: #343a33;
-  --dv-p1: #23452f; --dv-p2: #2d6e46; --dv-p3: #3e9e64; --dv-p4: #6fd096;
-  --dv-na: #1d211d; --island: #4c534b;
+  --dv-n4: #ff8f86; --dv-n3: #e0605a; --dv-n2: #a5403b; --dv-n1: #5b2a28;
+  --dv-0: #33373d;
+  --dv-p1: #233a5e; --dv-p2: #35609f; --dv-p3: #4f86de; --dv-p4: #93baf5;
+  --dv-na: #1d2025; --island: #4d535b;
   color-scheme: dark;
 }
 

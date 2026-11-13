@@ -31,8 +31,9 @@
         <button type="button" id="r-1y" data-range="1y" aria-pressed="false">1년</button>
         <button type="button" id="r-term" data-range="term" aria-pressed="true">현 임기</button>
         <button type="button" id="r-all" data-range="all" aria-pressed="false">전체</button>
+        <button type="button" id="r-custom" data-range="custom" aria-pressed="false" aria-controls="range-custom">기간 설정</button>
       </div>
-      <span class="range-custom" id="range-custom">
+      <span class="range-custom" id="range-custom" hidden>
         <span class="rf"><label for="range-from">시작</label><input type="month" id="range-from"></span>
         <span aria-hidden="true">~</span>
         <span class="rf"><label for="range-to">끝</label><input type="month" id="range-to"></span>

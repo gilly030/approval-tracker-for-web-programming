@@ -67,10 +67,20 @@ async function get(url, tries = 5) {
 // ---------- 리포트 하나 처리 ----------
 async function processSeq(seq, since = null, force = false) {
   if (state.processed[seq]) return state.processed[seq];
-  const r = await get(PDF_URL(seq));
-  if (r.status === 404 || !r.buf || r.buf.length < 1000 || r.buf.subarray(0, 4).toString() !== '%PDF') {
-    return (state.processed[seq] = { kind: 'none' });
+  const isPdf = (x) => x && x.status !== 404 && x.buf && x.buf.length >= 1000 && x.buf.subarray(0, 4).toString() === '%PDF';
+  let r = await get(PDF_URL(seq));
+  if (!isPdf(r)) {
+    // 일부 게시물은 다운로드 주소가 오류 페이지를 준다 → 게시물 본문의 PDF 직접 링크로 받는다
+    const page = await get(`https://www.gallup.co.kr/gallupdb/reportContent.asp?seqNo=${seq}`);
+    const html = page.buf ? new TextDecoder('euc-kr').decode(page.buf) : '';
+    const link = (html.match(/href=["']([^"']+\.pdf)["']/i) || [])[1];
+    if (link) {
+      await sleep(PAUSE / 2);
+      r = await get(new URL(link, 'https://www.gallup.co.kr/gallupdb/').href);
+      if (isPdf(r)) log(`    (게시물 본문 링크로 받음: ${link.split('/').pop()})`);
+    }
   }
+  if (!isPdf(r)) return (state.processed[seq] = { kind: 'none' });
   const res = await parseGallupPdf(pdfjs, new Uint8Array(r.buf), PDF_OPTS);
   // 과거 채우기 중에는 기준 월 이전 표는 넣지 않는다
   if (since) res.tables = res.tables.filter((t) => t.key.slice(0, 7) >= since);
@@ -107,17 +117,18 @@ async function run() {
 
 
   // 0) 재처리 목록: 파서를 고친 뒤 특정 번호를 다시 읽힌다 (state.reprocess = [번호, ...])
-  for (const seq of [...(state.reprocess || [])]) {
+  // 한 번에 BACKFILL_PER_RUN개까지. 하나 끝날 때마다 목록에서 빼서, 중간에 멈춰도 남은 것부터 이어 간다
+  for (const seq of [...(state.reprocess || [])].slice(0, BACKFILL_PER_RUN)) {
     const src = `seq${seq}`;
     delete state.processed[seq];
     db.surveys = db.surveys.filter((s) => s.source !== src); // 이번에 표가 안 나오면 이전 결과도 지운다
     const info = await processSeq(seq, null, true);
     const banners = (db.surveys.find((s) => s.source === src && s.type === 'weekly')?.rows || []).map((r) => r.banner);
     log(`  재처리 ${seq} → ${info.kind} [${(info.tables || []).join(', ')}] 배너: ${[...new Set(banners)].join(' / ')}`);
+    state.reprocess = state.reprocess.filter((q) => q !== seq);
     changed = true;
     await sleep(PAUSE);
   }
-  state.reprocess = [];
 
   // 1) 새 리포트
   const start = state.lastSeq ? state.lastSeq + 1 : latest;
@@ -172,7 +183,7 @@ fs.writeFileSync(STATE, JSON.stringify(state, null, 1));
 log(`완료: 조사 ${db.surveys.length}건${failure ? ' (중간에 멈춤, 받은 만큼 저장)' : ''}`);
 // GitHub Actions: 실패 없이 끝났고 과거 채우기가 남았으면 다음 실행을 이어 걸라고 알린다
 if (process.env.GITHUB_OUTPUT) {
-  const more = !failure && state.backfill && !state.backfill.done;
+  const more = !failure && ((state.backfill && !state.backfill.done) || (state.reprocess || []).length > 0);
   fs.appendFileSync(process.env.GITHUB_OUTPUT, `chain=${more ? 'true' : 'false'}\n`);
 }
 // 페이지 구조가 바뀌었거나 하루 넘게(3시간 간격 8회) 계속 실패하면 실패로 끝내 GitHub이 메일을 보내게 한다
