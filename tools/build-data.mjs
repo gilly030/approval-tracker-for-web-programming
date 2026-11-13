@@ -6,12 +6,20 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { presidentOn } from '../js/parser.js';
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 
 export function buildData(dir = path.join(root, 'data')) {
   const db = JSON.parse(fs.readFileSync(path.join(dir, 'data.json'), 'utf8'));
   const state = fs.existsSync(path.join(dir, 'state.json')) ? JSON.parse(fs.readFileSync(path.join(dir, 'state.json'), 'utf8')) : null;
+  // 대통령 이름은 조사 날짜로 바로잡는다 (리포트 문장에서 잘못 읽은 경우 대비)
+  let fixed = 0;
+  for (const sv of db.surveys) {
+    const p = presidentOn(sv, sv.president);
+    if (p !== sv.president) { sv.president = p; fixed++; }
+  }
+  if (fixed) fs.writeFileSync(path.join(dir, 'data.json'), JSON.stringify(db));
   const surveys = [...db.surveys].sort((a, b) => a.key.localeCompare(b.key));
   const index = {
     updated: db.updated,
@@ -40,10 +48,10 @@ export function buildData(dir = path.join(root, 'data')) {
   for (const f of fs.readdirSync(ydir)) if (!keep.has(f)) fs.unlinkSync(path.join(ydir, f));
   index.years = Object.keys(years).map(Number).sort();
   fs.writeFileSync(path.join(dir, 'index.json'), JSON.stringify(index));
-  return { surveys: surveys.length, years: index.years.length };
+  return { surveys: surveys.length, years: index.years.length, fixed };
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const r = buildData();
-  console.log(`index.json: 조사 ${r.surveys}건 · 연도 파일 ${r.years}개`);
+  console.log(`index.json: 조사 ${r.surveys}건 · 연도 파일 ${r.years}개 · 대통령 이름 바로잡음 ${r.fixed}건`);
 }

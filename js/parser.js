@@ -364,6 +364,36 @@ function readTable(rows, t) {
 
 // ---------- 4. 기간·대통령·호수 ----------
 
+// 재임 시작일 (직무 평가가 있는 기간). 조사 날짜로 대통령을 정한다.
+// 새 대통령이 취임하면 여기에 한 줄 추가. 목록 이후 날짜는 리포트 문장에서 읽은 이름을 쓴다.
+export const PRESIDENTS = [
+  ['이명박', '2008-02-25'],
+  ['박근혜', '2013-02-25'],
+  ['문재인', '2017-05-10'],
+  ['윤석열', '2022-05-10'],
+  ['이재명', '2025-06-04'],
+];
+const NEXT_ELECTION = '2030-06-03'; // 이 날 이후는 목록에 없는 대통령일 수 있음
+
+// 조사가 시작된 날 (주간: 라벨의 조사일, 월간 통합: 처음 들어간 주)
+export function surveyStart(t) {
+  const pad = (n) => String(n).padStart(2, '0');
+  const m1 = t.label?.match(/\((\d{1,2})\/(\d{1,2})\s*~/);
+  const m2 = t.label?.match(/\((\d{1,2})\s*~\s*\d{1,2}일?\)/);
+  if (t.type === 'weekly' && m1) return `${t.year - (+m1[1] === 12 && t.month === 1 ? 1 : 0)}-${pad(+m1[1])}-${pad(+m1[2])}`;
+  if (t.type === 'weekly' && m2) return `${t.year}-${pad(t.month)}-${pad(+m2[1])}`;
+  if (t.type === 'weekly') return `${t.year}-${pad(t.month)}-${pad(Math.min(28, 1 + (t.week - 1) * 7))}`;
+  const w = +(t.label?.match(/\((\d)/)?.[1] || 1);
+  return `${t.year}-${pad(t.month)}-${pad(Math.min(28, 1 + (w - 1) * 7))}`;
+}
+export function presidentOn(t, parsedName = null) {
+  const d = surveyStart(t);
+  if (d >= NEXT_ELECTION && parsedName) return parsedName;
+  let who = null;
+  for (const [name, start] of PRESIDENTS) if (d >= start) who = name;
+  return who;
+}
+
 function parsePeriod(headText, pageText) {
   const h = headText.replace(/\s+/g, ' ');
   const year = (h.match(/(\d{4})\s*년/) || [])[1];
@@ -418,7 +448,7 @@ export async function parseGallupPdf(pdfjsLib, data, opts = {}) {
       result.tables.push({
         key: periodKey(period),
         ...period,
-        president: pres && pres !== '대통령' ? pres : null,
+        president: presidentOn(period, pres && pres !== '대통령' ? pres : null),
         page: p,
         sourceIssue: srcIssue ? +srcIssue : null,
         columns: tb.columns,
