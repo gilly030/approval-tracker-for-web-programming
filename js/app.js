@@ -385,6 +385,7 @@ function trendSeries(list) {
 
 let trendToken = 0;
 async function renderTrend() {
+  if (!$('#chart')) return; // 배너별 추이 그래프를 페이지에서 뺀 경우
   const token = ++trendToken;
   const metaList = surveysOf(state.type).filter(inRange).sort(byDate);
   $('#trend-title').textContent = `${state.banner} ${metricName()} 추이`;
@@ -493,12 +494,12 @@ for (const id of ['#range-from', '#range-to']) {
   $(id).addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); applyCustomRange(); } });
 }
 $('#range-apply').addEventListener('click', applyCustomRange);
-$('#legend').addEventListener('pointerover', (e) => {
+$('#legend')?.addEventListener('pointerover', (e) => {
   const b = e.target.closest('[data-group]');
   if (!b || !state.charts.trend || !state.trendData || !state.slots.has(b.dataset.group)) return;
   state.charts.trend.highlight(state.trendData.series.findIndex((s) => s.id === b.dataset.group));
 });
-$('#legend').addEventListener('pointerleave', () => state.charts.trend?.highlight(null));
+$('#legend')?.addEventListener('pointerleave', () => state.charts.trend?.highlight(null));
 
 const widths = new Map();
 let rz;
@@ -529,6 +530,6 @@ async function start() {
   ensureSurvey();
   renderMain();
   renderBannerSection();
-  for (const id of ['#main-chart', '#chart']) { widths.set($(id), Math.round($(id).clientWidth)); ro.observe($(id)); }
+  for (const id of ['#main-chart', '#chart']) { const el = $(id); if (!el) continue; widths.set(el, Math.round(el.clientWidth)); ro.observe(el); }
 }
 start();
