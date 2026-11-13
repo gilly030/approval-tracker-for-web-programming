@@ -54,8 +54,6 @@
 
   <div class="section-head">
     <h2>응답자 특성별로 보기</h2>
-    <p class="hint">위 그래프에서 점을 누르면 그 주의 결과로 바뀝니다. 지역·성·연령·지지정당 같은 특성(배너)을 고르세요. 배너 구성은 조사마다 조금씩 다를 수 있어요.</p>
-  </div>
 
 
   <nav class="banners" id="banners" aria-label="응답자 특성(배너)"></nav>
@@ -77,37 +75,10 @@
       <span class="key"><i style="background:var(--neg)"></i>잘못하고 있다</span>
       <span class="key"><i class="hatch-swatch"></i>미공개*</span>
     </div>
-    <p class="legend-foot">*표본이 적어 미공개</p>
+    <p class="legend-foot">*표본이 적은 경우 통계 신뢰성을 위해 미공개 처리 합니다.</p>
     <div class="regionmap" id="regionmap" hidden></div>
     <div class="rows" id="rows"></div>
     <details class="tbl"><summary>표로 보기</summary><div class="tbl-wrap" id="snap-table"></div></details>
-  </section>
-
-  <section class="figure" id="trend" aria-labelledby="trend-title">
-    <div class="panel-head">
-      <div>
-        <h2 id="trend-title" class="fig-title">추이</h2>
-        <p class="fig-measure" id="trend-sub"></p>
-      </div>
-      <div class="trend-tools">
-      <div class="seg" role="group" aria-label="조사 단위">
-        <button type="button" id="type-weekly" data-type="weekly" aria-pressed="true">주간</button>
-        <button type="button" id="type-monthly" data-type="monthly" aria-pressed="false">월간 통합</button>
-      </div>
-      <div class="seg" role="group" aria-label="지표">
-        <button type="button" id="m-pos" data-metric="pos" aria-pressed="true">긍정률</button>
-        <button type="button" id="m-neg" data-metric="neg" aria-pressed="false">부정률</button>
-        <button type="button" id="m-net" data-metric="net" aria-pressed="false">긍정−부정</button>
-      </div>
-      </div>
-    </div>
-    <div class="legend" id="legend" aria-label="비교할 그룹 (최대 6개)"></div>
-    <div class="chart" id="chart"></div>
-    <p class="fig-note" id="trend-hint"></p>
-    <div class="fig-foot">
-      <span><a href="#" data-export="csv:trend">데이터 받기</a> · <a href="#" data-export="png:trend">이미지 저장</a></span>
-      <span class="fig-src">자료: 한국갤럽 데일리 오피니언</span>
-    </div>
   </section>
 
   <footer class="notes">
