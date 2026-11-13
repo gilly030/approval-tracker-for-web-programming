@@ -7458,7 +7458,11 @@
    "kind": "none"
   },
   "978": {
-   "kind": "none"
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
   },
   "979": {
    "kind": "other",
@@ -7908,16 +7912,28 @@
    "replaced": []
   },
   "1021": {
-   "kind": "none"
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
   },
   "1022": {
-   "kind": "none"
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
   },
   "1023": {
    "kind": "none"
   },
   "1024": {
-   "kind": "none"
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
   },
   "1025": {
    "kind": "other",
@@ -7927,7 +7943,11 @@
    "warnings": 0
   },
   "1026": {
-   "kind": "none"
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
   },
   "1027": {
    "kind": "daily",
@@ -7955,10 +7975,18 @@
    "replaced": []
   },
   "1028": {
-   "kind": "none"
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
   },
   "1029": {
-   "kind": "none"
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
   },
   "1030": {
    "kind": "daily",
@@ -7987,7 +8015,11 @@
    "replaced": []
   },
   "1032": {
-   "kind": "none"
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
   },
   "1033": {
    "kind": "daily",
@@ -8131,7 +8163,17 @@
    "replaced": []
   },
   "1044": {
-   "kind": "none"
+   "kind": "daily",
+   "issue": 370,
+   "month": "2019-09",
+   "tables": [
+    "2019-09-W3"
+   ],
+   "warnings": 2,
+   "added": [
+    "2019-09-W3"
+   ],
+   "replaced": []
   },
   "1045": {
    "kind": "other",
@@ -8144,7 +8186,35 @@
    "kind": "none"
   },
   "1047": {
-   "kind": "none"
+   "kind": "daily",
+   "issue": 371,
+   "month": "2019-09",
+   "tables": [
+    "2019-09-W4",
+    "2019-01-M",
+    "2019-02-M",
+    "2019-03-M",
+    "2019-04-M",
+    "2019-05-M",
+    "2019-06-M",
+    "2019-07-M",
+    "2019-08-M",
+    "2019-09-M"
+   ],
+   "warnings": 3,
+   "added": [
+    "2019-09-W4",
+    "2019-01-M",
+    "2019-02-M",
+    "2019-03-M",
+    "2019-04-M",
+    "2019-05-M",
+    "2019-06-M",
+    "2019-07-M",
+    "2019-08-M",
+    "2019-09-M"
+   ],
+   "replaced": []
   },
   "1048": {
    "kind": "other",
@@ -8154,7 +8224,17 @@
    "warnings": 0
   },
   "1049": {
-   "kind": "none"
+   "kind": "daily",
+   "issue": 372,
+   "month": "2019-10",
+   "tables": [
+    "2019-10-W1"
+   ],
+   "warnings": 1,
+   "added": [
+    "2019-10-W1"
+   ],
+   "replaced": []
   },
   "1050": {
    "kind": "other",
@@ -8164,7 +8244,17 @@
    "warnings": 0
   },
   "1051": {
-   "kind": "none"
+   "kind": "daily",
+   "issue": 373,
+   "month": "2019-10",
+   "tables": [
+    "2019-10-W2"
+   ],
+   "warnings": 2,
+   "added": [
+    "2019-10-W2"
+   ],
+   "replaced": []
   },
   "1052": {
    "kind": "other",
@@ -8174,7 +8264,17 @@
    "warnings": 0
   },
   "1053": {
-   "kind": "none"
+   "kind": "daily",
+   "issue": 374,
+   "month": "2019-10",
+   "tables": [
+    "2019-10-W3"
+   ],
+   "warnings": 1,
+   "added": [
+    "2019-10-W3"
+   ],
+   "replaced": []
   },
   "1054": {
    "kind": "other",
@@ -8191,7 +8291,17 @@
    "warnings": 0
   },
   "1056": {
-   "kind": "none"
+   "kind": "daily",
+   "issue": 375,
+   "month": "2019-10",
+   "tables": [
+    "2019-10-W4"
+   ],
+   "warnings": 2,
+   "added": [
+    "2019-10-W4"
+   ],
+   "replaced": []
   },
   "1057": {
    "kind": "other",
@@ -8201,13 +8311,63 @@
    "warnings": 0
   },
   "1058": {
-   "kind": "none"
+   "kind": "daily",
+   "issue": 376,
+   "month": "2019-10",
+   "tables": [
+    "2019-10-W5",
+    "2019-01-M",
+    "2019-02-M",
+    "2019-03-M",
+    "2019-04-M",
+    "2019-05-M",
+    "2019-06-M",
+    "2019-07-M",
+    "2019-08-M",
+    "2019-09-M",
+    "2019-10-M"
+   ],
+   "warnings": 2,
+   "added": [
+    "2019-10-W5",
+    "2019-01-M",
+    "2019-02-M",
+    "2019-03-M",
+    "2019-04-M",
+    "2019-05-M",
+    "2019-06-M",
+    "2019-07-M",
+    "2019-08-M",
+    "2019-09-M",
+    "2019-10-M"
+   ],
+   "replaced": []
   },
   "1059": {
-   "kind": "none"
+   "kind": "daily",
+   "issue": 377,
+   "month": "2019-11",
+   "tables": [
+    "2019-11-W1"
+   ],
+   "warnings": 1,
+   "added": [
+    "2019-11-W1"
+   ],
+   "replaced": []
   },
   "1060": {
-   "kind": "none"
+   "kind": "daily",
+   "issue": 378,
+   "month": "2019-11",
+   "tables": [
+    "2019-11-W2"
+   ],
+   "warnings": 1,
+   "added": [
+    "2019-11-W2"
+   ],
+   "replaced": []
   },
   "1061": {
    "kind": "other",
@@ -8217,7 +8377,17 @@
    "warnings": 0
   },
   "1062": {
-   "kind": "none"
+   "kind": "daily",
+   "issue": 379,
+   "month": "2019-11",
+   "tables": [
+    "2019-11-W3"
+   ],
+   "warnings": 1,
+   "added": [
+    "2019-11-W3"
+   ],
+   "replaced": []
   },
   "1063": {
    "kind": "other",
@@ -10640,7 +10810,11 @@
    "replaced": []
   },
   "1285": {
-   "kind": "none"
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
   },
   "1286": {
    "kind": "daily",
@@ -10659,7 +10833,11 @@
    "replaced": []
   },
   "1287": {
-   "kind": "none"
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
   },
   "1288": {
    "kind": "daily",
@@ -10792,7 +10970,11 @@
    "warnings": 0
   },
   "1300": {
-   "kind": "none"
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
   },
   "1301": {
    "kind": "daily",
@@ -14681,56 +14863,6 @@
   "misses": 80
  },
  "reprocess": [
-  1332,
-  1330,
-  1328,
-  1327,
-  1323,
-  1321,
-  1300,
-  1287,
-  1285,
-  1277,
-  1255,
-  1215,
-  1214,
-  1212,
-  1208,
-  1207,
-  1205,
-  1204,
-  1178,
-  1176,
-  1171,
-  1119,
-  1118,
-  1116,
-  1115,
-  1113,
-  1111,
-  1105,
-  1062,
-  1060,
-  1059,
-  1058,
-  1056,
-  1053,
-  1051,
-  1049,
-  1047,
-  1046,
-  1044,
-  1041,
-  1034,
-  1032,
-  1029,
-  1028,
-  1026,
-  1024,
-  1023,
-  1022,
-  1021,
-  978,
   977,
   892,
   889,
