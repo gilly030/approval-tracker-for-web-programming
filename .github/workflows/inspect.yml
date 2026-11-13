@@ -1,0 +1,25 @@
+name: PDF 점검 (수동)
+
+on:
+  workflow_dispatch:
+    inputs:
+      seq:
+        description: "갤럽 게시물 번호"
+        required: true
+      pages:
+        description: "볼 쪽 번호 (빈칸이면 직무 평가 표가 있는 쪽)"
+        default: ""
+
+permissions:
+  contents: read
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+      - run: npm install --no-audit --no-fund
+      - run: node tools/inspect-pdf.mjs "${{ github.event.inputs.seq }}" ${{ github.event.inputs.pages }}
