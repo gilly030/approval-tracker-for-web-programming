@@ -47,7 +47,7 @@ export function lineChart(el, o) {
     const x0 = Math.max(m.l, X(b.x0)), x1 = Math.min(m.l + iw, X(b.x1));
     if (x1 - x0 < 1) return;
     if (i % 2 === (o.bands.length % 2 === 0 ? 1 : 0)) s += `<rect class="lc-band" x="${x0}" y="${m.t}" width="${x1 - x0}" height="${ih}"/>`;
-    if (x1 - x0 > 46) s += `<text class="lc-bandlabel" x="${x0 + 6}" y="${m.t + 14}">${esc(b.label)}</text>`;
+    if (x1 - x0 > 34) s += `<text class="lc-bandlabel" x="${x0 + 6}" y="${m.t + 14}">${esc(b.label)}</text>`;
   });
   for (let v = lo; v <= hi; v += step) {
     s += `<line class="lc-grid${v === 0 ? ' lc-zero' : ''}" x1="${m.l}" x2="${m.l + iw}" y1="${Y(v)}" y2="${Y(v)}"/>`;

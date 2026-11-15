@@ -7,7 +7,7 @@
   --muted: #7b818a;
   --line: #e1e4e8;
   --axis: #b8bdc4;
-  --band: #f0f2f5;      /* 그래프의 대통령 임기 음영 */
+  --band: #e4ebe1;      /* 그래프의 대통령 임기 음영 */
   --pos: #1f5fc4;       /* 잘하고 있다: 파랑 */
   --neg: #d93a35;       /* 잘못하고 있다: 빨강 */
   --mid: #c9cdd2;       /* 의견유보 */
@@ -29,7 +29,7 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --bg: #121417; --surface: #181b1f; --ink: #eef0f3; --ink-2: #c3c8cf; --muted: #8b929b;
-    --line: #2a2e34; --axis: #3d434b; --band: #1e2228; --pos: #4a86e8; --neg: #e5504b; --mid: #4a4f57;
+    --line: #2a2e34; --axis: #3d434b; --band: #1d231d; --pos: #4a86e8; --neg: #e5504b; --mid: #4a4f57;
     --chip: #23272d; --focus: #4a86e8;
     --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --s5: #d55181; --s6: #9085e9;
     --dv-n4: #ff8f86; --dv-n3: #e0605a; --dv-n2: #a5403b; --dv-n1: #5b2a28;
@@ -41,7 +41,7 @@
 }
 :root[data-theme="dark"] {
   --bg: #121417; --surface: #181b1f; --ink: #eef0f3; --ink-2: #c3c8cf; --muted: #8b929b;
-  --line: #2a2e34; --axis: #3d434b; --band: #1e2228; --pos: #4a86e8; --neg: #e5504b; --mid: #4a4f57;
+  --line: #2a2e34; --axis: #3d434b; --band: #1d231d; --pos: #4a86e8; --neg: #e5504b; --mid: #4a4f57;
   --chip: #23272d; --focus: #4a86e8;
   --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --s5: #d55181; --s6: #9085e9;
   --dv-n4: #ff8f86; --dv-n3: #e0605a; --dv-n2: #a5403b; --dv-n1: #5b2a28;

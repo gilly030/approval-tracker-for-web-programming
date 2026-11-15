@@ -1,6 +1,7 @@
 // 공개 페이지. data/index.json(요약)을 먼저 읽고, 배너 상세는 data/years/YYYY.json 을 필요할 때 읽는다.
 import { lineChart, downloadCSV, downloadPNG } from './linechart.js';
 import { regionMap } from './tilemap.js';
+import { PRESIDENTS } from './parser.js';
 
 const $ = (s) => document.querySelector(s);
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -188,14 +189,17 @@ function withBreaks(list, toPoint) {
   });
   return out;
 }
+// 대통령 임기 구간: 조사가 없던 기간(탄핵·궐위 등)까지 실제 임기 날짜로 칠한다
 function presidentBands(list) {
-  const bands = [];
-  for (const s of list) {
-    const b = bands[bands.length - 1];
-    if (b && b.label === s.president) b.x1 = dateOf(s);
-    else bands.push({ label: s.president || '?', x0: dateOf(s), x1: dateOf(s) });
-  }
-  return bands.length > 1 ? bands : [];
+  const names = [...new Set(list.map((s) => s.president).filter(Boolean))];
+  if (names.length < 2) return [];
+  return names.map((name) => {
+    const i = PRESIDENTS.findIndex(([n]) => n === name);
+    if (i < 0) return null;
+    const x0 = new Date(PRESIDENTS[i][1]);
+    const x1 = PRESIDENTS[i + 1] ? new Date(PRESIDENTS[i + 1][1]) : new Date(8640000000000000);
+    return { label: name, x0, x1 };
+  }).filter(Boolean);
 }
 
 // ---------- 메인 그래프 ----------
