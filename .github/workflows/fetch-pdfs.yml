@@ -1,0 +1,26 @@
+name: PDF 받기 (점검용, 수동)
+
+on:
+  workflow_dispatch:
+    inputs:
+      seqs:
+        description: "갤럽 게시물 번호들 (띄어쓰기로 구분)"
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+      - run: node tools/fetch-pdfs.mjs ${{ github.event.inputs.seqs }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pdfs
+          path: pdfs/
+          retention-days: 3
