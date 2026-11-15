@@ -6,6 +6,8 @@ const $ = (s) => document.querySelector(s);
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const fmtN = (n) => (n == null ? '–' : n.toLocaleString('ko-KR'));
 const moe = (n) => (n ? 1.96 * Math.sqrt(0.25 / n) * 100 : null);
+// 전체 표본오차: 갤럽 리포트 표지에 적힌 값을 쓰고, 없으면 같은 방식(95% 신뢰수준, 응답비율 50% 가정)으로 계산
+const surveyMoe = (s) => s?.moe ?? moe(s?.n);
 const SMALL_N = 100;
 const MAX_SERIES = 6;
 const SLOTS = ['--s1', '--s2', '--s3', '--s4', '--s5', '--s6'];
@@ -169,7 +171,7 @@ function renderHeadline() {
         <span style="flex-basis:${s.rest}%;background:var(--mid)"></span>
         <span style="flex-basis:${s.neg}%;background:var(--neg)"></span>
       </div>
-      <div class="meta">전국 만 18세 이상 <span class="num">${fmtN(s.n)}</span>명 · 표본오차 ±<span class="num">${moe(s.n).toFixed(1)}</span>%p (95% 신뢰수준) · 데일리 오피니언 제${s.issue ?? '?'}호</div>
+      <div class="meta">전국 만 18세 이상 <span class="num">${fmtN(s.n)}</span>명 · 표본오차 ±<span class="num">${surveyMoe(s).toFixed(1)}</span>%p (95% 신뢰수준) · 데일리 오피니언 제${s.issue ?? '?'}호</div>
     </div>`;
 }
 
@@ -240,7 +242,7 @@ function renderMainTable(list) {
     rows.map((s, i) => {
       const p = rows[i + 1];
       const d = p && p.president === s.president ? s.pos - p.pos : null;
-      return `<tr><td>${esc(s.label)}</td><td>${esc(s.president ?? '')}</td><td>${s.pos}%</td><td>${s.neg}%</td><td>${s.rest}%</td><td>${d == null ? '–' : (d > 0 ? '+' : d < 0 ? '−' : '±') + Math.abs(d)}</td><td>${fmtN(s.n)}</td><td>±${moe(s.n)?.toFixed(1) ?? '–'}%p</td><td>${s.issue ? `제${s.issue}호` : '–'}</td></tr>`;
+      return `<tr><td>${esc(s.label)}</td><td>${esc(s.president ?? '')}</td><td>${s.pos}%</td><td>${s.neg}%</td><td>${s.rest}%</td><td>${d == null ? '–' : (d > 0 ? '+' : d < 0 ? '−' : '±') + Math.abs(d)}</td><td>${fmtN(s.n)}</td><td>±${surveyMoe(s)?.toFixed(1) ?? '–'}%p</td><td>${s.issue ? `제${s.issue}호` : '–'}</td></tr>`;
     }).join('')
   }</tbody></table>`;
 }
@@ -301,9 +303,9 @@ function renderBanners() {
 }
 
 // ---------- 특성별 막대 ----------
-function rowHTML(r, isTotal = false) {
+function rowHTML(r, isTotal = false, totalMoe = null) {
   const small = r.n != null && r.n < SMALL_N;
-  const m = moe(r.n);
+  const m = isTotal ? totalMoe : null; // 표본오차는 전체에만 표시
   const rawG = r.raw?.split('|')[1];
   const raw = rawG && rawG !== r.group ? `<span class="raw">${esc(rawG)}</span>` : '';
   const label = `<div class="g">${esc(isTotal ? '전체' : r.group)}${small ? '<span class="pill">표본 적음</span>' : ''}${raw}</div>`;
@@ -328,15 +330,15 @@ async function renderSnapshot() {
   if (!s || s.key !== state.surveyKey) return;
   const rows = s.rows.filter((r) => r.banner === state.banner);
   const total = s.rows.find((r) => r.banner === '전체');
-  $('#rows').innerHTML = rowHTML(total, true) + rows.map((r) => rowHTML(r)).join('');
+  $('#rows').innerHTML = rowHTML(total, true, surveyMoe({ ...total, moe: s.moe })) + rows.map((r) => rowHTML(r)).join('');
   // 지역별이면 위에 타일 지도
   const mapEl = $('#regionmap');
   mapEl.hidden = state.banner !== '지역별';
   if (state.banner === '지역별') regionMap(mapEl, rows);
   const detailKeys = Object.keys(rows.find((r) => r.detail)?.detail || {});
   const hasW = rows.some((r) => r.nWeighted != null);
-  $('#snap-table').innerHTML = `<table><thead><tr><th>${esc(state.banner)}</th><th>사례수</th>${hasW ? '<th>가중 사례수</th>' : ''}<th>잘하고 있다</th><th>잘못하고 있다</th><th>의견유보</th>${detailKeys.map((k) => `<th>${esc(k)}</th>`).join('')}<th>표본오차</th></tr></thead><tbody>${
-    [total, ...rows].map((r) => `<tr><td>${esc(r.banner === '전체' ? '전체' : r.group)}</td><td>${fmtN(r.n)}</td>${hasW ? `<td>${fmtN(r.nWeighted)}</td>` : ''}<td>${r.pos ?? '–'}${r.pos != null ? '%' : ''}</td><td>${r.neg ?? '–'}${r.neg != null ? '%' : ''}</td><td>${r.rest ?? '–'}${r.rest != null ? '%' : ''}</td>${detailKeys.map((k) => `<td>${r.detail?.[k] != null ? r.detail[k] + '%' : '–'}</td>`).join('')}<td>±${moe(r.n)?.toFixed(1) ?? '–'}%p</td></tr>`).join('')
+  $('#snap-table').innerHTML = `<table><thead><tr><th>${esc(state.banner)}</th><th>사례수</th>${hasW ? '<th>가중 사례수</th>' : ''}<th>잘하고 있다</th><th>잘못하고 있다</th><th>의견유보</th>${detailKeys.map((k) => `<th>${esc(k)}</th>`).join('')}</tr></thead><tbody>${
+    [total, ...rows].map((r) => `<tr><td>${esc(r.banner === '전체' ? '전체' : r.group)}</td><td>${fmtN(r.n)}</td>${hasW ? `<td>${fmtN(r.nWeighted)}</td>` : ''}<td>${r.pos ?? '–'}${r.pos != null ? '%' : ''}</td><td>${r.neg ?? '–'}${r.neg != null ? '%' : ''}</td><td>${r.rest ?? '–'}${r.rest != null ? '%' : ''}</td>${detailKeys.map((k) => `<td>${r.detail?.[k] != null ? r.detail[k] + '%' : '–'}</td>`).join('')}</tr>`).join('')
   }</tbody></table>`;
 }
 

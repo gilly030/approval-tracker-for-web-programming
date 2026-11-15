@@ -473,6 +473,13 @@ export async function parseGallupPdf(pdfjsLib, data, opts = {}) {
   // 리포트가 다루는 연·월 (대통령 평가 표가 없는 리포트도 날짜는 알 수 있게)
   const rp = firstText.match(/제\s*\d+\s*호\s*\(?\s*(\d{4})\s*년\s*(\d{1,2})\s*월/) || firstText.match(/(\d{4})\s*년\s*(\d{1,2})\s*월\s*\d\s*주/);
   result.reportMonth = rp ? `${rp[1]}-${String(rp[2]).padStart(2, '0')}` : null;
+  // 표지의 '1,001명 … 표본오차 ±3.1%포인트'를 사례수별로 모아 두었다가, 전체 사례수가 같은 표에 붙인다
+  const moeByN = {};
+  for (const m of firstText.matchAll(/(\d{1,2},?\d{3})\s*명[^±]{0,60}?표본\s*오차[^±]{0,10}±\s*(\d+(?:\.\d+)?)\s*%/g)) moeByN[+m[1].replace(',', '')] ??= +m[2];
+  for (const t of result.tables) {
+    const n = t.rows.find((r) => r.banner === '전체')?.n;
+    if (n != null && moeByN[n] != null) t.moe = moeByN[n];
+  }
   // 같은 기간이 여러 번 나오면 첫 번째만
   const seen = new Set();
   result.tables = result.tables.filter((t) => (seen.has(t.key) ? false : seen.add(t.key)));

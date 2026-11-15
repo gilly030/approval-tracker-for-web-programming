@@ -10,6 +10,7 @@ export function mergeInto(db, parsed, sourceName) {
       key: t.key, type: t.type, year: t.year, month: t.month, week: t.week,
       label: t.label, president: t.president,
       issue: parsed.issue ?? t.sourceIssue, source: sourceName,
+      ...(t.moe != null ? { moe: t.moe } : {}),
       columns: t.columns,
       rows: t.rows.map(({ bannerRaw, groupRaw, ...r }) => (r.group !== groupRaw || r.banner !== bannerRaw ? { ...r, raw: `${bannerRaw}|${groupRaw}` } : r)),
     };

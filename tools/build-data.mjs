@@ -29,7 +29,7 @@ export function buildData(dir = path.join(root, 'data')) {
       return {
         key: s.key, type: s.type, year: s.year, month: s.month, week: s.week,
         label: s.label, president: s.president, issue: s.issue,
-        n: t.n ?? null, pos: t.pos ?? null, neg: t.neg ?? null, rest: t.rest ?? null,
+        n: t.n ?? null, moe: s.moe ?? null, pos: t.pos ?? null, neg: t.neg ?? null, rest: t.rest ?? null,
         banners: [...new Set(s.rows.map((r) => r.banner))].filter((b) => b !== '전체'),
       };
     }),
