@@ -88,11 +88,13 @@ export function lineChart(el, o) {
     }
     s += `<g class="lc-series" data-i="${si}" style="--c:${sr.color}">`;
     s += `<path class="lc-line" d="${d}"/>`;
-    for (const p of sr.points) {
-      if (p.y == null) continue;
-      if (dense && !p.hollow) continue;
+    // 점은 찍지 않는다. 표본이 적은 점(hollow)과 앞뒤가 끊겨 선이 안 그려지는 외딴 점만 표시
+    sr.points.forEach((p, i) => {
+      if (p.y == null) return;
+      const lone = sr.points[i - 1]?.y == null && sr.points[i + 1]?.y == null;
+      if (!p.hollow && !lone) return;
       s += `<circle class="lc-dot${p.hollow ? ' hollow' : ''}" cx="${X(p.x).toFixed(1)}" cy="${Y(p.y).toFixed(1)}" r="${dense ? 2.5 : 3.5}"/>`;
-    }
+    });
     s += `</g>`;
   });
   // ---- 끝 값 ----
