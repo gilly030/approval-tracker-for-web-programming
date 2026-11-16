@@ -1200,8 +1200,14 @@
    "kind": "daily",
    "issue": 36,
    "month": "2012-09",
-   "tables": [],
-   "warnings": 0
+   "tables": [
+    "2012-09-W3"
+   ],
+   "warnings": 0,
+   "added": [
+    "2012-09-W3"
+   ],
+   "replaced": []
   },
   "336": {
    "kind": "other",
@@ -1249,15 +1255,27 @@
    "kind": "daily",
    "issue": 37,
    "month": "2012-09",
-   "tables": [],
-   "warnings": 0
+   "tables": [
+    "2012-09-W4"
+   ],
+   "warnings": 0,
+   "added": [
+    "2012-09-W4"
+   ],
+   "replaced": []
   },
   "343": {
    "kind": "daily",
    "issue": 38,
    "month": "2012-10",
-   "tables": [],
-   "warnings": 0
+   "tables": [
+    "2012-10-W1"
+   ],
+   "warnings": 0,
+   "added": [
+    "2012-10-W1"
+   ],
+   "replaced": []
   },
   "344": {
    "kind": "other",
@@ -1270,8 +1288,14 @@
    "kind": "daily",
    "issue": 39,
    "month": "2012-10",
-   "tables": [],
-   "warnings": 0
+   "tables": [
+    "2012-10-W2"
+   ],
+   "warnings": 0,
+   "added": [
+    "2012-10-W2"
+   ],
+   "replaced": []
   },
   "346": {
    "kind": "other",
@@ -1298,8 +1322,14 @@
    "kind": "daily",
    "issue": 40,
    "month": "2012-10",
-   "tables": [],
-   "warnings": 0
+   "tables": [
+    "2012-10-W3"
+   ],
+   "warnings": 0,
+   "added": [
+    "2012-10-W3"
+   ],
+   "replaced": []
   },
   "350": {
    "kind": "other",
@@ -1312,8 +1342,14 @@
    "kind": "daily",
    "issue": 41,
    "month": "2012-10",
-   "tables": [],
-   "warnings": 0
+   "tables": [
+    "2012-10-W4"
+   ],
+   "warnings": 1,
+   "added": [
+    "2012-10-W4"
+   ],
+   "replaced": []
   },
   "352": {
    "kind": "other",
@@ -1333,8 +1369,14 @@
    "kind": "daily",
    "issue": 42,
    "month": "2012-11",
-   "tables": [],
-   "warnings": 0
+   "tables": [
+    "2012-11-W1"
+   ],
+   "warnings": 0,
+   "added": [
+    "2012-11-W1"
+   ],
+   "replaced": []
   },
   "355": {
    "kind": "other",
@@ -1347,8 +1389,14 @@
    "kind": "daily",
    "issue": 43,
    "month": "2012-11",
-   "tables": [],
-   "warnings": 0
+   "tables": [
+    "2012-11-W2"
+   ],
+   "warnings": 1,
+   "added": [
+    "2012-11-W2"
+   ],
+   "replaced": []
   },
   "357": {
    "kind": "other",
@@ -1368,8 +1416,14 @@
    "kind": "daily",
    "issue": 44,
    "month": "2012-11",
-   "tables": [],
-   "warnings": 0
+   "tables": [
+    "2012-11-W3"
+   ],
+   "warnings": 0,
+   "added": [
+    "2012-11-W3"
+   ],
+   "replaced": []
   },
   "360": {
    "kind": "other",
@@ -1382,8 +1436,14 @@
    "kind": "daily",
    "issue": 45,
    "month": "2012-11",
-   "tables": [],
-   "warnings": 0
+   "tables": [
+    "2012-11-W4"
+   ],
+   "warnings": 0,
+   "added": [
+    "2012-11-W4"
+   ],
+   "replaced": []
   },
   "362": {
    "kind": "none"
@@ -15149,5 +15209,5 @@
   "misses": 80
  },
  "reprocess": [],
- "failStreak": 4
+ "failStreak": 0
 }

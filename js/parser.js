@@ -34,6 +34,7 @@ const median = (a) => { const b = [...a].sort((x, y) => x - y); return b.length 
 
 function itemsToWords(items, pageHeight) {
   const raw = [];
+  let g = 0;
   for (const it of items) {
     if (!it.str || !it.str.trim()) continue;
     const x = it.transform[4];
@@ -48,8 +49,9 @@ function itemsToWords(items, pageHeight) {
       const px0 = x + (w * off) / str.length;
       const px1 = x + (w * (off + p.length)) / str.length;
       off += p.length;
-      if (p.trim()) raw.push({ s: p, x0: px0, x1: px1, y });
+      if (p.trim()) raw.push({ s: p, x0: px0, x1: px1, y, g });
     }
+    g++;
   }
   raw.sort((a, b) => a.y - b.y || a.x0 - b.x0);
   // 같은 줄에서 거의 붙어 있는 조각은 한 단어로 합친다
@@ -143,14 +145,22 @@ function readTable(rows, t) {
   const bannerX = Math.min(...labelXs);
   // 2012년 일부 표는 '전체'가 그룹 칸이 아니라 배너 칸에 있다 → 그룹 칸은 그 오른쪽 첫 라벨 열
   let groupColX = groupX;
-  if (Math.abs(bannerX - groupX) < 15) {
-    const right = labelXs.filter((x) => x > groupX + 15);
+  // 그룹 칸 위치는 값이 있는 행의 마지막 라벨로 정한다 (배너 둘째 줄 '정당별'·'성향별'이 배너 칸 안쪽에 들여 쓰여 있어 최솟값을 쓰면 틀림)
+  const totalInBanner = Math.abs(bannerX - groupX) < 15;
+  if (totalInBanner) {
+    const right = body.filter((r) => r.values.length && r.labels.length)
+      .map((r) => r.labels[r.labels.length - 1].x0).filter((x) => x > groupX + 15);
     if (right.length) groupColX = Math.min(...right);
   }
   const split = bannerX < groupColX - 15 ? (bannerX + groupColX) / 2 : -Infinity;
   for (const r of body) {
     r.bannerWords = r.labels.filter((w) => w.x0 < split);
     r.groupWords = r.labels.filter((w) => w.x0 >= split);
+    // '전체'가 배너 칸에 있으면 그룹으로 옮긴다 (배너 글자로 남으면 아래 '지역별'과 붙어 버림)
+    if (totalInBanner && r === body[0] && !r.groupWords.length) {
+      r.groupWords = r.bannerWords.filter((w) => w.s === '전체');
+      r.bannerWords = r.bannerWords.filter((w) => w.s !== '전체');
+    }
   }
 
   // ---- 열 정의: 값의 오른쪽 끝을 묶는다 ----
@@ -183,11 +193,19 @@ function readTable(rows, t) {
     if (/[?？‘’“”]|질문|귀하/.test(txt)) break;
     colHeadRows.unshift(headRows[i]);
   }
-  for (const r of colHeadRows) for (const w of r.words) {
-    const cx = (w.x0 + w.x1) / 2;
-    let best = null, bd = 22;
-    for (const c of cols) { const d = Math.abs(c.x1 - widthGuess / 2 - cx); if (d < bd) { bd = d; best = c; } }
-    if (best) best.head.push(w);
+  // 한 조각에 든 머리글('잘하고 있다' 등, 2012년 9~11월 리포트)은 쪼개지 않고 조각 가운데로 붙인다
+  for (const r of colHeadRows) {
+    const units = [];
+    for (const w of r.words) {
+      const u = units[units.length - 1];
+      if (u && u.g === w.g) { u.s += ' ' + w.s; u.x1 = w.x1; } else units.push({ ...w });
+    }
+    for (const w of units) {
+      const cx = (w.x0 + w.x1) / 2;
+      let best = null, bd = 22;
+      for (const c of cols) { const d = Math.abs(c.x1 - widthGuess / 2 - cx); if (d < bd) { bd = d; best = c; } }
+      if (best) best.head.push(w);
+    }
   }
   cols.forEach((c) => {
     c.rawLabel = c.head.sort((a, b) => a.y - b.y || a.x0 - b.x0).map((w) => w.s).join('');
@@ -200,7 +218,7 @@ function readTable(rows, t) {
   const posIdx = cols.findIndex((c) => /잘하고/.test(c.label));
   const negIdx = cols.findIndex((c) => /잘못하고/.test(c.label));
   if (posIdx < 0 || negIdx !== posIdx + 1) {
-    return { error: `'잘하고/잘못하고' 열을 찾지 못함 (열: ${cols.map((c) => c.label || '?').join(' | ')})` };
+    return { headText, error: `'잘하고/잘못하고' 열을 찾지 못함 (열: ${cols.map((c) => c.label || '?').join(' | ')})` };
   }
   const nCols = cols.slice(0, posIdx).filter((c) => totalByCol.has(c) && !/%/.test(totalByCol.get(c)));
   let sum = 0, mainEnd = posIdx - 1;
@@ -210,7 +228,7 @@ function readTable(rows, t) {
     sum += v; mainEnd = i;
     if (Math.abs(sum - 100) <= 2) break;
   }
-  if (Math.abs(sum - 100) > 2) return { error: `'전체' 행 평가 열 합계가 100이 아님 (${sum})` };
+  if (Math.abs(sum - 100) > 2) return { headText, error: `'전체' 행 평가 열 합계가 100이 아님 (${sum})` };
   const mainCols = cols.slice(posIdx, mainEnd + 1);
   // 세부 열: 직전 main 열 값을 정확히 쪼갠 경우만
   const detailCols = [];

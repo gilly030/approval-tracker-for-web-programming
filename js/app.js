@@ -117,7 +117,7 @@ function setPending(on) {
   state.rangePending = on;
   $('#range-apply').classList.toggle('idle', !on);
   $('#range-info').classList.toggle('pending', on);
-  if (on) $('#range-info').textContent = '적용을 누르면 이 기간으로 바뀝니다';
+  $('#range-info').textContent = on ? '적용을 누르면 이 기간으로 바뀝니다' : '';
 }
 function applyCustomRange() {
   let from = $('#range-from').value, to = $('#range-to').value;
@@ -210,7 +210,7 @@ function renderMain() {
   $('#main-title').textContent = one ? `${pres[0]} 대통령 직무 수행 평가` : '대통령 직무 수행 평가';
   $('#main-q').textContent = `귀하는 요즘 ${one ? pres[0] : '○○○'} 대통령이 대통령으로서의 직무를 잘 수행하고 있다고 보십니까, 아니면 잘못 수행하고 있다고 보십니까?`;
   const [a, b] = rangeDates();
-  if (!state.rangePending) $('#range-info').textContent = list.length ? `자료: ${list[0].label} ~ ${list[list.length - 1].label} · 주간 조사 ${list.length}회` : `${ymLabel(ym(a))} ~ ${ymLabel(ym(b))}`;
+  $('#main-info').textContent = list.length ? `자료: ${list[0].label} ~ ${list[list.length - 1].label} · 주간 조사 ${list.length}회` : `${ymLabel(ym(a))} ~ ${ymLabel(ym(b))}`;
   renderGap(list);
   if (list.length < 2) {
     $('#main-legend').innerHTML = '';
@@ -234,8 +234,6 @@ function renderMain() {
     ariaLabel: `대통령 직무 긍정률과 부정률 추이, ${list[0].label}부터 ${list[list.length - 1].label}까지`,
   });
   state.mainData = { list, series, title: $('#main-title').textContent };
-  $('#main-note').textContent = '점을 누르면 그 주의 응답자 특성별 결과가 아래에 나옵니다. 매주 조사(전국 만 18세 이상 약 1,000명), 의견유보(어느 쪽도 아님·모름/응답거절)는 그리지 않았습니다.'
-    + (one ? '' : ' 음영은 대통령 임기 구분이고, 대통령이 바뀌거나 조사가 한 달 넘게 비면 선을 끊었습니다.');
   renderMainTable(list);
 }
 
