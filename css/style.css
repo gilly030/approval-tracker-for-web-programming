@@ -81,15 +81,23 @@ h1, h2, h3 { margin: 0; text-wrap: balance; }
 .source a { color: var(--ink-2); }
 
 /* ---------- 최신 수치 ---------- */
-.headline { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 24px 40px; align-items: end; }
-.headline .kicker { font-size: 13px; color: var(--ink-2); letter-spacing: 0.02em; }
-.headline .big { font-family: var(--font-display); font-size: clamp(44px, 9vw, 76px); line-height: 1; font-weight: 700; color: var(--pos); margin-top: 6px; }
+.headline { display: grid; gap: 22px; }
+.hl-top { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 8px 32px; }
+.headline .kicker { margin: 0; font-family: var(--font-display); font-size: clamp(22px, 3.4vw, 30px); font-weight: 800; letter-spacing: -0.015em; line-height: 1.25; color: var(--ink); }
+.headline .when { margin-top: 6px; font-size: 14px; color: var(--ink-2); }
+.headline .big { font-family: var(--font-display); font-size: clamp(52px, 9vw, 80px); line-height: 0.9; font-weight: 800; color: var(--pos); }
 .headline .big .unit { font-size: 0.45em; margin-left: 2px; }
-.headline .sub { margin-top: 10px; color: var(--ink-2); font-size: 14px; }
-.headline .delta { font-family: var(--font-num); font-size: 13px; padding: 1px 6px; border-radius: 3px; background: var(--chip); color: var(--ink-2); margin-left: 6px; white-space: nowrap; }
-.split { display: grid; gap: 8px; }
-.split-bar { display: flex; height: 18px; gap: 2px; border-radius: 4px; overflow: hidden; }
-.split-bar span { display: block; height: 100%; }
+.split { display: grid; gap: 6px; }
+.split-labels, .split-bar { display: flex; gap: 3px; }
+.split-labels span { min-width: 0; font-size: 14px; font-weight: 700; white-space: nowrap; }
+.split-labels .p { color: var(--pos); }
+.split-labels .m { color: var(--ink-2); text-align: center; overflow: visible; display: flex; justify-content: center; }
+.split-labels .n { color: var(--neg); text-align: right; }
+.split-bar { height: 44px; border-radius: 4px; overflow: hidden; }
+.split-bar span { display: flex; align-items: center; min-width: 0; padding: 0 12px; height: 100%; font-family: var(--font-num); font-size: 17px; font-weight: 700; color: #fff; white-space: nowrap; }
+.split-bar .p { background: var(--pos); }
+.split-bar .m { background: var(--mid); color: var(--ink); justify-content: center; padding: 0; }
+.split-bar .n { background: var(--neg); justify-content: flex-end; }
 .split-legend { display: flex; flex-wrap: wrap; gap: 4px 18px; font-size: 13px; color: var(--ink-2); }
 .key { display: inline-flex; align-items: center; gap: 6px; }
 .key i { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
@@ -158,7 +166,8 @@ td:first-child { font-family: var(--font-body); }
 .notes p { margin: 0; max-width: 72ch; }
 
 @media (max-width: 720px) {
-  .headline { grid-template-columns: minmax(0, 1fr); }
+  .split-bar span { padding: 0 8px; font-size: 15px; }
+  .split-labels span { font-size: 13px; }
   .row { grid-template-columns: minmax(0, 1fr) 78px; gap: 4px 10px; }
   .row .bar, .row .na { grid-column: 1 / -1; grid-row: 2; }
   .row .nn { grid-row: 1; grid-column: 2; }
@@ -186,7 +195,7 @@ textarea { width: 100%; min-height: 120px; font: 12px/1.4 var(--font-num); backg
 /* ---------- Gallup식 그래프 ---------- */
 .figure { display: grid; gap: 10px; min-width: 0; border-top: 2px solid var(--ink); padding-top: 18px; }
 .fig-title { font-size: clamp(20px, 3.2vw, 26px); font-weight: 700; letter-spacing: -0.015em; line-height: 1.25; }
-.fig-q { margin: 0; font-style: italic; color: var(--ink-2); font-size: 15.5px; max-width: 62ch; line-height: 1.5; }
+.fig-q { margin: 0; font-style: italic; color: var(--ink-2); font-size: 15.5px; line-height: 1.5; }
 .fig-info { margin: -4px 0 0; font-size: 13px; color: var(--ink-2); text-align: right; }
 .fig-foot { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 16px; font-size: 13px; color: var(--ink-2); }
 .fig-foot a { color: var(--ink-2); text-decoration: none; border-bottom: 1px solid var(--axis); }

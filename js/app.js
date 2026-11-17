@@ -157,21 +157,23 @@ function renderGap(list) {
 // ---------- 최신 수치 ----------
 function renderHeadline() {
   const s = latest();
-  const prev = weekly().filter((x) => x.president === s.president && dateOf(x) < dateOf(s)).pop();
-  const d = prev ? s.pos - prev.pos : null;
-  const delta = d == null ? '' : `<span class="delta" title="직전 조사(${esc(prev.label)}) 대비">${d > 0 ? '+' : d < 0 ? '−' : '±'}${Math.abs(d)}%p</span>`;
+  // 막대 칸: 이름은 막대 위, 수치는 막대 안
+  const parts = [
+    { name: '잘하고 있다', v: s.pos, cls: 'p' },
+    { name: '의견유보', v: s.rest, cls: 'm' },
+    { name: '잘못하고 있다', v: s.neg, cls: 'n' },
+  ];
   $('#headline').innerHTML = `
-    <div>
-      <div class="kicker">${esc(s.president || '')} 대통령 국정 수행 지지도 · ${esc(s.label)}</div>
+    <div class="hl-top">
+      <div class="hl-title">
+        <h2 class="kicker">${esc(s.president || '')} 대통령 국정 수행 지지도</h2>
+        <div class="when">${esc(s.label)}</div>
+      </div>
       <div class="big num">${s.pos}<span class="unit">%</span></div>
-      <div class="sub">잘못하고 있다 <b class="num">${s.neg}%</b> · 의견유보 <span class="num">${s.rest}%</span>${delta}</div>
     </div>
     <div class="split">
-      <div class="split-bar" role="img" aria-label="잘하고 있다 ${s.pos}%, 의견유보 ${s.rest}%, 잘못하고 있다 ${s.neg}%">
-        <span style="flex-basis:${s.pos}%;background:var(--pos)"></span>
-        <span style="flex-basis:${s.rest}%;background:var(--mid)"></span>
-        <span style="flex-basis:${s.neg}%;background:var(--neg)"></span>
-      </div>
+      <div class="split-labels" aria-hidden="true">${parts.map((q) => `<span class="${q.cls}" style="flex-basis:${q.v}%">${q.name}</span>`).join('')}</div>
+      <div class="split-bar" role="img" aria-label="잘하고 있다 ${s.pos}%, 의견유보 ${s.rest}%, 잘못하고 있다 ${s.neg}%">${parts.map((q) => `<span class="${q.cls}" style="flex-basis:${q.v}%">${q.v}%</span>`).join('')}</div>
       <div class="meta">전국 만 18세 이상 <span class="num">${fmtN(s.n)}</span>명 · 표본오차 ±<span class="num">${surveyMoe(s).toFixed(1)}</span>%p (95% 신뢰수준) · 데일리 오피니언 제${s.issue ?? '?'}호</div>
     </div>`;
 }
