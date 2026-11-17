@@ -162,7 +162,7 @@ function renderHeadline() {
   const delta = d == null ? '' : `<span class="delta" title="직전 조사(${esc(prev.label)}) 대비">${d > 0 ? '+' : d < 0 ? '−' : '±'}${Math.abs(d)}%p</span>`;
   $('#headline').innerHTML = `
     <div>
-      <div class="kicker">${esc(s.president || '')} 대통령 직무 긍정률 · ${esc(s.label)}</div>
+      <div class="kicker">${esc(s.president || '')} 대통령 국정 수행 지지도 · ${esc(s.label)}</div>
       <div class="big num">${s.pos}<span class="unit">%</span></div>
       <div class="sub">잘못하고 있다 <b class="num">${s.neg}%</b> · 의견유보 <span class="num">${s.rest}%</span>${delta}</div>
     </div>
