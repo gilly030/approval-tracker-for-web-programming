@@ -530,6 +530,8 @@ function setSlide(i) {
   $('#deck-prev').disabled = i === 0;
   $('#deck-next').disabled = i === all.length - 1;
   $('#deck-next-label').textContent = NEXT_LABEL[i] || '';
+  // 아래 각주는 지금 화면에 해당하는 문단만
+  document.querySelectorAll('.notes [data-slides]').forEach((p) => { p.hidden = !p.dataset.slides.split(' ').includes(String(i)); });
   fitDeck();
 }
 function goSlide(i) {
