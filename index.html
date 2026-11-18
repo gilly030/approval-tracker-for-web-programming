@@ -18,8 +18,24 @@
     <div class="source">자료: <a href="https://www.gallup.co.kr/gallupdb/report.asp" target="_blank" rel="noopener">한국갤럽 데일리 오피니언</a> · <span id="updated"></span></div>
   </header>
 
+  <div class="deck" id="deck" role="region" aria-roledescription="carousel" aria-label="대통령 직무평가">
+  <div class="deck-nav">
+    <div class="deck-tabs" role="tablist" aria-label="화면 고르기">
+      <button type="button" role="tab" data-go="0" aria-selected="true">지지도</button>
+      <button type="button" role="tab" data-go="1" aria-selected="false">추이</button>
+      <button type="button" role="tab" data-go="2" aria-selected="false">특성별</button>
+    </div>
+    <div class="deck-arrows">
+      <button type="button" class="deck-btn" id="deck-prev" aria-label="이전 화면">&#8249;</button>
+      <button type="button" class="deck-btn next" id="deck-next" aria-label="다음 화면"><span class="deck-next-label" id="deck-next-label">추이 보기</span><span aria-hidden="true">&#8250;</span></button>
+    </div>
+  </div>
+  <div class="deck-track" id="deck-track">
+  <div class="slide" role="group" aria-roledescription="slide" aria-label="1 / 3 지지도">
   <section class="headline" id="headline" aria-live="polite"></section>
+  </div>
 
+  <div class="slide" role="group" aria-roledescription="slide" aria-label="2 / 3 추이">
   <section class="figure" id="main" aria-labelledby="main-title">
     <h2 id="main-title" class="fig-title">대통령 직무 수행 평가</h2>
     <p class="fig-q" id="main-q">귀하는 요즘 대통령이 대통령으로서의 직무를 잘 수행하고 있다고 보십니까, 아니면 잘못 수행하고 있다고 보십니까?</p>
@@ -50,7 +66,9 @@
     </div>
     <details class="tbl"><summary>조사별 수치 <span id="main-table-count"></span></summary><div class="tbl-wrap" id="main-table"></div></details>
   </section>
+  </div>
 
+  <div class="slide" role="group" aria-roledescription="slide" aria-label="3 / 3 특성별">
   <div class="section-head">
     <h2>응답자 특성별로 보기</h2>
   </div>
@@ -80,6 +98,9 @@
     <div class="rows" id="rows"></div>
     <details class="tbl"><summary>표로 보기</summary><div class="tbl-wrap" id="snap-table"></div></details>
   </section>
+  </div>
+  </div>
+  </div>
 
   <footer class="notes">
     <p>질문: "귀하는 요즘 ○○○ 대통령이 대통령으로서의 직무를 잘 수행하고 있다고 보십니까, 잘못 수행하고 있다고 보십니까?" 긍·부정 2점 척도, 재질문 1회.</p>

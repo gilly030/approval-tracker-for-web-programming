@@ -270,11 +270,7 @@ function selectSurvey(key, fromChart = false) {
   renderBanners();
   renderSnapshot();
   renderTrend();
-  if (fromChart) {
-    const el = $('#snapshot');
-    const r = el.getBoundingClientRect();
-    if (r.top > innerHeight * 0.85) el.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
-  }
+  if (fromChart) goSlide(2); // 그래프에서 고른 주의 특성별 결과로 넘어간다
 }
 function stepSurvey(dir) {
   const w = weekly();
@@ -519,6 +515,57 @@ const ro = new ResizeObserver((ents) => {
   clearTimeout(rz); rz = setTimeout(() => { renderMain(); renderTrend(); }, 120);
 });
 
+// ---------- 넘겨 보기 (지지도 · 추이 · 특성별) ----------
+const deck = { i: 0, timer: null };
+const NEXT_LABEL = ['추이 보기', '특성별 보기', ''];
+const slides = () => [...document.querySelectorAll('#deck-track > .slide')];
+const smooth = () => (matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth');
+// 트랙 높이를 지금 화면에 맞춘다 (화면마다 길이가 달라 아래 내용이 비어 보이지 않게)
+function fitDeck() { const sl = slides()[deck.i]; if (sl) $('#deck-track').style.height = `${sl.offsetHeight}px`; }
+function setSlide(i) {
+  deck.i = i;
+  const all = slides();
+  all.forEach((sl, k) => { sl.inert = k !== i; });
+  document.querySelectorAll('.deck-tabs [data-go]').forEach((b) => b.setAttribute('aria-selected', String(+b.dataset.go === i)));
+  $('#deck-prev').disabled = i === 0;
+  $('#deck-next').disabled = i === all.length - 1;
+  $('#deck-next-label').textContent = NEXT_LABEL[i] || '';
+  fitDeck();
+}
+function goSlide(i) {
+  const t = $('#deck-track');
+  i = Math.max(0, Math.min(slides().length - 1, i));
+  setSlide(i);
+  t.scrollTo({ left: i * t.clientWidth, behavior: smooth() });
+  const d = $('#deck');
+  if (d.getBoundingClientRect().top < 0) d.scrollIntoView({ block: 'start', behavior: smooth() });
+}
+function initDeck() {
+  const t = $('#deck-track');
+  // 손가락으로 넘긴 경우: 스크롤이 멈춘 뒤 위치로 현재 화면을 정한다
+  t.addEventListener('scroll', () => {
+    clearTimeout(deck.timer);
+    deck.timer = setTimeout(() => { const i = Math.round(t.scrollLeft / t.clientWidth); if (i !== deck.i) setSlide(i); }, 90);
+  }, { passive: true });
+  $('#deck-prev').addEventListener('click', () => goSlide(deck.i - 1));
+  $('#deck-next').addEventListener('click', () => goSlide(deck.i + 1));
+  document.querySelectorAll('.deck-tabs [data-go]').forEach((b) => b.addEventListener('click', () => goSlide(+b.dataset.go)));
+  // 키보드: 입력 칸 밖에서 ←/→
+  document.addEventListener('keydown', (e) => {
+    if (e.altKey || e.ctrlKey || e.metaKey || !['ArrowLeft', 'ArrowRight'].includes(e.key)) return;
+    if (e.target.closest('input, select, textarea, [contenteditable], .seg, .banners')) return;
+    goSlide(deck.i + (e.key === 'ArrowRight' ? 1 : -1));
+  });
+  // 내용이 바뀌거나 창 폭이 바뀌면 높이·위치를 다시 맞춘다
+  let lastW = t.clientWidth;
+  const ro2 = new ResizeObserver(() => {
+    fitDeck();
+    if (t.clientWidth !== lastW) { lastW = t.clientWidth; t.scrollLeft = deck.i * t.clientWidth; }
+  });
+  slides().forEach((sl) => ro2.observe(sl));
+  setSlide(0);
+}
+
 // ---------- 시작 ----------
 async function start() {
   try {
@@ -536,6 +583,7 @@ async function start() {
   ensureSurvey();
   renderMain();
   renderBannerSection();
+  initDeck();
   for (const id of ['#main-chart', '#chart']) { const el = $(id); if (!el) continue; widths.set(el, Math.round(el.clientWidth)); ro.observe(el); }
 }
 start();
