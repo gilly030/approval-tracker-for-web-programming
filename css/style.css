@@ -8,8 +8,8 @@
   --line: #e1e4e8;
   --axis: #b8bdc4;
   --band: #e4ebe1;      /* 그래프의 대통령 임기 음영 */
-  --pos: #1f5fc4;       /* 잘하고 있다: 파랑 */
-  --neg: #d93a35;       /* 잘못하고 있다: 빨강 */
+  --pos: #123d7a;       /* 잘하고 있다: 파랑 */
+  --neg: #a3262a;       /* 잘못하고 있다: 빨강 */
   --mid: #c9cdd2;       /* 의견유보 */
   --on-fill: #ffffff;
   --chip: #eceef1;
