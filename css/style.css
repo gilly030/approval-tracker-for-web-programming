@@ -317,14 +317,16 @@ textarea { width: 100%; min-height: 120px; font: 12px/1.4 var(--font-num); backg
 .deck-arrows { display: inline-flex; gap: 8px; }
 .deck-btn { white-space: nowrap; flex: none; font: inherit; font-size: 22px; line-height: 1; min-width: 40px; height: 40px; padding: 0 12px; border: 1px solid var(--axis); background: var(--surface); color: var(--ink); border-radius: 999px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
 .deck-btn:disabled { opacity: 0.35; cursor: default; }
-.deck-btn.next { background: var(--ink); color: var(--bg); border-color: var(--ink); padding: 0 14px 0 18px; }
-.deck-btn.next:disabled { background: var(--surface); color: var(--ink); border-color: var(--axis); }
-.deck-next-label { font-size: 14px; font-weight: 700; }
-.deck-btn.next:disabled .deck-next-label { display: none; }
+.deck-btn.next, .deck-btn.prev { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.deck-btn.next { padding: 0 14px 0 18px; }
+.deck-btn.prev { padding: 0 18px 0 14px; }
+.deck-btn.next:disabled, .deck-btn.prev:disabled { background: var(--surface); color: var(--ink); border-color: var(--axis); padding: 0 12px; }
+.deck-label { font-size: 14px; font-weight: 700; }
+.deck-btn:disabled .deck-label { display: none; }
 .deck-track { display: flex; align-items: flex-start; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; scrollbar-width: none; overscroll-behavior-x: contain; transition: height 0.25s ease; }
 .deck-track::-webkit-scrollbar { display: none; }
 .slide { flex: 0 0 100%; min-width: 0; scroll-snap-align: start; scroll-snap-stop: always; display: grid; gap: 28px; align-content: start; }
 .slide > .figure { border-top: 0; padding-top: 0; }
 .slide > .section-head { margin-top: 0; }
 @media (prefers-reduced-motion: reduce) { .deck-track { transition: none; } }
-@media (max-width: 560px) { .deck-tabs button { padding: 6px 5px; } .deck-next-label { display: none; } .deck-btn.next { padding: 0 12px; } }
+@media (max-width: 560px) { .deck-tabs button { padding: 6px 5px; } .deck-label { display: none; } .deck-btn.next, .deck-btn.prev { padding: 0 12px; } }
