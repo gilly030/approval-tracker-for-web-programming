@@ -518,6 +518,7 @@ const ro = new ResizeObserver((ents) => {
 // ---------- 넘겨 보기 (지지도 · 추이 · 특성별) ----------
 const deck = { i: 0, timer: null };
 const NEXT_LABEL = ['추이 보기', '특성별 보기', ''];
+const PREV_LABEL = ['', '지지도 보기', '추이 보기'];
 const slides = () => [...document.querySelectorAll('#deck-track > .slide')];
 const smooth = () => (matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth');
 // 트랙 높이를 지금 화면에 맞춘다 (화면마다 길이가 달라 아래 내용이 비어 보이지 않게)
@@ -530,6 +531,7 @@ function setSlide(i) {
   $('#deck-prev').disabled = i === 0;
   $('#deck-next').disabled = i === all.length - 1;
   $('#deck-next-label').textContent = NEXT_LABEL[i] || '';
+  $('#deck-prev-label').textContent = PREV_LABEL[i] || '';
   // 아래 각주는 지금 화면에 해당하는 문단만
   document.querySelectorAll('.notes [data-slides]').forEach((p) => { p.hidden = !p.dataset.slides.split(' ').includes(String(i)); });
   fitDeck();
