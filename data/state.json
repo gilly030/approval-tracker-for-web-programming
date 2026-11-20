@@ -1,5 +1,5 @@
 {
- "lastSeq": 1667,
+ "lastSeq": 1668,
  "processed": {
   "174": {
    "kind": "none"
@@ -15198,6 +15198,25 @@
    "warnings": 1,
    "added": [
     "2026-11-W2"
+   ],
+   "replaced": []
+  },
+  "1668": {
+   "kind": "daily",
+   "issue": 683,
+   "month": "2026-11",
+   "tables": [
+    "2026-11-W3"
+   ],
+   "warnings": 0,
+   "skipped": [
+    {
+     "page": 6,
+     "reason": "'잘하고/잘못하고' 열을 찾지 못함 (열: 사례수 | 상대표준오차추정치 | 95%신뢰구간하한 | 상한)"
+    }
+   ],
+   "added": [
+    "2026-11-W3"
    ],
    "replaced": []
   }
