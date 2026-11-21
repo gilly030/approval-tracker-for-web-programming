@@ -16,6 +16,7 @@ export const fmtNum = (n) => n.toLocaleString(LOCALE);
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 export const monthName = (m) => (EN ? MONTHS[m - 1] : `${m}월`);
+export const yearName = (y) => (EN ? String(y) : `${y}년`);
 export const ymLabel = (v) => { const [y, m] = v.split('-'); return EN ? `${MONTHS[+m - 1]} ${y}` : `${y}년 ${+m}월`; };
 
 // ---------- UI strings ----------
@@ -36,7 +37,7 @@ const KO = {
   mainTitle: (p) => (p ? `${p} 대통령 직무 수행 평가` : '대통령 직무 수행 평가'),
   question: (p) => `귀하는 요즘 ${p || '○○○'} 대통령이 대통령으로서의 직무를 잘 수행하고 있다고 보십니까, 아니면 잘못 수행하고 있다고 보십니까?`,
   rangeGroup: '기간', r3m: '3개월', r6m: '6개월', r1y: '1년', rterm: '현 임기', rall: '전체', rcustom: '기간 설정',
-  from: '시작', to: '끝', apply: '적용',
+  from: '시작', to: '끝', apply: '적용', monthAria: '월',
   pending: '적용을 누르면 이 기간으로 바뀝니다', pickBoth: '시작과 끝 월을 모두 골라 주세요',
   mainInfo: (a, b, n) => `자료: ${a} ~ ${b} · 주간 조사 ${n}회`,
   tooFew: (n) => `이 기간에는 주간 조사 자료가 ${n ? '1회뿐' : '없'}이에요. 기간을 넓혀 보세요.`,
@@ -87,7 +88,7 @@ const EN_TEXT = {
   mainTitle: (p) => (p ? `President ${p}: job performance` : 'Presidential job performance'),
   question: (p) => `"Do you think President ${p || '___'} is doing a good job or a poor job as president these days?"`,
   rangeGroup: 'Period', r3m: '3 months', r6m: '6 months', r1y: '1 year', rterm: 'This term', rall: 'All', rcustom: 'Custom',
-  from: 'From', to: 'To', apply: 'Apply',
+  from: 'From', to: 'To', apply: 'Apply', monthAria: 'Month',
   pending: 'Press Apply to switch to this period', pickBoth: 'Choose both a start and an end month',
   mainInfo: (a, b, n) => `Data: ${a} – ${b} · ${n} weekly surveys`,
   tooFew: (n) => `${n ? 'Only one weekly survey' : 'No weekly surveys'} in this period. Try a longer period.`,

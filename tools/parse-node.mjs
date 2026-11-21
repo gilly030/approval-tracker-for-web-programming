@@ -1,5 +1,5 @@
-// Node에서 PDF를 파싱해 결과를 출력/병합한다.
-// 사용법: node tools/parse-node.mjs <pdf...> [--merge data/data.json]
+// Parse PDFs in Node and print the result, optionally merging it into data.json.
+// Usage: node tools/parse-node.mjs <pdf...> [--merge data/data.json]
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';

@@ -1,5 +1,6 @@
-// 점검용: 갤럽 게시물 번호들의 PDF를 pdfs/ 폴더에 받는다 (Actions에서 아티팩트로 올려 내려받아 보기 위함)
-// 사용법: node tools/fetch-pdfs.mjs 343 345 ...
+// Debugging aid: download the PDFs of the given Gallup post numbers into pdfs/
+// (the Actions workflow uploads them as an artifact).
+// Usage: node tools/fetch-pdfs.mjs 343 345 ...
 import fs from 'node:fs';
 const UA = { 'User-Agent': 'Mozilla/5.0 (compatible; approval-tracker/1.0)' };
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));

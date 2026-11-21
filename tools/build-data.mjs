@@ -1,7 +1,7 @@
-// data/data.json(원본) → 사이트가 읽는 가벼운 파일들로 나눈다.
-//   data/index.json      모든 조사의 전체 수치·배너 목록 (메인 그래프와 조사 목록용, 작음)
-//   data/years/YYYY.json 그해 조사의 응답자 특성별 전체 표 (배너를 볼 때만 불러옴)
-// 사용법: node tools/build-data.mjs
+// Split data/data.json (the full database) into the small files the site loads:
+//   data/index.json      totals and banner list of every survey (main chart and survey table; small)
+//   data/years/YYYY.json all group results for that year (loaded only when a week is shown)
+// Usage: node tools/build-data.mjs
 
 import fs from 'node:fs';
 import path from 'node:path';
@@ -13,7 +13,7 @@ const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 export function buildData(dir = path.join(root, 'data')) {
   const db = JSON.parse(fs.readFileSync(path.join(dir, 'data.json'), 'utf8'));
   const state = fs.existsSync(path.join(dir, 'state.json')) ? JSON.parse(fs.readFileSync(path.join(dir, 'state.json'), 'utf8')) : null;
-  // 대통령 이름은 조사 날짜로 바로잡는다 (리포트 문장에서 잘못 읽은 경우 대비)
+  // Set the president from the survey date (in case the name read from the report text is wrong)
   let fixed = 0;
   for (const sv of db.surveys) {
     const p = presidentOn(sv, sv.president);

@@ -1,5 +1,6 @@
-// 점검용: 갤럽 게시물 번호의 PDF를 받아, 대통령 직무 평가가 있는 쪽의 글자 배치를 출력한다.
-// 사용법: node tools/inspect-pdf.mjs <게시물 번호> [쪽 번호...]
+// Debugging aid: download one Gallup post's PDF and print the text layout of the pages with
+// the approval table.
+// Usage: node tools/inspect-pdf.mjs <post number> [page numbers...]
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import * as pdfjs from 'pdfjs-dist/legacy/build/pdf.mjs';
@@ -12,7 +13,7 @@ const [seq, ...pages] = process.argv.slice(2);
 const res = await fetch(`https://www.gallup.co.kr/gallupdb/fileDownload.asp?seqNo=${seq}&bType=8`, { headers: { 'User-Agent': 'Mozilla/5.0 (compatible; approval-tracker/1.0)' } });
 const data = new Uint8Array(await res.arrayBuffer());
 if (String.fromCharCode(...data.slice(0, 4)) !== '%PDF') {
-  // PDF가 아니면 응답 정보와 게시물 본문 페이지의 링크를 보여준다
+  // Not a PDF: print the response and the links found on the post page
   console.log(`게시물 ${seq}: PDF 아님 · HTTP ${res.status} · ${res.headers.get('content-type')} · ${data.length}바이트 · 최종 주소 ${res.url}`);
   console.log(new TextDecoder('utf-8').decode(data.slice(0, 600)).replace(/\s+/g, ' '));
   for (const u of [`https://www.gallup.co.kr/gallupdb/reportContent.asp?seqNo=${seq}`]) {

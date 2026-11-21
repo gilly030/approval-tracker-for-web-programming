@@ -1,5 +1,5 @@
-// 대한민국 시도 경계 (통계청 센서스용 행정구역경계 2013, southkorea-maps 경유) — 단순화. 울릉도·독도 포함.
-// 이 파일은 tools 밖의 일회성 스크립트로 만들었습니다. 원본: github.com/southkorea/southkorea-maps
+// South Korea province boundaries (Statistics Korea census boundaries 2013, via southkorea-maps), simplified.
+// Includes Ulleungdo and Dokdo. Generated once by a script; source: github.com/southkorea/southkorea-maps
 export const VIEWBOX = "0 0 512 474";
 export const DOKDO = [505.7, 123.1];
 export const ULLEUNG = [437.4, 100.1];

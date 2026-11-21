@@ -1,7 +1,7 @@
-// 배너·그룹 이름 정규화 표.
-// 시기마다 표기가 달라지는 같은 집단을 하나의 이름으로 묶는다.
-// 여기에 없는 이름은 원래 표기 그대로 쓰인다 (버리지 않음).
-// 새 표기가 나오면 관리자 페이지의 "새 이름" 목록을 보고 여기에 추가하면 된다.
+// Banner and group name normalization.
+// Gallup's wording for the same group changes over the years; these tables map it to one name.
+// Names not listed here are kept as written (never dropped).
+// When the admin page lists a new name, add it here if it matches an existing one.
 
 export const BANNER_MAP = {
   '전체': '전체',
@@ -25,14 +25,14 @@ export const BANNER_MAP = {
   '평소정치에관심이': '정치관심도별',
 };
 
-// 배너별 그룹 이름 정규화. 키는 정규화된 배너 이름.
+// Group names per banner. Keys are normalized banner names.
 export const GROUP_MAP = {
   '지역별': {
     '대전/충청': '대전/세종/충청',
     '전남광주/전북': '광주/전라',
   },
   '연령별': {
-    // 2020년 선거연령 하향 이후 18세부터 조사. 같은 '가장 젊은 층'으로 묶되 이름에 범위를 남긴다.
+    // Since the 2020 voting-age change the youngest group starts at 18; all versions map to one group.
     '19~29세': '29세 이하',
     '19-29세': '29세 이하',
     '18~29세': '29세 이하',

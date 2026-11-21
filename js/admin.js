@@ -1,4 +1,4 @@
-// 관리자 페이지: 브라우저 안에서 PDF를 파싱해 data.json에 반영한다. 서버 필요 없음.
+// Admin page: parses a Gallup PDF in the browser and merges it into data.json. No server needed.
 import * as pdfjsLib from 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.min.mjs';
 import { parseGallupPdf } from './parser.js';
 import { mergeInto } from './merge.js';
@@ -17,7 +17,7 @@ async function loadDb() {
   try {
     const r = await fetch('data/data.json', { cache: 'no-cache' });
     if (r.ok) db = await r.json();
-  } catch { /* 새로 시작 */ }
+  } catch { /* start from an empty database */ }
   showDb();
 }
 function showDb() {
@@ -34,7 +34,7 @@ $('#db-file').addEventListener('change', async (e) => {
   catch (err) { $('#db-status').textContent = `JSON을 읽지 못했어요: ${err.message}`; }
 });
 
-// ---------- PDF 파싱 ----------
+// ---------- PDF parsing ----------
 async function handleFiles(files) {
   const pdfs = [...files].filter((f) => /\.pdf$/i.test(f.name) || f.type === 'application/pdf');
   if (!pdfs.length) return;
@@ -95,7 +95,7 @@ function renderResults() {
   $('#apply').disabled = !parsedFiles.some((p) => p.res?.tables.length);
 }
 
-// ---------- 반영 ----------
+// ---------- merge ----------
 $('#apply').addEventListener('click', () => {
   let next = db, added = [], replaced = [], kept = [];
   parsedFiles.forEach((pf, fi) => {
@@ -123,7 +123,7 @@ $('#copy').addEventListener('click', async () => {
   catch { $('#apply-status').textContent = '복사가 막혀 있어요. 내려받기를 써 주세요.'; }
 });
 
-// ---------- 끌어다 놓기 ----------
+// ---------- drag and drop ----------
 const drop = $('#drop');
 ['dragenter', 'dragover'].forEach((ev) => drop.addEventListener(ev, (e) => { e.preventDefault(); drop.classList.add('over'); }));
 ['dragleave', 'drop'].forEach((ev) => drop.addEventListener(ev, (e) => { e.preventDefault(); drop.classList.remove('over'); }));
