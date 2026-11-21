@@ -1,17 +1,18 @@
-// 지역별 순평가(긍정 − 부정) 지도. 실제 시도 경계(울릉도·독도 포함)를 갤럽 권역별 색으로 칠한다.
+// Net approval (approve − disapprove) map. Real province shapes (incl. Ulleungdo and Dokdo) colored by Gallup region.
 import { VIEWBOX, PATHS, DOKDO, ULLEUNG } from './korea-paths.js';
 import { t, term, fmtNum, mapLabel } from './i18n.js';
 
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
-// 시도 → 권역을 찾을 때 쓸 낱말
+// Words used to match each province to a Gallup region
 const SIDO = {
   서울: ['서울'], 인천: ['인천'], 경기: ['경기'], 강원: ['강원'],
   충북: ['충북', '충청'], 충남: ['충남', '충청'], 세종: ['세종', '충청'], 대전: ['대전'],
   전북: ['전북', '전라'], 전남: ['전남', '전라'], 광주: ['광주'],
   경북: ['경북'], 대구: ['대구'], 경남: ['경남'], 울산: ['울산'], 부산: ['부산'], 제주: ['제주'],
 };
-// 권역 라벨을 둘 시도와 위치 조정 (지도 좌표). 서울은 작아서 바다 쪽으로 빼고 선을 잇는다.
+// Province that carries each region label, with an offset in map units. Seoul is small, so its label
+// sits out over the sea with a leader line.
 const ANCHOR = [
   { words: ['서울'], sido: '서울', dx: -78, dy: -30, callout: true },
   { words: ['경기', '인천'], sido: '경기', dx: 14, dy: 22 },
@@ -52,7 +53,7 @@ export function regionMap(el, rows) {
     if (q.k == null && q.reg) s += `<path class="tm-hatch" d="${PATHS[q.name]}"/>`;
     s += `</g>`;
   }
-  // 울릉도·독도: 권역 색을 칠하지 않고 회색, 실제 크기 그대로
+  // Ulleungdo and Dokdo: grey, not colored by region, drawn at real size
   if (PATHS['울릉도·독도']) {
     s += `<path class="tm-islands" d="${PATHS['울릉도·독도']}"><title>${esc(term('울릉도·독도'))}</title></path>`;
     if (ULLEUNG) s += `<text class="tm-islet" x="${ULLEUNG[0]}" y="${ULLEUNG[1] + 15}" text-anchor="middle">${esc(term('울릉도'))}</text>`;
@@ -71,7 +72,7 @@ export function regionMap(el, rows) {
       </div>
     </div>`;
 
-  // 권역 라벨: 기준 시도의 가운데에 '이름 값'
+  // Region labels: 'name value' at the centre of the anchor province
   const svg = el.querySelector('svg');
   const lab = svg.querySelector('.tm-labels');
   let L = '';
@@ -90,7 +91,7 @@ export function regionMap(el, rows) {
   }
   lab.innerHTML = L;
 
-  // 올리면 그 권역 수치를 보여주고 같은 권역만 진하게
+  // On hover: show that region's numbers and fade the other regions
   const tip = el.querySelector('.tm-tip');
   const [, , VW] = VIEWBOX.split(' ').map(Number);
   const show = (name, ev) => {

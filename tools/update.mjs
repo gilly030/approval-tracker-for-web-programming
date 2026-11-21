@@ -1,12 +1,12 @@
-// 갤럽 리포트 자동 반영 (GitHub Actions에서 매일 실행).
+// Automatic update from Gallup Korea reports (run by GitHub Actions every 3 hours).
 //
-// 1) 리포트 게시판 첫 페이지에서 가장 큰 게시물 번호(seqNo)를 찾는다.
-// 2) data/state.json 의 lastSeq 보다 큰 번호의 PDF를 받아 파싱해 data/data.json 에 반영한다.
-// 3) state.backfill 이 남아 있으면 과거 번호로 내려가며 한 번에 최대 BACKFILL_PER_RUN 개씩 채운다.
-//    (취임 이후 리포트를 모두 채우면 done 으로 바뀌고 더 이상 내려가지 않는다)
+// 1) Find the highest post number (seqNo) on the first page of the report board.
+// 2) Download and parse every PDF newer than state.lastSeq and merge it into data/data.json.
+// 3) While state.backfill is not done, walk back through older posts, up to BACKFILL_PER_RUN per run
+//    (it is marked done once every report back to the start date has been read).
 //
-// 사용법: node tools/update.mjs [--dry-run] [--max N]
-// 브라우저가 아니라 서버(Actions)에서 실행되므로 CORS 제한이 없다.
+// Usage: node tools/update.mjs [--dry-run] [--max N]
+// Runs on a server (Actions), not in the browser, so there are no CORS limits.
 
 import fs from 'node:fs';
 import path from 'node:path';
@@ -27,7 +27,7 @@ const PDF_OPTS = { cMapUrl: PDFJS + '/cmaps/', cMapPacked: true, standardFontDat
 const args = process.argv.slice(2);
 const DRY = args.includes('--dry-run');
 const BACKFILL_PER_RUN = Number(args[args.indexOf('--max') + 1]) || 50;
-const PAUSE = 6000; // 요청 사이 간격 (갤럽 서버에 부담을 주지 않게)
+const PAUSE = 6000; // wait between requests so as not to load Gallup's server
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const log = (...a) => console.log(...a);
 
@@ -36,19 +36,19 @@ let db = readJson(DATA, { surveys: [] });
 const state = readJson(STATE, { lastSeq: 0, processed: {}, backfill: null });
 state.processed ??= {};
 
-// ---------- 게시판 ----------
+// ---------- report board ----------
 export function latestSeqFromHtml(html) {
   const seqs = [...html.matchAll(/seqNo=(\d+)/gi)].map((m) => +m[1]);
   return seqs.length ? Math.max(...seqs) : null;
 }
 export function titlesFromHtml(html) {
-  // 제목 텍스트 옆에 다운로드 링크가 있는 구조. 번호별 제목을 느슨하게 잡아 로그용으로만 쓴다.
+  // Each title sits next to its download link. Titles are matched loosely and used only for the log.
   const out = {};
   for (const m of html.matchAll(/(데일리 오피니언 제\s*(\d+)\s*호[^<]{0,80})[\s\S]{0,1500}?seqNo=(\d+)/g)) out[+m[3]] ??= m[1].trim();
   return out;
 }
 
-// 갤럽 서버가 가끔 응답하지 않는다: 간격을 늘려 가며 5번까지 다시 시도
+// Gallup's server sometimes does not answer: retry up to 5 times with growing waits
 async function get(url, tries = 5) {
   for (let i = 1; i <= tries; i++) {
     try {
@@ -64,13 +64,13 @@ async function get(url, tries = 5) {
   }
 }
 
-// ---------- 리포트 하나 처리 ----------
+// ---------- process one report ----------
 async function processSeq(seq, since = null, force = false) {
   if (state.processed[seq]) return state.processed[seq];
   const isPdf = (x) => x && x.status !== 404 && x.buf && x.buf.length >= 1000 && x.buf.subarray(0, 4).toString() === '%PDF';
   let r = await get(PDF_URL(seq));
   if (!isPdf(r)) {
-    // 일부 게시물은 다운로드 주소가 오류 페이지를 준다 → 게시물 본문의 PDF 직접 링크로 받는다
+    // For some posts the download URL returns an error page; use the direct PDF link from the post instead
     const page = await get(`https://www.gallup.co.kr/gallupdb/reportContent.asp?seqNo=${seq}`);
     const html = page.buf ? new TextDecoder('euc-kr').decode(page.buf) : '';
     const link = (html.match(/href=["']([^"']+\.pdf)["']/i) || [])[1];
@@ -82,7 +82,7 @@ async function processSeq(seq, since = null, force = false) {
   }
   if (!isPdf(r)) return (state.processed[seq] = { kind: 'none' });
   const res = await parseGallupPdf(pdfjs, new Uint8Array(r.buf), PDF_OPTS);
-  // 과거 채우기 중에는 기준 월 이전 표는 넣지 않는다
+  // During backfill, skip tables from before the start month
   if (since) res.tables = res.tables.filter((t) => t.key.slice(0, 7) >= since);
   const info = {
     kind: res.issue ? 'daily' : 'other',
@@ -93,7 +93,7 @@ async function processSeq(seq, since = null, force = false) {
     skipped: res.skipped.length ? res.skipped : undefined,
   };
   if (res.tables.length) {
-    // 재처리: 같은 기간 자료를 지우고 새로 넣는다
+    // Reprocessing: remove the existing data for these periods and add the new tables
     if (force) { const keys = new Set(res.tables.map((t) => t.key)); db.surveys = db.surveys.filter((s) => !keys.has(s.key)); }
     const m = mergeInto(db, res, `seq${seq}`);
     db = m.db;
@@ -103,8 +103,8 @@ async function processSeq(seq, since = null, force = false) {
   return info;
 }
 
-// ---------- 실행 ----------
-// 접속이 중간에 끊겨도 그때까지 받은 것은 저장한다.
+// ---------- run ----------
+// If the connection drops part-way, everything read so far is still saved.
 let changed = false;
 let structureError = false;
 async function run() {
@@ -116,12 +116,12 @@ async function run() {
   log(`게시판 최신 번호: ${latest} (저장된 마지막 번호: ${state.lastSeq})`);
 
 
-  // 0) 재처리 목록: 파서를 고친 뒤 특정 번호를 다시 읽힌다 (state.reprocess = [번호, ...])
-  // 한 번에 BACKFILL_PER_RUN개까지. 하나 끝날 때마다 목록에서 빼서, 중간에 멈춰도 남은 것부터 이어 간다
+  // 0) Reprocess list: re-read given posts after a parser fix (state.reprocess = [seq, ...]).
+  // Up to BACKFILL_PER_RUN per run; each is removed when done, so an interrupted run resumes where it stopped
   for (const seq of [...(state.reprocess || [])].slice(0, BACKFILL_PER_RUN)) {
     const src = `seq${seq}`;
     delete state.processed[seq];
-    db.surveys = db.surveys.filter((s) => s.source !== src); // 이번에 표가 안 나오면 이전 결과도 지운다
+    db.surveys = db.surveys.filter((s) => s.source !== src); // if no table is found this time, drop the old result too
     const info = await processSeq(seq, null, true);
     const banners = (db.surveys.find((s) => s.source === src && s.type === 'weekly')?.rows || []).map((r) => r.banner);
     log(`  재처리 ${seq} → ${info.kind} [${(info.tables || []).join(', ')}] 배너: ${[...new Set(banners)].join(' / ')}`);
@@ -130,7 +130,7 @@ async function run() {
     await sleep(PAUSE);
   }
 
-  // 1) 새 리포트
+  // 1) new reports
   const start = state.lastSeq ? state.lastSeq + 1 : latest;
   for (let seq = start; seq <= latest; seq++) {
     const info = await processSeq(seq);
@@ -140,7 +140,7 @@ async function run() {
   }
   if (latest > state.lastSeq) { state.lastSeq = latest; changed = true; }
 
-  // 2) 과거 채우기
+  // 2) backfill
   const bf = state.backfill;
   if (bf && !bf.done) {
     let seq = bf.next ?? (Math.min(latest, ...Object.keys(state.processed).map(Number)) - 1);
@@ -151,7 +151,7 @@ async function run() {
       count++;
       log(`  과거 번호 ${seq} → ${info.kind}${info.issue ? ` 제${info.issue}호 ${info.month ?? ''}` : ''}${info.tables?.length ? ` [${info.tables.join(', ')}]` : ''}`);
       if (info.added?.length || info.replaced?.length) changed = true;
-      // 대통령 평가 표가 없는 번호가 오래 이어지면(데일리 오피니언 이전 시기) 끝낸다
+      // Stop after a long run of posts without approval tables (before Daily Opinion began)
       bf.misses = info.tables?.length ? 0 : (bf.misses || 0) + 1;
       if (bf.misses >= 80) { bf.done = true; log('  평가 표가 있는 리포트가 더 나오지 않아 과거 채우기를 마쳤어요.'); break; }
       if (info.kind === 'daily' && info.month && info.month < bf.since) {
@@ -181,10 +181,11 @@ if (changed) db.updated = new Date().toISOString().slice(0, 10);
 fs.writeFileSync(DATA, JSON.stringify(db));
 fs.writeFileSync(STATE, JSON.stringify(state, null, 1));
 log(`완료: 조사 ${db.surveys.length}건${failure ? ' (중간에 멈춤, 받은 만큼 저장)' : ''}`);
-// GitHub Actions: 실패 없이 끝났고 과거 채우기가 남았으면 다음 실행을 이어 걸라고 알린다
+// GitHub Actions: if the run succeeded and backfill is not finished, ask for a follow-up run
 if (process.env.GITHUB_OUTPUT) {
   const more = !failure && ((state.backfill && !state.backfill.done) || (state.reprocess || []).length > 0);
   fs.appendFileSync(process.env.GITHUB_OUTPUT, `chain=${more ? 'true' : 'false'}\n`);
 }
-// 페이지 구조가 바뀌었거나 하루 넘게(3시간 간격 8회) 계속 실패하면 실패로 끝내 GitHub이 메일을 보내게 한다
+// Fail the run (so GitHub emails the owner) if the page layout changed or runs kept failing for
+// over a day (8 runs, 3 hours apart)
 if (failure && (structureError || state.failStreak >= 8)) process.exit(1);

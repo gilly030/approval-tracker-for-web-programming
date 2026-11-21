@@ -1,8 +1,8 @@
-// Gallup 리포트 스타일 선 그래프 (SVG, 라이브러리 없음)
-//  - 위쪽 범례에 올리면 그 선만 진하게, 나머지는 흐리게
-//  - 그래프에 올리면 가장 가까운 점에 '이름 / 시점 / 값' 주석
-//  - 선 끝에 마지막 값
-//  - 키보드: 그래프에 포커스 후 ←→ 시점 이동, ↑↓ 선 바꾸기
+// Line chart in the style of Gallup reports (SVG, no library)
+//  - hovering a legend item highlights that line and fades the others
+//  - hovering the chart annotates the nearest point with name / date / value
+//  - the last value is printed at the end of each line
+//  - keyboard: focus the chart, then ←→ moves in time and ↑↓ switches lines
 
 import { t, monthName, fmtNum } from './i18n.js';
 
@@ -10,13 +10,13 @@ const NS = 'http://www.w3.org/2000/svg';
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
 /**
- * @param {HTMLElement} el  그래프를 그릴 상자
+ * @param {HTMLElement} el  box to draw the chart in
  * @param {object} o
  *   series: [{ id, name, color, points: [{ x: Date, y: number|null, label: string, n?: number, hollow?: bool }] }]
- *   legendEl?: 범례를 그릴 상자 (없으면 범례 없음)
+ *   legendEl?: box for the legend (no legend if omitted)
  *   unit: '%' | '%p'
- *   yMin?, yMax?: 고정 범위
- *   height?: 기본 높이
+ *   yMin?, yMax?: fixed y range
+ *   height?: chart height
  *   ariaLabel
  */
 export function lineChart(el, o) {
@@ -28,7 +28,7 @@ export function lineChart(el, o) {
   const m = { t: o.bands?.length || o.onSelect ? 30 : 18, r: narrow ? 34 : 46, b: 44, l: 40 };
   const iw = W - m.l - m.r, ih = H - m.t - m.b;
 
-  // ---- 눈금 ----
+  // ---- scales ----
   const allY = series.flatMap((s) => s.points.map((p) => p.y)).filter((v) => v != null);
   let lo = o.yMin ?? Math.min(0, Math.floor(Math.min(...allY) / 10) * 10);
   let hi = o.yMax ?? Math.ceil((Math.max(...allY) + 4) / 10) * 10;
@@ -36,7 +36,7 @@ export function lineChart(el, o) {
   const step = hi - lo > 60 ? 20 : 10;
   hi = lo + Math.ceil((hi - lo) / step) * step;
   const xs = [...new Set(series.flatMap((s) => s.points.filter((p) => p.y != null).map((p) => +p.x)))].sort((a, b) => a - b);
-  // 가로축 범위: 고른 기간(xMin~xMax)이 있으면 그대로, 없으면 자료 범위. 자료가 없는 구간은 비워 둔다.
+  // x range: the chosen period (xMin..xMax) if given, otherwise the data range. Spans without data stay empty.
   const t0 = o.xMin != null ? Math.min(+o.xMin, xs[0]) : xs[0];
   const t1 = o.xMax != null ? Math.max(+o.xMax, xs[xs.length - 1]) : xs[xs.length - 1];
   const pad = (t1 - t0) * (o.xMin != null ? 0.01 : 0.02) || 86400000 * 15;
@@ -44,7 +44,7 @@ export function lineChart(el, o) {
   const Y = (v) => m.t + ih - ((v - lo) / (hi - lo)) * ih;
 
   let s = `<svg viewBox="0 0 ${W} ${H}" role="img" tabindex="0" aria-label="${esc(o.ariaLabel || t('lineChart'))}">`;
-  // 구간 띠 (예: 대통령 임기). 번갈아 음영, 폭이 넉넉하면 위에 이름
+  // Bands (e.g. presidential terms): alternate shading, with the name on top when wide enough
   (o.bands || []).forEach((b, i) => {
     const x0 = Math.max(m.l, X(b.x0)), x1 = Math.min(m.l + iw, X(b.x1));
     if (x1 - x0 < 1) return;
@@ -55,7 +55,7 @@ export function lineChart(el, o) {
     s += `<line class="lc-grid${v === 0 ? ' lc-zero' : ''}" x1="${m.l}" x2="${m.l + iw}" y1="${Y(v)}" y2="${Y(v)}"/>`;
     s += `<text class="lc-tick" x="${m.l - 8}" y="${Y(v) + 4}" text-anchor="end">${v}${v === hi ? esc(o.unit || '') : ''}</text>`;
   }
-  // x축: 월 단위 눈금, 1월과 첫 눈금에는 연도
+  // x axis: monthly ticks, with the year under January and the first tick
   const d0 = new Date(t0), d1 = new Date(t1);
   const months = (d1.getFullYear() - d0.getFullYear()) * 12 + d1.getMonth() - d0.getMonth() + 1;
   const every = [1, 2, 3, 4, 6, 12, 24, 36, 60].find((k) => months / k <= (narrow ? 5 : 9)) || 60;
@@ -80,7 +80,7 @@ export function lineChart(el, o) {
   });
   s += `<line class="lc-axis" x1="${m.l}" x2="${m.l + iw}" y1="${Y(lo)}" y2="${Y(lo)}"/>`;
 
-  // ---- 선 ----
+  // ---- lines ----
   const dense = xs.length > 36;
   series.forEach((sr, si) => {
     let d = '', pen = false;
@@ -90,7 +90,7 @@ export function lineChart(el, o) {
     }
     s += `<g class="lc-series" data-i="${si}" style="--c:${sr.color}">`;
     s += `<path class="lc-line" d="${d}"/>`;
-    // 점은 찍지 않는다. 표본이 적은 점(hollow)과 앞뒤가 끊겨 선이 안 그려지는 외딴 점만 표시
+    // No dots, except hollow (small sample) points and isolated points that have no line through them
     sr.points.forEach((p, i) => {
       if (p.y == null) return;
       const lone = sr.points[i - 1]?.y == null && sr.points[i + 1]?.y == null;
@@ -99,7 +99,7 @@ export function lineChart(el, o) {
     });
     s += `</g>`;
   });
-  // ---- 끝 값 ----
+  // ---- end values ----
   const ends = series.map((sr, si) => {
     const p = [...sr.points].reverse().find((q) => q.y != null);
     return { si, x: X(p.x), y: Y(p.y), v: p.y };
@@ -109,7 +109,7 @@ export function lineChart(el, o) {
     s += `<g class="lc-end" data-i="${e.si}"><circle class="lc-enddot" cx="${e.x}" cy="${Y(series[e.si].points.filter((p) => p.y != null).pop().y)}" r="4" style="--c:${series[e.si].color}"/>`;
     s += `<text class="lc-endval" x="${e.x + 9}" y="${e.y + 4.5}">${e.v}</text></g>`;
   }
-  // 선택된 시점: 세로선과 진한 점
+  // Selected date: a vertical line and solid dots
   if (o.selectedX != null && xs.includes(+o.selectedX)) {
     const sx = X(o.selectedX);
     s += `<line class="lc-sel" x1="${sx}" x2="${sx}" y1="${m.t}" y2="${m.t + ih}"/>`;
@@ -178,7 +178,7 @@ export function lineChart(el, o) {
     const r = svg.getBoundingClientRect();
     const px = ((ev.clientX - r.left) / r.width) * W;
     const py = ((ev.clientY - r.top) / r.height) * H;
-    if (px < m.l - 10) return hidePoint(); // 오른쪽 끝 값 라벨 위에서도 마지막 시점을 보여준다
+    if (px < m.l - 10) return hidePoint(); // over the end labels on the right, keep showing the last date
     let xi = 0, bd = Infinity;
     xs.forEach((t, i) => { const d = Math.abs(X(t) - px); if (d < bd) { bd = d; xi = i; } });
     let si = null, by = Infinity;
@@ -212,7 +212,7 @@ export function lineChart(el, o) {
   });
   svg.addEventListener('blur', hidePoint);
 
-  // ---- 범례 ----
+  // ---- legend ----
   if (o.legendEl) {
     o.legendEl.innerHTML = series.map((sr, i) => `<button type="button" class="lc-key" data-si="${i}" aria-pressed="false" style="--c:${sr.color}"><i></i>${esc(sr.name)}</button>`).join('');
     o.legendEl.querySelectorAll('[data-si]').forEach((b) => {
@@ -231,16 +231,16 @@ export function lineChart(el, o) {
   };
 }
 
-// ---------- 내보내기 ----------
+// ---------- export ----------
 
-/** 표 데이터를 CSV로 내려받기 */
+/** Download table data as CSV */
 export function downloadCSV(filename, header, rows) {
   const q = (v) => (v == null ? '' : /[",\n]/.test(String(v)) ? `"${String(v).replace(/"/g, '""')}"` : String(v));
   const text = '﻿' + [header, ...rows].map((r) => r.map(q).join(',')).join('\n');
   save(new Blob([text], { type: 'text/csv;charset=utf-8' }), filename);
 }
 
-/** 그래프를 제목·각주와 함께 PNG로 저장 */
+/** Save the chart with its title and footnote as a PNG (SVG drawn onto a canvas) */
 export async function downloadPNG(filename, svg, { title, subtitle, legend = [], footer }) {
   const vb = svg.viewBox.baseVal;
   const W = vb.width, top = 92, bottom = 40, H = vb.height + top + bottom;

@@ -1,13 +1,15 @@
-// 한국갤럽 리포트 PDF → 대통령 직무 수행 평가 응답자 특성별 표 추출기.
-// 브라우저와 Node 양쪽에서 동작한다 (pdf.js 라이브러리를 인자로 받음).
+// Gallup Korea report PDF -> presidential job approval tables by respondent group.
+// Runs in both the browser and Node (the pdf.js library is passed in).
 //
-// 핵심 원칙: 배너·열 구성을 코드에 고정하지 않는다.
-//  - 표의 기준점은 '전체' 행.
-//  - 열은 값의 오른쪽 끝 좌표로 묶고, 열 이름은 그 위에 쌓인 머리글 글자로 읽는다.
-//  - '잘하고' 열부터 '전체' 행 합계가 100%가 될 때까지가 평가 열(main),
-//    그 뒤에 직전 열을 쪼갠 세부 열(예: 의견유보 = 어느 쪽도 아님 + 모름)이 있으면 detail로 붙인다.
-//  - 배너명은 그룹명보다 왼쪽 열에 있는 글자. 여러 줄로 쪼개져 있어도 이어 붙이고,
-//    그룹 첫 줄에 있든(2013~) 그룹 세로 가운데에 있든(2012) 모두 처리한다.
+// Main idea: nothing about the banners or columns is hard-coded.
+//  - Each table is anchored on its '전체' (total) row.
+//  - Columns are found by grouping values on their right edge; column names are the header
+//    text stacked above each column.
+//  - Rating columns ('main') run from the '잘하고' (approve) column until the total row adds
+//    up to 100%. Columns after that which split the previous one (e.g. no opinion = neither +
+//    don't know) are kept as 'detail'.
+//  - The banner name is the text left of the group names. It may be split over several lines,
+//    and may sit on the group's first line (2013 on) or be centred vertically (2012).
 
 import { normalizeBanner, normalizeGroup, BANNER_MAP } from './normalize.js';
 
@@ -16,7 +18,7 @@ const KNOWN_BANNERS = Object.keys(BANNER_MAP);
 const VALUE_RE = /^(-|\d{1,3}(,\d{3})*%?|\d+%?)$/;
 const isValue = (s) => VALUE_RE.test(s);
 const toNum = (s) => (s === '-' ? null : Number(s.replace(/[,%]/g, '')));
-// 열 머리글 표기 정리 (표 제목 글자가 섞여 들어오므로 핵심어로 판정)
+// Normalize a column header (table-title text can get mixed in, so match on key words)
 function prettyCol(raw) {
   const s = raw.replace(/\s/g, '');
   if (/잘못하고/.test(s)) return '잘못하고 있다';
@@ -30,7 +32,7 @@ function prettyCol(raw) {
 }
 const median = (a) => { const b = [...a].sort((x, y) => x - y); return b.length ? b[b.length >> 1] : 0; };
 
-// ---------- 1. pdf.js 텍스트 조각 → 단어 → 행 ----------
+// ---------- 1. pdf.js text items -> words -> rows ----------
 
 function itemsToWords(items, pageHeight) {
   const raw = [];
@@ -40,9 +42,9 @@ function itemsToWords(items, pageHeight) {
     const x = it.transform[4];
     const y = pageHeight - it.transform[5];
     const w = it.width;
-    // 일부 리포트(2019~2020년 등)는 '48%'가 '4 8 %'처럼 글자 사이에 공백이 든 채 저장돼 있다
+    // Some reports (e.g. 2019-2020) store '48%' with spaces between the characters: '4 8 %'
     const str = /^\d(?:\s+\d)+\s*%$|^\d\s+%$/.test(it.str.trim()) ? it.str.replace(/\s+/g, '') : it.str;
-    // 조각 안에 공백이 있으면 글자 수 비례로 나눈다
+    // Split an item at its spaces, placing each part by its share of the characters
     const parts = str.split(/(\s+)/);
     let off = 0;
     for (const p of parts) {
@@ -54,7 +56,7 @@ function itemsToWords(items, pageHeight) {
     g++;
   }
   raw.sort((a, b) => a.y - b.y || a.x0 - b.x0);
-  // 같은 줄에서 거의 붙어 있는 조각은 한 단어로 합친다
+  // Merge items on the same line that almost touch into one word
   const words = [];
   for (const w of raw) {
     const last = words[words.length - 1];
@@ -77,10 +79,10 @@ function groupRows(words, tol = 2.5) {
   return rows;
 }
 
-// ---------- 2. 한 페이지에서 표 찾기 ----------
+// ---------- 2. find tables on a page ----------
 
 function findTables(rows, pageWidth) {
-  // '전체' 오른쪽에 숫자가 2개 이상 있는 곳이 표의 기준점
+  // A '전체' (total) word followed by several numbers anchors a table
   const anchors = [];
   for (const r of rows) {
     r.words.forEach((w, i) => {
@@ -102,7 +104,7 @@ function findTables(rows, pageWidth) {
 
 const inBox = (w, t) => w.x0 >= t.left - 0.5 && w.x1 <= t.right + 0.5;
 
-// ---------- 3. 표 하나 읽기 ----------
+// ---------- 3. read one table ----------
 
 function readTable(rows, t) {
   const warnings = [];
@@ -110,13 +112,13 @@ function readTable(rows, t) {
   const aIdx = rows.indexOf(aRow);
   const groupX = t.anchor.word.x0;
 
-  // 머리글 영역: 기준 행 위쪽 약 110pt
+  // Header area: about 110pt above the anchor row
   const headRows = rows.slice(0, aIdx).filter((r) => r.y >= aRow.y - 110)
     .map((r) => ({ y: r.y, words: r.words.filter((w) => inBox(w, t)) }))
     .filter((r) => r.words.length);
   const headText = headRows.map((r) => r.words.map((w) => w.s).join(' ')).join(' ');
 
-  // 데이터 영역: 기준 행부터 아래로, 각주를 만나거나 간격이 크게 벌어지면 끝
+  // Body: from the anchor row down, until a footnote or a large vertical gap
   const body = [];
   let lastY = aRow.y;
   const pitches = [];
@@ -133,19 +135,20 @@ function readTable(rows, t) {
     lastY = rows[i].y;
   }
 
-  // 행마다 라벨 단어 / 값 단어 분리 (첫 값 이전까지가 라벨)
+  // Split each row into label words and value words (labels come before the first value)
   for (const r of body) {
     const firstVal = r.words.findIndex((w) => isValue(w.s) && w.x0 > groupX);
     r.labels = firstVal < 0 ? r.words : r.words.slice(0, firstVal);
     r.values = firstVal < 0 ? [] : r.words.slice(firstVal).filter((w) => isValue(w.s));
   }
 
-  // 배너 열 / 그룹 열 경계
+  // Boundary between the banner column and the group column
   const labelXs = body.flatMap((r) => r.labels.map((w) => w.x0));
   const bannerX = Math.min(...labelXs);
-  // 2012년 일부 표는 '전체'가 그룹 칸이 아니라 배너 칸에 있다 → 그룹 칸은 그 오른쪽 첫 라벨 열
+  // In some 2012 tables '전체' sits in the banner column, so the group column is the next one right
   let groupColX = groupX;
-  // 그룹 칸 위치는 값이 있는 행의 마지막 라벨로 정한다 (배너 둘째 줄 '정당별'·'성향별'이 배너 칸 안쪽에 들여 쓰여 있어 최솟값을 쓰면 틀림)
+  // Take the group column from the last label of rows that have values: the second line of a
+  // banner ('정당별', '성향별') is indented inside the banner column, so the leftmost label is wrong
   const totalInBanner = Math.abs(bannerX - groupX) < 15;
   if (totalInBanner) {
     const right = body.filter((r) => r.values.length && r.labels.length)
@@ -156,16 +159,16 @@ function readTable(rows, t) {
   for (const r of body) {
     r.bannerWords = r.labels.filter((w) => w.x0 < split);
     r.groupWords = r.labels.filter((w) => w.x0 >= split);
-    // '전체'가 배너 칸에 있으면 그룹으로 옮긴다 (배너 글자로 남으면 아래 '지역별'과 붙어 버림)
+    // Move a '전체' in the banner column to the group column (otherwise it joins the '지역별' banner below)
     if (totalInBanner && r === body[0] && !r.groupWords.length) {
       r.groupWords = r.bannerWords.filter((w) => w.s === '전체');
       r.bannerWords = r.bannerWords.filter((w) => w.s !== '전체');
     }
   }
 
-  // ---- 열 정의: 값의 오른쪽 끝을 묶는다 ----
+  // ---- columns: group values by their right edge ----
   const dataRows = body.filter((r) => r.values.length >= 2);
-  // '-'(표본 부족)는 가운데 정렬이라 열 위치 계산에서 빼고, 나중에 가장 가까운 열에 붙인다
+  // '-' (sample too small) is centred, so leave it out here and attach it to the nearest column later
   const ends = dataRows.flatMap((r) => r.values.filter((w) => w.s !== '-').map((w) => w.x1)).sort((a, b) => a - b);
   const cols = [];
   for (const e of ends) {
@@ -185,15 +188,16 @@ function readTable(rows, t) {
     }
     return best;
   };
-  // 머리글 단어를 가장 가까운 열 중심에 붙인다
-  // 열 머리글은 기준 행 바로 위에서부터, 질문 문장이 나오는 줄 전까지만
+  // Attach header words to the nearest column centre.
+  // Column headers run from just above the anchor row up to the line with the question text
   const colHeadRows = [];
   for (let i = headRows.length - 1; i >= 0; i--) {
     const txt = headRows[i].words.map((w) => w.s).join(' ');
     if (/[?？‘’“”]|질문|귀하/.test(txt)) break;
     colHeadRows.unshift(headRows[i]);
   }
-  // 한 조각에 든 머리글('잘하고 있다' 등, 2012년 9~11월 리포트)은 쪼개지 않고 조각 가운데로 붙인다
+  // Headers stored as one item ('잘하고 있다' in the Sep-Nov 2012 reports) are placed by the
+  // item's centre instead of word by word
   for (const r of colHeadRows) {
     const units = [];
     for (const w of r.words) {
@@ -212,7 +216,7 @@ function readTable(rows, t) {
     c.label = prettyCol(c.rawLabel);
   });
 
-  // ---- 열 역할 판정 ----
+  // ---- column roles ----
   const totalByCol = new Map();
   for (const w of totalVals) { const c = colOf(w); if (c) totalByCol.set(c, w.s); }
   const posIdx = cols.findIndex((c) => /잘하고/.test(c.label));
@@ -230,7 +234,7 @@ function readTable(rows, t) {
   }
   if (Math.abs(sum - 100) > 2) return { headText, error: `'전체' 행 평가 열 합계가 100이 아님 (${sum})` };
   const mainCols = cols.slice(posIdx, mainEnd + 1);
-  // 세부 열: 직전 main 열 값을 정확히 쪼갠 경우만
+  // Detail columns: only when they add up exactly to the last main column
   const detailCols = [];
   const lastMain = toNum(totalByCol.get(cols[mainEnd]));
   let dsum = 0;
@@ -243,12 +247,12 @@ function readTable(rows, t) {
   if (!(detailCols.length >= 2 && Math.abs(dsum - lastMain) <= 1)) detailCols.length = 0;
   const restLabel = mainCols.length === 3 ? mainCols[2].label : mainCols.slice(2).map((c) => c.label).join('+');
 
-  // ---- 배너 블록: 배너 열 글자를 이어 붙인다 ('…별'로 끝나면 끊음) ----
+  // ---- banner blocks: join the banner-column text (a name ending in '별' closes a block) ----
   const pitch = median(pitches) || 10;
   const frags = body.flatMap((r) => r.bannerWords.map((w) => ({ s: w.s, y: r.y })));
   const blocks = [];
-  // 이미 아는 배너 이름의 첫 단어가 나오면, 앞 글자가 그 이름의 일부가 아닌 한 새 배너로 본다
-  // (예: '본인·배우자 / 명의 집' 다음 줄의 '평소 / 정치에 / 관심이')
+  // The first word of a known banner name starts a new banner, unless the text so far is part of
+  // that name (e.g. '평소 / 정치에 / 관심이' on the line after '본인·배우자 / 명의 집')
   const known = KNOWN_BANNERS.map((k) => k.replace(/\s/g, ''));
   const startsKnown = (s) => KNOWN_BANNERS.some((k) => k.split(/\s+/)[0] === s && /\s/.test(k));
   const prefixOfKnown = (s) => known.some((k) => k.startsWith(s.replace(/\s/g, '')) && k !== s.replace(/\s/g, ''));
@@ -260,11 +264,11 @@ function readTable(rows, t) {
     else blocks.push({ text: f.s, y0: f.y, y1: f.y, parts: [f] });
   }
 
-  // ---- 데이터 행 → 구간 → 배너 지정 ----
+  // ---- data rows -> sections -> banner for each row ----
   const recs = dataRows.filter((r) => r.groupWords.length);
 
-  // 이름이 '…별'로 끝나지 않는 특별 배너 두 개가 붙어 버린 경우 나눈다:
-  // 앞쪽 그룹들의 사례수 합이 전체와 같아지는 지점 아래에도 배너 글자가 있으면 거기서 새 배너
+  // Split two special banners (names not ending in '별') that were joined: if banner text
+  // continues below the row where the group sample sizes add up to the total, start a new banner there
   const nCol0 = cols.slice(0, posIdx).find((c) => totalByCol.has(c) && !/%/.test(totalByCol.get(c)));
   const totalN = nCol0 ? toNum(totalByCol.get(nCol0)) : null;
   const rowN = (r) => { const w = r.values.find((v) => colOf(v) === nCol0); return w ? toNum(w.s) : null; };
@@ -288,7 +292,7 @@ function readTable(rows, t) {
     }
   }
   for (const b of blocks) b.text = b.text.replace(/\s*\/\s*/g, '/').replace(/^(\S+\/)\s+/, '$1');
-  // 큰 간격으로 구간 나누기 (2012형: 배너가 그룹 가운데에 있음)
+  // Split into sections at large gaps (2012 layout: banner centred beside its groups)
   const segs = [];
   recs.forEach((r, i) => {
     if (i === 0 || r.y - recs[i - 1].y > 1.45 * pitch) segs.push([]);
@@ -299,7 +303,7 @@ function readTable(rows, t) {
     const y0 = seg[0].y - 0.6 * pitch, y1 = seg[seg.length - 1].y + 0.6 * pitch;
     const inside = blocks.filter((b) => b.y0 >= y0 && b.y1 <= y1 + pitch);
     if (inside.length === 1) {
-      // 구간에 배너가 하나뿐이면 (가운데 정렬형 포함) 구간 전체가 그 배너
+      // A section with a single banner (including centred ones) belongs entirely to it
       seg.forEach((r) => (r.banner = inside[0].text));
       carry = inside[0].text;
       continue;
@@ -311,7 +315,7 @@ function readTable(rows, t) {
     }
   }
 
-  // ---- 레코드 만들기 ----
+  // ---- build records ----
   const out = [];
   const unknownBanners = new Set();
   for (const r of recs) {
@@ -339,7 +343,7 @@ function readTable(rows, t) {
     };
     if (detailCols.length && !suppressed) {
       rec.detail = Object.fromEntries(detailCols.map((c) => [c.label, get(c) ?? 0]));
-      // 의견유보 칸이 비어 있는데 세부 칸은 있으면 세부 합으로 채운다
+      // If the 'no opinion' cell is empty but the detail cells are not, use their sum
       const lastMainVal = main[main.length - 1];
       if ((lastMainVal == null) && main.length >= 3) {
         const d = Object.values(rec.detail).reduce((a, v) => a + v, 0);
@@ -357,7 +361,7 @@ function readTable(rows, t) {
     out.push(rec);
   }
 
-  // 배너별 사례수 합 점검
+  // Check that each banner's group sample sizes add up to the total
   const total = out.find((r) => r.banner === '전체');
   if (total && total.n) {
     const byBanner = {};
@@ -386,10 +390,10 @@ function readTable(rows, t) {
   };
 }
 
-// ---------- 4. 기간·대통령·호수 ----------
+// ---------- 4. period, president, issue number ----------
 
-// 재임 시작일 (직무 평가가 있는 기간). 조사 날짜로 대통령을 정한다.
-// 새 대통령이 취임하면 여기에 한 줄 추가. 목록 이후 날짜는 리포트 문장에서 읽은 이름을 쓴다.
+// Start of each term with job approval surveys. The survey date decides the president.
+// Add a line when a new president takes office; after the list ends, the name read from the report is used.
 export const PRESIDENTS = [
   ['이명박', '2008-02-25'],
   ['박근혜', '2013-02-25'],
@@ -397,9 +401,9 @@ export const PRESIDENTS = [
   ['윤석열', '2022-05-10'],
   ['이재명', '2025-06-04'],
 ];
-const NEXT_ELECTION = '2030-06-03'; // 이 날 이후는 목록에 없는 대통령일 수 있음
+const NEXT_ELECTION = '2030-06-03'; // after this date the president may not be in the list
 
-// 조사가 시작된 날 (주간: 라벨의 조사일, 월간 통합: 처음 들어간 주)
+// First day of a survey (weekly: the dates in the label; monthly: the first week included)
 export function surveyStart(t) {
   const pad = (n) => String(n).padStart(2, '0');
   const m1 = t.label?.match(/\((\d{1,2})\/(\d{1,2})\s*~/);
@@ -432,7 +436,7 @@ function parsePeriod(headText, pageText) {
     const days = (h.match(/\(([\d/~\s-]+일?)\)/) || [])[1];
     return { type: 'weekly', year: +m[1], month: +m[2], week: +m[3], label: `${m[1]}년 ${+m[2]}월 ${m[3]}주${days ? ` (${days.replace(/\s/g, '')})` : ''}` };
   }
-  // 주차 없이 날짜만 적힌 경우 (예: 2012년 12월 10~12일)
+  // Dates without a week number (e.g. '2012년 12월 10~12일')
   if ((m = h.match(/(\d{4})\s*년\s*(\d{1,2})\s*월\s*(\d{1,2})\s*~\s*(\d{1,2})\s*일/))) {
     const week = Math.ceil(+m[3] / 7);
     return { type: 'weekly', year: +m[1], month: +m[2], week, label: `${m[1]}년 ${+m[2]}월 ${week}주 (${+m[3]}~${+m[4]}일)` };
@@ -445,7 +449,7 @@ export const periodKey = (p) =>
     ? `${p.year}-${String(p.month).padStart(2, '0')}-W${p.week}`
     : `${p.year}-${String(p.month).padStart(2, '0')}-M`;
 
-// ---------- 5. 문서 전체 ----------
+// ---------- 5. whole document ----------
 
 export async function parseGallupPdf(pdfjsLib, data, opts = {}) {
   const doc = await pdfjsLib.getDocument({ data, ...opts }).promise;
@@ -466,7 +470,7 @@ export async function parseGallupPdf(pdfjsLib, data, opts = {}) {
         if (/대통령/.test(head) && /직무/.test(head)) result.skipped.push({ page: p, reason: tb.error });
         continue;
       }
-      // 대통령 직무 평가 표만 (당선인 평가, 국회·정당 평가 등은 제외)
+      // Presidential job approval tables only (skip president-elect, National Assembly, party tables)
       if (!(/대통령/.test(head) && /직무/.test(head)) || /당선인|권한대행/.test(head)) {
         continue;
       }
@@ -488,17 +492,18 @@ export async function parseGallupPdf(pdfjsLib, data, opts = {}) {
     }
   }
   result.issue = +((firstText.match(/제\s*(\d+)\s*호/) || [])[1] || 0) || null;
-  // 리포트가 다루는 연·월 (대통령 평가 표가 없는 리포트도 날짜는 알 수 있게)
+  // Year and month of the report (known even when it has no approval table)
   const rp = firstText.match(/제\s*\d+\s*호\s*\(?\s*(\d{4})\s*년\s*(\d{1,2})\s*월/) || firstText.match(/(\d{4})\s*년\s*(\d{1,2})\s*월\s*\d\s*주/);
   result.reportMonth = rp ? `${rp[1]}-${String(rp[2]).padStart(2, '0')}` : null;
-  // 표지의 '1,001명 … 표본오차 ±3.1%포인트'를 사례수별로 모아 두었다가, 전체 사례수가 같은 표에 붙인다
+  // Collect '1,001명 … 표본오차 ±3.1%포인트' from the cover by sample size and attach the margin
+  // of error to the table with the same total sample size
   const moeByN = {};
   for (const m of firstText.matchAll(/(\d{1,2},?\d{3})\s*명[^±]{0,60}?표본\s*오차[^±]{0,10}±\s*(\d+(?:\.\d+)?)\s*%/g)) moeByN[+m[1].replace(',', '')] ??= +m[2];
   for (const t of result.tables) {
     const n = t.rows.find((r) => r.banner === '전체')?.n;
     if (n != null && moeByN[n] != null) t.moe = moeByN[n];
   }
-  // 같은 기간이 여러 번 나오면 첫 번째만
+  // Keep only the first table for each period
   const seen = new Set();
   result.tables = result.tables.filter((t) => (seen.has(t.key) ? false : seen.add(t.key)));
   return result;

@@ -1,6 +1,7 @@
-// 파싱 결과를 data.json 구조에 병합한다.
+// Merge parser output into the data.json structure.
 // data.json = { updated, surveys: [ { key, type, year, month, week, label, president, issue, source, columns, rows:[...] } ] }
-// 같은 key(기간)가 이미 있으면: 주간은 교체하지 않고 유지, 월간 통합은 더 최근 호수에서 온 것으로 교체.
+// When a key (period) already exists: weekly surveys are kept as they are; monthly combined tables
+// are replaced by the one from the more recent report.
 
 export function mergeInto(db, parsed, sourceName) {
   const surveys = [...(db.surveys || [])];

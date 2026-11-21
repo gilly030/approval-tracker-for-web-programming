@@ -49,9 +49,9 @@
         <button type="button" id="r-custom" data-range="custom" aria-pressed="false" aria-controls="range-custom" data-i18n="rcustom">기간 설정</button>
       </div>
       <span class="range-custom" id="range-custom" hidden>
-        <span class="rf"><label for="range-from" data-i18n="from">시작</label><input type="month" id="range-from"></span>
+        <span class="rf"><label for="range-from-y" data-i18n="from">시작</label><select id="range-from-y"></select><select id="range-from-m" aria-label="월" data-i18n-aria="monthAria"></select></span>
         <span aria-hidden="true">~</span>
-        <span class="rf"><label for="range-to" data-i18n="to">끝</label><input type="month" id="range-to"></span>
+        <span class="rf"><label for="range-to-y" data-i18n="to">끝</label><select id="range-to-y"></select><select id="range-to-m" aria-label="월" data-i18n-aria="monthAria"></select></span>
         <button type="button" class="btn primary" id="range-apply" data-i18n="apply">적용</button>
       </span>
       <span class="range-info" id="range-info"></span>
