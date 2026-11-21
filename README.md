@@ -24,16 +24,16 @@ tools/build-data.mjs  data.json → index.json, years/ 생성
 data/state.json     자동 갱신이 어디까지 처리했는지 기록
 tools/update.mjs    자동 갱신 스크립트 (GitHub Actions에서 실행)
 tools/parse-node.mjs  (선택) 같은 파서를 Node에서 돌리는 명령줄 도구
-.github/workflows/update.yml  매일 두 번 자동 갱신
+.github/workflows/update.yml  3시간마다 자동 갱신
 ```
 
 ## 자동 갱신 (기본)
 
-`.github/workflows/update.yml`이 매일 두 번(한국시간 11:23, 19:23) 실행됩니다.
+`.github/workflows/update.yml`이 3시간마다(한국시간 0:23, 3:23, … 21:23) 실행됩니다. GitHub이 예약 실행을 자주 건너뛰어 실제로는 하루 2~3번쯤 돕니다. 갤럽은 보통 금요일 오후에 새 리포트를 올립니다.
 
 1. 갤럽 리포트 게시판에서 가장 큰 게시물 번호를 확인합니다.
 2. `data/state.json`의 `lastSeq`보다 큰 번호의 PDF를 받아 파싱하고 `data/data.json`에 반영합니다.
-3. `state.backfill`이 끝나지 않았으면 과거 번호로 내려가며 한 번에 최대 60개씩 채웁니다. 2012년 1월(데일리 오피니언 시작) 이전에 닿거나 평가 표가 있는 리포트가 더 나오지 않으면 멈춥니다. 하루 두 번이라 2012년까지 다 채우는 데 1주일쯤 걸립니다.
+3. `state.backfill`이 끝나지 않았으면 과거 번호로 내려가며 한 번에 최대 60개씩 채웁니다. 2012년 1월(데일리 오피니언 시작) 이전에 닿거나 평가 표가 있는 리포트가 더 나오지 않으면 멈춥니다. (2012년 1월까지 모두 채워 `backfill.done`이 `true`입니다.)
 4. `tools/build-data.mjs`가 `data/index.json`(요약)과 `data/years/연도.json`(배너 상세)을 만듭니다.
 5. 데이터가 바뀌었을 때만 커밋하고 GitHub Pages를 다시 배포합니다.
 
