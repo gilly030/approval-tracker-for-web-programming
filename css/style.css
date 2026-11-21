@@ -79,6 +79,8 @@ h1, h2, h3 { margin: 0; text-wrap: balance; }
 .brand small { font-family: var(--font-body); font-size: 13px; font-weight: 400; color: var(--muted); margin-left: 8px; letter-spacing: 0; }
 .source { font-size: 13px; color: var(--muted); }
 .source a { color: var(--ink-2); }
+.source .lang-switch { margin-left: 12px; padding: 3px 10px; border: 1px solid var(--axis); border-radius: 999px; font-size: 12.5px; color: var(--ink); text-decoration: none; white-space: nowrap; }
+.source .lang-switch:hover { border-color: var(--ink); }
 
 /* ---------- 최신 수치 ---------- */
 .headline { display: grid; gap: 22px; }

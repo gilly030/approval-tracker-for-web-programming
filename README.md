@@ -13,6 +13,7 @@ admin.html          관리자 페이지: PDF를 올려 data.json에 반영
 css/style.css
 js/app.js           공개 페이지 로직
 js/linechart.js     Gallup 리포트식 선 그래프 (범례 강조, 점 주석, 데이터·이미지 내보내기)
+js/i18n.js          한국어/영어 화면 문구와 데이터 용어 번역 (?lang=en, 상단 English 버튼)
 js/admin.js         관리자 페이지 로직 (pdf.js를 CDN에서 불러옴)
 js/parser.js        PDF → 표 추출기 (브라우저·Node 공용)
 js/normalize.js     시기마다 다른 배너·그룹 이름을 하나로 묶는 표

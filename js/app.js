@@ -2,10 +2,11 @@
 import { lineChart, downloadCSV, downloadPNG } from './linechart.js';
 import { regionMap } from './tilemap.js';
 import { PRESIDENTS } from './parser.js';
+import { t, term, surveyLabel, shortSurveyLabel, ymLabel, fmtNum, applyStatic } from './i18n.js';
 
 const $ = (s) => document.querySelector(s);
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-const fmtN = (n) => (n == null ? '–' : n.toLocaleString('ko-KR'));
+const fmtN = (n) => (n == null ? '–' : fmtNum(n));
 const moe = (n) => (n ? 1.96 * Math.sqrt(0.25 / n) * 100 : null);
 // 전체 표본오차: 갤럽 리포트 표지에 적힌 값을 쓰고, 없으면 같은 방식(95% 신뢰수준, 응답비율 50% 가정)으로 계산
 const surveyMoe = (s) => s?.moe ?? moe(s?.n);
@@ -46,7 +47,6 @@ function dateOf(s) {
 }
 const byDate = (a, b) => dateOf(a) - dateOf(b);
 const ym = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-const ymLabel = (v) => { const [y, m] = v.split('-'); return `${y}년 ${+m}월`; };
 const monthStart = (v) => { const [y, m] = v.split('-').map(Number); return new Date(y, m - 1, 1); };
 const monthEnd = (v) => { const [y, m] = v.split('-').map(Number); return new Date(y, m, 0, 23, 59); };
 const css = (v) => `var(${v})`;
@@ -61,7 +61,7 @@ const latest = () => { const w = weekly(); return w[w.length - 1] || [...all()].
 function loadYear(y) {
   if (!state.years.has(y)) {
     state.years.set(y, fetch(`data/years/${y}.json`, { cache: 'no-cache' }).then((r) => {
-      if (!r.ok) throw new Error(`${y}년 자료를 불러오지 못했어요 (${r.status})`);
+      if (!r.ok) throw new Error(t('yearFail', y, r.status));
       return r.json();
     }).then((j) => { for (const s of j.surveys) state.detail.set(s.key, s); return j.surveys; }));
   }
@@ -117,11 +117,11 @@ function setPending(on) {
   state.rangePending = on;
   $('#range-apply').classList.toggle('idle', !on);
   $('#range-info').classList.toggle('pending', on);
-  $('#range-info').textContent = on ? '적용을 누르면 이 기간으로 바뀝니다' : '';
+  $('#range-info').textContent = on ? t('pending') : '';
 }
 function applyCustomRange() {
   let from = $('#range-from').value, to = $('#range-to').value;
-  if (!from || !to) { $('#range-info').textContent = '시작과 끝 월을 모두 골라 주세요'; return; }
+  if (!from || !to) { $('#range-info').textContent = t('pickBoth'); return; }
   if (from > to) [from, to] = [to, from];
   state.range = { preset: 'custom', from, to };
   renderRange(); ensureSurvey(); renderMain(); renderBanners(); renderSnapshot(); renderTrend();
@@ -138,19 +138,19 @@ function renderGap(list) {
   const el = $('#range-gap');
   const [a] = axisRange();
   const bf = state.index.backfill;
-  const collecting = bf && !bf.done ? ' 과거 자료를 자동으로 모으는 중이라, 며칠 안에 채워집니다.' : '';
-  if (!list.length) { el.hidden = false; el.textContent = `이 기간에는 아직 자료가 없어요.${collecting}`; return; }
+  const collecting = bf && !bf.done ? t('collecting') : '';
+  if (!list.length) { el.hidden = false; el.textContent = t('noDataYet') + collecting; return; }
   const firstD = dateOf(list[0]);
   if ((firstD - a) / 864e5 > GAP_DAYS) {
     el.hidden = false;
-    el.textContent = `${ymLabel(ym(a))}부터 ${ymLabel(ym(firstD))} 전까지는 아직 자료가 없어요.${collecting}`;
+    el.textContent = t('noDataFromTo', ymLabel(ym(a)), ymLabel(ym(firstD))) + collecting;
     return;
   }
   // 수집 중에는 중간에 1년 넘게 빈 구간이 생길 수 있다
   const hole = list.findIndex((s, i) => i && (dateOf(s) - dateOf(list[i - 1])) / 864e5 > 365);
   if (hole > 0 && collecting) {
     el.hidden = false;
-    el.textContent = `${ymLabel(ym(dateOf(list[hole - 1])))}부터 ${ymLabel(ym(dateOf(list[hole])))} 사이는 아직 자료가 없어요.${collecting}`;
+    el.textContent = t('noDataBetween', ymLabel(ym(dateOf(list[hole - 1]))), ymLabel(ym(dateOf(list[hole])))) + collecting;
   } else el.hidden = true;
 }
 
@@ -159,22 +159,22 @@ function renderHeadline() {
   const s = latest();
   // 막대 칸: 이름은 막대 위, 수치는 막대 안
   const parts = [
-    { name: '잘하고 있다', v: s.pos, cls: 'p' },
-    { name: '의견유보', v: s.rest, cls: 'm' },
-    { name: '잘못하고 있다', v: s.neg, cls: 'n' },
+    { name: t('pos'), v: s.pos, cls: 'p' },
+    { name: t('rest'), v: s.rest, cls: 'm' },
+    { name: t('neg'), v: s.neg, cls: 'n' },
   ];
   $('#headline').innerHTML = `
     <div class="hl-top">
       <div class="hl-title">
-        <h2 class="kicker">${esc(s.president || '')} 대통령 국정 수행 지지도</h2>
-        <div class="when">${esc(s.label)}</div>
+        <h2 class="kicker">${esc(t('approvalOf', term(s.president || '')))}</h2>
+        <div class="when">${esc(surveyLabel(s))}</div>
       </div>
       <div class="big num">${s.pos}<span class="unit">%</span></div>
     </div>
     <div class="split">
       <div class="split-labels" aria-hidden="true">${parts.map((q) => `<span class="${q.cls}" style="flex-basis:${q.v}%">${q.name}</span>`).join('')}</div>
-      <div class="split-bar" role="img" aria-label="잘하고 있다 ${s.pos}%, 의견유보 ${s.rest}%, 잘못하고 있다 ${s.neg}%">${parts.map((q) => `<span class="${q.cls}" style="flex-basis:${q.v}%">${q.v}%</span>`).join('')}</div>
-      <div class="meta">전국 만 18세 이상 <span class="num">${fmtN(s.n)}</span>명 · 표본오차 ±<span class="num">${surveyMoe(s).toFixed(1)}</span>%p (95% 신뢰수준) · 데일리 오피니언 제${s.issue ?? '?'}호</div>
+      <div class="split-bar" role="img" aria-label="${parts.map((q) => `${q.name} ${q.v}%`).join(', ')}">${parts.map((q) => `<span class="${q.cls}" style="flex-basis:${q.v}%">${q.v}%</span>`).join('')}</div>
+      <div class="meta">${t('headMeta', fmtN(s.n), surveyMoe(s).toFixed(1), s.issue ?? '?')}</div>
     </div>`;
 }
 
@@ -200,7 +200,7 @@ function presidentBands(list) {
     if (i < 0) return null;
     const x0 = new Date(PRESIDENTS[i][1]);
     const x1 = PRESIDENTS[i + 1] ? new Date(PRESIDENTS[i + 1][1]) : new Date(8640000000000000);
-    return { label: name, x0, x1 };
+    return { label: term(name), x0, x1 };
   }).filter(Boolean);
 }
 
@@ -209,22 +209,22 @@ function renderMain() {
   const list = weekly().filter(inRange);
   const pres = [...new Set(list.map((s) => s.president))];
   const one = pres.length === 1;
-  $('#main-title').textContent = one ? `${pres[0]} 대통령 직무 수행 평가` : '대통령 직무 수행 평가';
-  $('#main-q').textContent = `귀하는 요즘 ${one ? pres[0] : '○○○'} 대통령이 대통령으로서의 직무를 잘 수행하고 있다고 보십니까, 아니면 잘못 수행하고 있다고 보십니까?`;
+  $('#main-title').textContent = t('mainTitle', one ? term(pres[0]) : null);
+  $('#main-q').textContent = t('question', one ? term(pres[0]) : null);
   const [a, b] = rangeDates();
-  $('#main-info').textContent = list.length ? `자료: ${list[0].label} ~ ${list[list.length - 1].label} · 주간 조사 ${list.length}회` : `${ymLabel(ym(a))} ~ ${ymLabel(ym(b))}`;
+  $('#main-info').textContent = list.length ? t('mainInfo', surveyLabel(list[0]), surveyLabel(list[list.length - 1]), list.length) : `${ymLabel(ym(a))} ~ ${ymLabel(ym(b))}`;
   renderGap(list);
   if (list.length < 2) {
     $('#main-legend').innerHTML = '';
-    $('#main-chart').innerHTML = `<div class="empty">이 기간에는 주간 조사 자료가 ${list.length ? '1회뿐' : '없'}이에요. 기간을 넓혀 보세요.</div>`;
+    $('#main-chart').innerHTML = `<div class="empty">${esc(t('tooFew', list.length))}</div>`;
     state.charts.main = null; state.mainData = null;
     $('#main-table').innerHTML = '';
     return;
   }
-  const pt = (key) => (s) => ({ x: dateOf(s), y: s[key], label: `${s.label}${one ? '' : ` · ${s.president}`}`, n: s.n });
+  const pt = (key) => (s) => ({ x: dateOf(s), y: s[key], label: `${surveyLabel(s)}${one ? '' : ` · ${term(s.president)}`}`, n: s.n });
   const series = [
-    { id: 'pos', name: '잘하고 있다', color: css('--pos'), points: withBreaks(list, pt('pos')) },
-    { id: 'neg', name: '잘못하고 있다', color: css('--neg'), points: withBreaks(list, pt('neg')) },
+    { id: 'pos', name: t('pos'), color: css('--pos'), points: withBreaks(list, pt('pos')) },
+    { id: 'neg', name: t('neg'), color: css('--neg'), points: withBreaks(list, pt('neg')) },
   ];
   const sel = list.find((s) => s.key === state.surveyKey);
   state.charts.main = lineChart($('#main-chart'), {
@@ -233,7 +233,7 @@ function renderMain() {
     selectedX: sel ? dateOf(sel) : null,
     selectedLabel: sel ? shortLabel(sel) : null,
     onSelect: (x) => { const s = list.find((q) => +dateOf(q) === +x); if (s) selectSurvey(s.key, true); },
-    ariaLabel: `대통령 직무 긍정률과 부정률 추이, ${list[0].label}부터 ${list[list.length - 1].label}까지`,
+    ariaLabel: t('chartAria', surveyLabel(list[0]), surveyLabel(list[list.length - 1])),
   });
   state.mainData = { list, series, title: $('#main-title').textContent };
   renderMainTable(list);
@@ -241,12 +241,12 @@ function renderMain() {
 
 function renderMainTable(list) {
   const rows = [...list].reverse();
-  $('#main-table-count').textContent = `${rows.length}회`;
-  $('#main-table').innerHTML = `<table><thead><tr><th>조사</th><th>대통령</th><th>잘하고 있다</th><th>잘못하고 있다</th><th>의견유보</th><th>긍정률 변화</th><th>사례수</th><th>표본오차</th><th>출처</th></tr></thead><tbody>${
+  $('#main-table-count').textContent = t('times', rows.length);
+  $('#main-table').innerHTML = `<table><thead><tr><th>${t('thSurvey')}</th><th>${t('thPresident')}</th><th>${t('pos')}</th><th>${t('neg')}</th><th>${t('rest')}</th><th>${t('thChange')}</th><th>${t('thN')}</th><th>${t('thMoe')}</th><th>${t('thSource')}</th></tr></thead><tbody>${
     rows.map((s, i) => {
       const p = rows[i + 1];
       const d = p && p.president === s.president ? s.pos - p.pos : null;
-      return `<tr><td>${esc(s.label)}</td><td>${esc(s.president ?? '')}</td><td>${s.pos}%</td><td>${s.neg}%</td><td>${s.rest}%</td><td>${d == null ? '–' : (d > 0 ? '+' : d < 0 ? '−' : '±') + Math.abs(d)}</td><td>${fmtN(s.n)}</td><td>±${surveyMoe(s)?.toFixed(1) ?? '–'}%p</td><td>${s.issue ? `제${s.issue}호` : '–'}</td></tr>`;
+      return `<tr><td>${esc(surveyLabel(s))}</td><td>${esc(term(s.president ?? ''))}</td><td>${s.pos}%</td><td>${s.neg}%</td><td>${s.rest}%</td><td>${d == null ? '–' : (d > 0 ? '+' : d < 0 ? '−' : '±') + Math.abs(d)}</td><td>${fmtN(s.n)}</td><td>±${surveyMoe(s)?.toFixed(1) ?? '–'}%p</td><td>${s.issue ? t('issue', s.issue) : '–'}</td></tr>`;
     }).join('')
   }</tbody></table>`;
 }
@@ -255,7 +255,7 @@ function renderMainTable(list) {
 // ---------- 선택한 조사 ----------
 const surveysOf = (type) => all().filter((s) => s.type === type);
 const currentMeta = () => all().find((s) => s.key === state.surveyKey);
-const shortLabel = (s) => s.label.replace(/^\d{4}년 /, '').replace(/\s*\(.*\)$/, '');
+const shortLabel = shortSurveyLabel;
 
 // 선택이 없거나 기간 밖이면 기간 안의 가장 최근 주로
 function ensureSurvey() {
@@ -299,7 +299,7 @@ const STANDARD_BANNERS = ['지역별', '성별', '연령별', '지지정당별',
 function renderBanners() {
   const list = STANDARD_BANNERS.filter((b) => currentMeta().banners.includes(b));
   if (!list.includes(state.banner)) state.banner = list[0];
-  $('#banners').innerHTML = list.map((b, i) => `<button type="button" id="banner-${i}" data-banner="${esc(b)}" aria-pressed="${b === state.banner}">${esc(b)}</button>`).join('');
+  $('#banners').innerHTML = list.map((b, i) => `<button type="button" id="banner-${i}" data-banner="${esc(b)}" aria-pressed="${b === state.banner}">${esc(term(b))}</button>`).join('');
 }
 
 // ---------- 특성별 막대 ----------
@@ -307,14 +307,16 @@ function rowHTML(r, isTotal = false, totalMoe = null) {
   const small = r.n != null && r.n < SMALL_N;
   const m = isTotal ? totalMoe : null; // 표본오차는 전체에만 표시
   const rawG = r.raw?.split('|')[1];
-  const raw = rawG && rawG !== r.group ? `<span class="raw">${esc(rawG)}</span>` : '';
-  const label = `<div class="g">${esc(isTotal ? '전체' : r.group)}${small ? '<span class="pill">표본 적음</span>' : ''}${raw}</div>`;
-  const nn = `<div class="nn"><span class="num">${fmtN(r.n)}</span>명${m ? `<br>±<span class="num">${m.toFixed(1)}</span>%p` : ''}</div>`;
-  if (r.pos == null) return `<div class="row">${label}<div class="na">표본이 적어 수치 미공개</div>${nn}</div>`;
+  const name = isTotal ? t('total') : term(r.group);
+  const raw = rawG && rawG !== r.group && term(rawG) !== name ? `<span class="raw">${esc(term(rawG))}</span>` : '';
+  const label = `<div class="g">${esc(name).replace(/\//g, '/<wbr>')}${small ? `<span class="pill">${t('smallN')}</span>` : ''}${raw}</div>`;
+  const nn = `<div class="nn">${t('people', `<span class="num">${fmtN(r.n)}</span>`)}${m ? `<br>±<span class="num">${m.toFixed(1)}</span>%p` : ''}</div>`;
+  if (r.pos == null) return `<div class="row">${label}<div class="na">${t('hidden')}</div>${nn}</div>`;
   const lbl = (v) => (v >= 9 ? `${v}%` : '');
-  return `<div class="row${isTotal ? ' total' : ''}" title="잘하고 있다 ${r.pos}% · 의견유보 ${r.rest}% · 잘못하고 있다 ${r.neg}%">
+  const desc = `${t('pos')} ${r.pos}% · ${t('rest')} ${r.rest}% · ${t('neg')} ${r.neg}%`;
+  return `<div class="row${isTotal ? ' total' : ''}" title="${esc(desc)}">
     ${label}
-    <div class="bar${small ? ' small' : ''}" role="img" aria-label="${esc(isTotal ? '전체' : r.group)}: 잘하고 있다 ${r.pos}%, 의견유보 ${r.rest}%, 잘못하고 있다 ${r.neg}%">
+    <div class="bar${small ? ' small' : ''}" role="img" aria-label="${esc(name)}: ${esc(desc)}">
       <span class="p" style="flex:0 0 calc(${r.pos}% - 2px)">${lbl(r.pos)}</span>
       <span class="m" style="flex:0 0 calc(${r.rest}% - 2px)">${lbl(r.rest)}</span>
       <span class="n" style="flex:1 1 auto">${lbl(r.neg)}</span>
@@ -323,8 +325,8 @@ function rowHTML(r, isTotal = false, totalMoe = null) {
 }
 async function renderSnapshot() {
   const meta = currentMeta();
-  $('#snap-when').textContent = `${meta.label}${meta.president ? ` · ${meta.president} 대통령` : ''}`;
-  $('#snap-title').textContent = `${state.banner} 평가`;
+  $('#snap-when').textContent = t('snapWhen', surveyLabel(meta), meta.president ? term(meta.president) : null);
+  $('#snap-title').textContent = t('snapTitle', term(state.banner));
   renderStepper();
   const [s] = await details([meta]);
   if (!s || s.key !== state.surveyKey) return;
@@ -337,8 +339,8 @@ async function renderSnapshot() {
   if (state.banner === '지역별') regionMap(mapEl, rows);
   const detailKeys = Object.keys(rows.find((r) => r.detail)?.detail || {});
   const hasW = rows.some((r) => r.nWeighted != null);
-  $('#snap-table').innerHTML = `<table><thead><tr><th>${esc(state.banner)}</th><th>사례수</th>${hasW ? '<th>가중 사례수</th>' : ''}<th>잘하고 있다</th><th>잘못하고 있다</th><th>의견유보</th>${detailKeys.map((k) => `<th>${esc(k)}</th>`).join('')}</tr></thead><tbody>${
-    [total, ...rows].map((r) => `<tr><td>${esc(r.banner === '전체' ? '전체' : r.group)}</td><td>${fmtN(r.n)}</td>${hasW ? `<td>${fmtN(r.nWeighted)}</td>` : ''}<td>${r.pos ?? '–'}${r.pos != null ? '%' : ''}</td><td>${r.neg ?? '–'}${r.neg != null ? '%' : ''}</td><td>${r.rest ?? '–'}${r.rest != null ? '%' : ''}</td>${detailKeys.map((k) => `<td>${r.detail?.[k] != null ? r.detail[k] + '%' : '–'}</td>`).join('')}</tr>`).join('')
+  $('#snap-table').innerHTML = `<table><thead><tr><th>${esc(term(state.banner))}</th><th>${t('thN')}</th>${hasW ? `<th>${t('thNW')}</th>` : ''}<th>${t('pos')}</th><th>${t('neg')}</th><th>${t('rest')}</th>${detailKeys.map((k) => `<th>${esc(term(k))}</th>`).join('')}</tr></thead><tbody>${
+    [total, ...rows].map((r) => `<tr><td>${esc(r.banner === '전체' ? t('total') : term(r.group))}</td><td>${fmtN(r.n)}</td>${hasW ? `<td>${fmtN(r.nWeighted)}</td>` : ''}<td>${r.pos ?? '–'}${r.pos != null ? '%' : ''}</td><td>${r.neg ?? '–'}${r.neg != null ? '%' : ''}</td><td>${r.rest ?? '–'}${r.rest != null ? '%' : ''}</td>${detailKeys.map((k) => `<td>${r.detail?.[k] != null ? r.detail[k] + '%' : '–'}</td>`).join('')}</tr>`).join('')
   }</tbody></table>`;
 }
 
@@ -431,10 +433,10 @@ async function renderTrend() {
 function exportCSV(which) {
   const d = which === 'main' ? state.mainData : state.trendData;
   if (!d) return;
-  const header = ['조사', '대통령', ...d.series.map((s) => s.name), '사례수'];
+  const header = [t('thSurvey'), t('thPresident'), ...d.series.map((s) => s.name), t('thN')];
   const rows = d.list.map((s) => {
     const vals = d.series.map((sr) => sr.points.find((p) => p.y != null && +p.x === +dateOf(s))?.y ?? '');
-    return [s.label, s.president, ...vals, s.n ?? s.rows?.find((r) => r.banner === '전체')?.n];
+    return [surveyLabel(s), term(s.president), ...vals, s.n ?? s.rows?.find((r) => r.banner === '전체')?.n];
   });
   downloadCSV(`${d.title}.csv`, header, rows);
 }
@@ -442,13 +444,13 @@ function exportPNG(which) {
   const c = state.charts[which];
   const d = which === 'main' ? state.mainData : state.trendData;
   if (!c || !d) return;
-  const sub = `${d.list[0].label} ~ ${d.list[d.list.length - 1].label}` + (which === 'main' ? ' · 잘하고 있다 / 잘못하고 있다 (%)' : ` · ${$('#trend-sub').textContent}`);
+  const sub = `${surveyLabel(d.list[0])} ~ ${surveyLabel(d.list[d.list.length - 1])}` + (which === 'main' ? t('pngSub') : ` · ${$('#trend-sub').textContent}`);
   const cs = getComputedStyle(document.documentElement);
   const color = (v) => (v.startsWith('var(') ? cs.getPropertyValue(v.slice(4, -1)).trim() : v);
   downloadPNG(`${d.title}.png`, c.svg, {
     title: d.title, subtitle: sub,
     legend: d.series.map((s) => ({ name: s.name, color: color(s.color) })),
-    footer: `자료: 한국갤럽 데일리 오피니언 · ${location.host || ''}`,
+    footer: `${t('pngFooter')} · ${location.host || ''}`,
   });
 }
 
@@ -517,8 +519,8 @@ const ro = new ResizeObserver((ents) => {
 
 // ---------- 넘겨 보기 (지지도 · 추이 · 특성별) ----------
 const deck = { i: 0, timer: null };
-const NEXT_LABEL = ['추이 보기', '특성별 보기', ''];
-const PREV_LABEL = ['', '지지도 보기', '추이 보기'];
+const NEXT_LABEL = t('next');
+const PREV_LABEL = t('prev');
 const slides = () => [...document.querySelectorAll('#deck-track > .slide')];
 const smooth = () => (matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth');
 // 트랙 높이를 지금 화면에 맞춘다 (화면마다 길이가 달라 아래 내용이 비어 보이지 않게)
@@ -572,15 +574,16 @@ function initDeck() {
 
 // ---------- 시작 ----------
 async function start() {
+  applyStatic();
   try {
     const res = await fetch('data/index.json', { cache: 'no-cache' });
     if (!res.ok) throw new Error(res.status);
     state.index = await res.json();
   } catch (err) {
-    $('#headline').innerHTML = `<div class="empty">data/index.json 을 불러오지 못했어요 (${esc(err.message)}). 이 페이지는 웹 서버에서 열어야 합니다. 폴더에서 <code>npx serve</code> 를 실행한 뒤 주소로 접속해 보세요.</div>`;
+    $('#headline').innerHTML = `<div class="empty">${t('loadFail', esc(err.message))}</div>`;
     return;
   }
-  $('#updated').textContent = `${state.index.updated} 갱신`;
+  $('#updated').textContent = t('updated', state.index.updated);
   if (!surveysOf(state.type).length) state.type = all()[0]?.type || 'weekly';
   renderHeadline();
   renderRange();
