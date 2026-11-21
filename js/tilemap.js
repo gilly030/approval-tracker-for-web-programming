@@ -1,5 +1,6 @@
 // 지역별 순평가(긍정 − 부정) 지도. 실제 시도 경계(울릉도·독도 포함)를 갤럽 권역별 색으로 칠한다.
 import { VIEWBOX, PATHS, DOKDO, ULLEUNG } from './korea-paths.js';
+import { t, term, fmtNum, mapLabel } from './i18n.js';
 
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
@@ -42,10 +43,10 @@ export function regionMap(el, rows) {
   });
   const regOfSido = (n) => sidos.find((s) => s.name === n)?.reg;
 
-  let s = `<svg viewBox="${VIEWBOX}" role="img" aria-label="지역별 대통령 직무 순평가 지도 (울릉도·독도 포함)">`;
+  let s = `<svg viewBox="${VIEWBOX}" role="img" aria-label="${esc(t('mapAria'))}">`;
   s += `<defs><pattern id="tm-stripes" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="5" class="tm-stripe"/></pattern></defs>`;
   for (const q of sidos) {
-    const label = q.reg ? `${q.name} (${q.reg.group}): 잘하고 있다 ${q.reg.pos ?? '–'}%, 잘못하고 있다 ${q.reg.neg ?? '–'}%` : `${q.name}: 자료 없음`;
+    const label = q.reg ? `${term(q.name)} (${term(q.reg.group)}): ${t('pos')} ${q.reg.pos ?? '–'}%, ${t('neg')} ${q.reg.neg ?? '–'}%` : `${term(q.name)}: ${t('noData')}`;
     s += `<g class="tm-cell" tabindex="0" data-name="${esc(q.name)}" aria-label="${esc(label)}">`;
     s += `<path class="tm-area" d="${PATHS[q.name]}" style="fill:${fillVar(q.k)}"/>`;
     if (q.k == null && q.reg) s += `<path class="tm-hatch" d="${PATHS[q.name]}"/>`;
@@ -53,9 +54,9 @@ export function regionMap(el, rows) {
   }
   // 울릉도·독도: 권역 색을 칠하지 않고 회색, 실제 크기 그대로
   if (PATHS['울릉도·독도']) {
-    s += `<path class="tm-islands" d="${PATHS['울릉도·독도']}"><title>울릉도·독도</title></path>`;
-    if (ULLEUNG) s += `<text class="tm-islet" x="${ULLEUNG[0]}" y="${ULLEUNG[1] + 15}" text-anchor="middle">울릉도</text>`;
-    if (DOKDO) s += `<text class="tm-islet" x="${DOKDO[0] - 2}" y="${DOKDO[1] + 13}" text-anchor="end">독도</text>`;
+    s += `<path class="tm-islands" d="${PATHS['울릉도·독도']}"><title>${esc(term('울릉도·독도'))}</title></path>`;
+    if (ULLEUNG) s += `<text class="tm-islet" x="${ULLEUNG[0]}" y="${ULLEUNG[1] + 15}" text-anchor="middle">${esc(term('울릉도'))}</text>`;
+    if (DOKDO) s += `<text class="tm-islet" x="${DOKDO[0] - 2}" y="${DOKDO[1] + 13}" text-anchor="end">${esc(term('독도'))}</text>`;
   }
   s += `<g class="tm-labels"></g></svg>`;
 
@@ -66,7 +67,7 @@ export function regionMap(el, rows) {
       <div class="tm-map">${s}<div class="tm-tip" hidden></div></div>
       <div class="tm-side">
         ${legendHTML()}
-        <ol class="tm-list">${list.map(({ r, v }) => `<li data-group="${esc(r.group)}"><i${v == null ? ' class="hatch-swatch"' : ` style="background:${fillVar(stepOf(v))}"`}></i><span class="tm-g">${esc(r.group)}</span>${v == null ? '<span class="tm-v tm-na">미공개</span>' : `<span class="tm-v num">${fmt(v)}</span>`}</li>`).join('')}</ol>
+        <ol class="tm-list">${list.map(({ r, v }) => `<li data-group="${esc(r.group)}"><i${v == null ? ' class="hatch-swatch"' : ` style="background:${fillVar(stepOf(v))}"`}></i><span class="tm-g">${esc(term(r.group))}</span>${v == null ? `<span class="tm-v tm-na">${t('na')}</span>` : `<span class="tm-v num">${fmt(v)}</span>`}</li>`).join('')}</ol>
       </div>
     </div>`;
 
@@ -83,7 +84,7 @@ export function regionMap(el, rows) {
     const cx = b.x + b.width / 2, cy = b.y + b.height / 2;
     const x = cx + a.dx, y = cy + a.dy;
     const v = reg.pos != null ? reg.pos - reg.neg : null;
-    const short = reg.group.split('/')[0] === reg.group ? reg.group : reg.group.replace(/\//g, '·');
+    const short = mapLabel(reg.group);
     if (a.callout) L += `<line class="tm-callout" x1="${cx}" y1="${cy}" x2="${x + 18}" y2="${y + 2}"/><circle class="tm-callout-dot" cx="${cx}" cy="${cy}" r="1.8"/>`;
     L += `<text class="tm-lab" x="${x}" y="${y}" text-anchor="middle"><tspan class="tm-lab-name" x="${x}">${esc(short)}</tspan>${v == null ? '' : `<tspan class="tm-lab-val" x="${x}" dy="14">${fmt(v)}</tspan>`}</text>`;
   }
@@ -99,8 +100,8 @@ export function regionMap(el, rows) {
     if (!q) { tip.hidden = true; return; }
     const r = q.reg;
     tip.innerHTML = r
-      ? `<b>${esc(r.group)}</b>${r.pos == null ? '<div>표본이 적어 미공개</div>' : `<div>잘하고 있다 <span class="num">${r.pos}%</span></div><div>잘못하고 있다 <span class="num">${r.neg}%</span></div><div class="tm-n">순평가 ${fmt(r.pos - r.neg)} · ${r.n?.toLocaleString('ko-KR')}명</div>`}`
-      : `<b>${esc(q.name)}</b><div>자료 없음</div>`;
+      ? `<b>${esc(term(r.group))}</b>${r.pos == null ? `<div>${t('hidden')}</div>` : `<div>${t('pos')} <span class="num">${r.pos}%</span></div><div>${t('neg')} <span class="num">${r.neg}%</span></div><div class="tm-n">${t('net', fmt(r.pos - r.neg), r.n != null ? fmtNum(r.n) : '–')}</div>`}`
+      : `<b>${esc(term(q.name))}</b><div>${t('noData')}</div>`;
     tip.hidden = false;
     const box = svg.getBoundingClientRect();
     let x, y;
@@ -129,10 +130,10 @@ export function regionMap(el, rows) {
 function legendHTML() {
   const neg = [4, 3, 2, 1].map((k) => `<span style="background:var(--dv-n${k})"></span>`).join('');
   const pos = [1, 2, 3, 4].map((k) => `<span style="background:var(--dv-p${k})"></span>`).join('');
-  return `<div class="tm-legend" aria-label="색 범례: 순평가 (긍정 − 부정, %p)">
-    <div class="tm-legend-heads"><b class="neg">부정 우세</b><b class="pos">긍정 우세</b></div>
+  return `<div class="tm-legend" aria-label="${t('legendAria')}">
+    <div class="tm-legend-heads"><b class="neg">${t('negLead')}</b><b class="pos">${t('posLead')}</b></div>
     <div class="tm-scale">${neg}<span class="mid" style="background:var(--dv-0)"></span>${pos}</div>
     <div class="tm-ticks num"><span>40</span><span>20</span><span>10</span><span></span><span>0</span><span></span><span>10</span><span>20</span><span>40</span></div>
-    <div class="tm-legend-note">순평가 = 잘하고 있다 − 잘못하고 있다 (%p)</div>
+    <div class="tm-legend-note">${t('netNote')}</div>
   </div>`;
 }

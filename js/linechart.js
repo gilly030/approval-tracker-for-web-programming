@@ -4,6 +4,8 @@
 //  - 선 끝에 마지막 값
 //  - 키보드: 그래프에 포커스 후 ←→ 시점 이동, ↑↓ 선 바꾸기
 
+import { t, monthName, fmtNum } from './i18n.js';
+
 const NS = 'http://www.w3.org/2000/svg';
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
@@ -41,7 +43,7 @@ export function lineChart(el, o) {
   const X = (t) => m.l + ((+t - (t0 - pad)) / (t1 - t0 + 2 * pad)) * iw;
   const Y = (v) => m.t + ih - ((v - lo) / (hi - lo)) * ih;
 
-  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" tabindex="0" aria-label="${esc(o.ariaLabel || '선 그래프')}">`;
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" tabindex="0" aria-label="${esc(o.ariaLabel || t('lineChart'))}">`;
   // 구간 띠 (예: 대통령 임기). 번갈아 음영, 폭이 넉넉하면 위에 이름
   (o.bands || []).forEach((b, i) => {
     const x0 = Math.max(m.l, X(b.x0)), x1 = Math.min(m.l + iw, X(b.x1));
@@ -73,7 +75,7 @@ export function lineChart(el, o) {
       return;
     }
     const yr = i === 0 || d.getMonth() === 0;
-    s += `<text class="lc-tick" x="${x}" y="${m.t + ih + 19}" text-anchor="middle">${d.getMonth() + 1}월</text>`;
+    s += `<text class="lc-tick" x="${x}" y="${m.t + ih + 19}" text-anchor="middle">${monthName(d.getMonth() + 1)}</text>`;
     if (yr) s += `<text class="lc-tick lc-year" x="${x}" y="${m.t + ih + 34}" text-anchor="middle">${d.getFullYear()}</text>`;
   });
   s += `<line class="lc-axis" x1="${m.l}" x2="${m.l + iw}" y1="${Y(lo)}" y2="${Y(lo)}"/>`;
@@ -154,9 +156,9 @@ export function lineChart(el, o) {
     const lines = [
       `<tspan class="lc-ann-name" style="fill:${sr.color}">${esc(sr.name)}</tspan>`,
       `<tspan>${esc(p.label)}</tspan>`,
-      `<tspan class="lc-ann-val">${p.y}${esc(o.unit || '')}${p.n ? `<tspan class="lc-ann-n"> · ${p.n.toLocaleString('ko-KR')}명</tspan>` : ''}</tspan>`,
+      `<tspan class="lc-ann-val">${p.y}${esc(o.unit || '')}${p.n ? `<tspan class="lc-ann-n"> · ${esc(t('people', fmtNum(p.n)))}</tspan>` : ''}</tspan>`,
     ];
-    if (o.onSelect && +o.selectedX !== xs[xi]) lines.push(`<tspan class="lc-ann-n">눌러서 특성별 보기</tspan>`);
+    if (o.onSelect && +o.selectedX !== xs[xi]) lines.push(`<tspan class="lc-ann-n">${esc(t('clickForGroups'))}</tspan>`);
     const h = lines.length * 15 + 8;
     const above = py - h - 8 > m.t;
     const baseY = above ? py - h : py + 24;

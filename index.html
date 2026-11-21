@@ -14,45 +14,45 @@
 <body>
 <main class="wrap">
   <header class="masthead">
-    <div class="brand">대통령 직무평가 트래커</div>
-    <div class="source">자료: <a href="https://www.gallup.co.kr/gallupdb/report.asp" target="_blank" rel="noopener">한국갤럽 데일리 오피니언</a> · <span id="updated"></span></div>
+    <div class="brand" data-i18n="brand">대통령 직무평가 트래커</div>
+    <div class="source"><span data-i18n-html="source">자료: <a href="https://www.gallup.co.kr/gallupdb/report.asp" target="_blank" rel="noopener">한국갤럽 데일리 오피니언</a> · </span><span id="updated"></span><a class="lang-switch" id="lang-switch" href="?lang=en" lang="en">English</a></div>
   </header>
 
-  <div class="deck" id="deck" role="region" aria-roledescription="carousel" aria-label="대통령 직무평가">
+  <div class="deck" id="deck" role="region" aria-roledescription="carousel" aria-label="대통령 직무평가" data-i18n-aria="deckLabel">
   <div class="deck-nav">
-    <div class="deck-tabs" role="tablist" aria-label="화면 고르기">
-      <button type="button" role="tab" data-go="0" aria-selected="true">지지도</button>
-      <button type="button" role="tab" data-go="1" aria-selected="false">추이</button>
-      <button type="button" role="tab" data-go="2" aria-selected="false">특성별</button>
+    <div class="deck-tabs" role="tablist" aria-label="화면 고르기" data-i18n-aria="tabsLabel">
+      <button type="button" role="tab" data-go="0" aria-selected="true" data-i18n="tab0">지지도</button>
+      <button type="button" role="tab" data-go="1" aria-selected="false" data-i18n="tab1">추이</button>
+      <button type="button" role="tab" data-go="2" aria-selected="false" data-i18n="tab2">특성별</button>
     </div>
     <div class="deck-arrows">
-      <button type="button" class="deck-btn prev" id="deck-prev" aria-label="이전 화면"><span aria-hidden="true">&#8249;</span><span class="deck-label" id="deck-prev-label"></span></button>
-      <button type="button" class="deck-btn next" id="deck-next" aria-label="다음 화면"><span class="deck-label" id="deck-next-label">추이 보기</span><span aria-hidden="true">&#8250;</span></button>
+      <button type="button" class="deck-btn prev" id="deck-prev" aria-label="이전 화면" data-i18n-aria="prevScreen"><span aria-hidden="true">&#8249;</span><span class="deck-label" id="deck-prev-label"></span></button>
+      <button type="button" class="deck-btn next" id="deck-next" aria-label="다음 화면" data-i18n-aria="nextScreen"><span class="deck-label" id="deck-next-label">추이 보기</span><span aria-hidden="true">&#8250;</span></button>
     </div>
   </div>
   <div class="deck-track" id="deck-track">
-  <div class="slide" role="group" aria-roledescription="slide" aria-label="1 / 3 지지도">
+  <div class="slide" role="group" aria-roledescription="slide" aria-label="1 / 3 지지도" data-i18n-aria="slide0">
   <section class="headline" id="headline" aria-live="polite"></section>
   </div>
 
-  <div class="slide" role="group" aria-roledescription="slide" aria-label="2 / 3 추이">
+  <div class="slide" role="group" aria-roledescription="slide" aria-label="2 / 3 추이" data-i18n-aria="slide1">
   <section class="figure" id="main" aria-labelledby="main-title">
     <h2 id="main-title" class="fig-title">대통령 직무 수행 평가</h2>
     <p class="fig-q" id="main-q">귀하는 요즘 대통령이 대통령으로서의 직무를 잘 수행하고 있다고 보십니까, 아니면 잘못 수행하고 있다고 보십니까?</p>
-    <div class="range" role="group" aria-label="기간">
+    <div class="range" role="group" aria-label="기간" data-i18n-aria="rangeGroup">
       <div class="seg">
-        <button type="button" id="r-3m" data-range="3m" aria-pressed="false">3개월</button>
-        <button type="button" id="r-6m" data-range="6m" aria-pressed="false">6개월</button>
-        <button type="button" id="r-1y" data-range="1y" aria-pressed="false">1년</button>
-        <button type="button" id="r-term" data-range="term" aria-pressed="true">현 임기</button>
-        <button type="button" id="r-all" data-range="all" aria-pressed="false">전체</button>
-        <button type="button" id="r-custom" data-range="custom" aria-pressed="false" aria-controls="range-custom">기간 설정</button>
+        <button type="button" id="r-3m" data-range="3m" aria-pressed="false" data-i18n="r3m">3개월</button>
+        <button type="button" id="r-6m" data-range="6m" aria-pressed="false" data-i18n="r6m">6개월</button>
+        <button type="button" id="r-1y" data-range="1y" aria-pressed="false" data-i18n="r1y">1년</button>
+        <button type="button" id="r-term" data-range="term" aria-pressed="true" data-i18n="rterm">현 임기</button>
+        <button type="button" id="r-all" data-range="all" aria-pressed="false" data-i18n="rall">전체</button>
+        <button type="button" id="r-custom" data-range="custom" aria-pressed="false" aria-controls="range-custom" data-i18n="rcustom">기간 설정</button>
       </div>
       <span class="range-custom" id="range-custom" hidden>
-        <span class="rf"><label for="range-from">시작</label><input type="month" id="range-from"></span>
+        <span class="rf"><label for="range-from" data-i18n="from">시작</label><input type="month" id="range-from"></span>
         <span aria-hidden="true">~</span>
-        <span class="rf"><label for="range-to">끝</label><input type="month" id="range-to"></span>
-        <button type="button" class="btn primary" id="range-apply">적용</button>
+        <span class="rf"><label for="range-to" data-i18n="to">끝</label><input type="month" id="range-to"></span>
+        <button type="button" class="btn primary" id="range-apply" data-i18n="apply">적용</button>
       </span>
       <span class="range-info" id="range-info"></span>
     </div>
@@ -61,20 +61,20 @@
     <div class="chart" id="main-chart"></div>
     <p class="fig-info" id="main-info"></p>
     <div class="fig-foot">
-      <span><a href="#" data-export="csv:main">데이터 받기</a> · <a href="#" data-export="png:main">이미지 저장</a></span>
-      <span class="fig-src">자료: 한국갤럽 데일리 오피니언</span>
+      <span><a href="#" data-export="csv:main" data-i18n="downloadData">데이터 받기</a> · <a href="#" data-export="png:main" data-i18n="saveImage">이미지 저장</a></span>
+      <span class="fig-src" data-i18n="figSrc">자료: 한국갤럽 데일리 오피니언</span>
     </div>
-    <details class="tbl"><summary>조사별 수치 <span id="main-table-count"></span></summary><div class="tbl-wrap" id="main-table"></div></details>
+    <details class="tbl"><summary><span data-i18n="bySurvey">조사별 수치</span> <span id="main-table-count"></span></summary><div class="tbl-wrap" id="main-table"></div></details>
   </section>
   </div>
 
-  <div class="slide" role="group" aria-roledescription="slide" aria-label="3 / 3 특성별">
+  <div class="slide" role="group" aria-roledescription="slide" aria-label="3 / 3 특성별" data-i18n-aria="slide2">
   <div class="section-head">
-    <h2>응답자 특성별로 보기</h2>
+    <h2 data-i18n="byGroupHead">응답자 특성별로 보기</h2>
   </div>
 
 
-  <nav class="banners" id="banners" aria-label="응답자 특성(배너)"></nav>
+  <nav class="banners" id="banners" aria-label="응답자 특성(배너)" data-i18n-aria="bannersLabel"></nav>
 
   <section class="panel" id="snapshot" aria-live="polite">
     <div class="panel-head">
@@ -82,30 +82,30 @@
         <h2 id="snap-title">특성별 평가</h2>
         <p class="snap-when" id="snap-when"></p>
       </div>
-      <div class="stepper" role="group" aria-label="조사 주 옮기기">
-        <button type="button" class="btn" id="prev-week">◀ 이전 주</button>
-        <button type="button" class="btn" id="next-week">다음 주 ▶</button>
+      <div class="stepper" role="group" aria-label="조사 주 옮기기" data-i18n-aria="stepLabel">
+        <button type="button" class="btn" id="prev-week" data-i18n="prevWeek">◀ 이전 주</button>
+        <button type="button" class="btn" id="next-week" data-i18n="nextWeek">다음 주 ▶</button>
       </div>
     </div>
     <div class="split-legend">
-      <span class="key"><i style="background:var(--pos)"></i>잘하고 있다</span>
-      <span class="key"><i style="background:var(--mid)"></i>의견유보</span>
-      <span class="key"><i style="background:var(--neg)"></i>잘못하고 있다</span>
-      <span class="key"><i class="hatch-swatch"></i>미공개*</span>
+      <span class="key"><i style="background:var(--pos)"></i><span data-i18n="pos">잘하고 있다</span></span>
+      <span class="key"><i style="background:var(--mid)"></i><span data-i18n="rest">의견유보</span></span>
+      <span class="key"><i style="background:var(--neg)"></i><span data-i18n="neg">잘못하고 있다</span></span>
+      <span class="key"><i class="hatch-swatch"></i><span data-i18n="naStar">미공개*</span></span>
     </div>
-    <p class="legend-foot">*표본이 적은 경우 통계 신뢰성을 위해 미공개 처리 합니다.</p>
+    <p class="legend-foot" data-i18n="legendFoot">*표본이 적은 경우 통계 신뢰성을 위해 미공개 처리 합니다.</p>
     <div class="regionmap" id="regionmap" hidden></div>
     <div class="rows" id="rows"></div>
-    <details class="tbl"><summary>표로 보기</summary><div class="tbl-wrap" id="snap-table"></div></details>
+    <details class="tbl"><summary data-i18n="asTable">표로 보기</summary><div class="tbl-wrap" id="snap-table"></div></details>
   </section>
   </div>
   </div>
   </div>
 
   <footer class="notes">
-    <p data-slides="0">질문: "귀하는 요즘 ○○○ 대통령이 대통령으로서의 직무를 잘 수행하고 있다고 보십니까, 잘못 수행하고 있다고 보십니까?" 긍·부정 2점 척도, 재질문 1회.</p>
-    <p data-slides="0 1">데이터는 3시간마다 갤럽 리포트 게시판을 확인해 새 리포트가 있으면 자동으로 갱신됩니다.</p>
-    <p data-slides="2">지역 지도: 통계청 센서스용 행정구역경계(2013, <a href="https://github.com/southkorea/southkorea-maps" target="_blank" rel="noopener">southkorea-maps</a>)를 단순화해 그렸습니다. </p>
+    <p data-slides="0" data-i18n="notesQ">질문: "귀하는 요즘 ○○○ 대통령이 대통령으로서의 직무를 잘 수행하고 있다고 보십니까, 잘못 수행하고 있다고 보십니까?" 긍·부정 2점 척도, 재질문 1회.</p>
+    <p data-slides="0 1" data-i18n="notesUpdate">데이터는 3시간마다 갤럽 리포트 게시판을 확인해 새 리포트가 있으면 자동으로 갱신됩니다.</p>
+    <p data-slides="2" data-i18n-html="notesMap">지역 지도: 통계청 센서스용 행정구역경계(2013, <a href="https://github.com/southkorea/southkorea-maps" target="_blank" rel="noopener">southkorea-maps</a>)를 단순화해 그렸습니다. </p>
   </footer>
 </main>
 <script type="module" src="js/app.js"></script>
