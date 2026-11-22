@@ -175,6 +175,10 @@ const MAP_SHORT = {
   '인천/경기': 'Gyeonggi', '대전/세종/충청': 'Chungcheong', '광주/전라': 'Jeolla',
   '대구/경북': 'Gyeongbuk', '부산/울산/경남': 'Gyeongnam',
 };
+// Shorter president names for narrow chart bands, tried in order (Korean names are already short).
+// Surname alone only where it is unique: there are two presidents named Lee.
+const SHORT_NAME = { 이명박: 'Lee MB', 박근혜: 'Park GH|Park', 문재인: 'Moon JI|Moon', 윤석열: 'Yoon SY|Yoon', 이재명: 'Lee JM' };
+export const shortName = (name) => (EN ? SHORT_NAME[name] ?? term(name) : name);
 export const mapLabel = (group) => (EN ? MAP_SHORT[group] ?? term(group) : group.split('/')[0] === group ? group : group.replace(/\//g, '·'));
 /** Data term in the current language (unknown terms are shown as they are) */
 export function term(s) {
