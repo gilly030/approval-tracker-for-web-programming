@@ -49,7 +49,8 @@ export function lineChart(el, o) {
     const x0 = Math.max(m.l, X(b.x0)), x1 = Math.min(m.l + iw, X(b.x1));
     if (x1 - x0 < 1) return;
     if (i % 2 === (o.bands.length % 2 === 0 ? 1 : 0)) s += `<rect class="lc-band" x="${x0}" y="${m.t}" width="${x1 - x0}" height="${ih}"/>`;
-    if (x1 - x0 > 34) s += `<text class="lc-bandlabel" x="${x0 + 6}" y="${m.t + 14}">${esc(b.label)}</text>`;
+    // The label is checked against the band width after rendering (see fitBandLabels)
+    if (x1 - x0 > 20) s += `<text class="lc-bandlabel" x="${x0 + 6}" y="${m.t + 14}" data-room="${x1 - x0 - 10}" data-short="${esc(b.short || '')}">${esc(b.label)}</text>`;
   });
   for (let v = lo; v <= hi; v += step) {
     s += `<line class="lc-grid${v === 0 ? ' lc-zero' : ''}" x1="${m.l}" x2="${m.l + iw}" y1="${Y(v)}" y2="${Y(v)}"/>`;
@@ -128,6 +129,7 @@ export function lineChart(el, o) {
   el.innerHTML = s;
 
   const svg = el.querySelector('svg');
+  fitBandLabels(svg);
   const groups = [...svg.querySelectorAll('.lc-series')];
   const endGs = [...svg.querySelectorAll('.lc-end')];
   const note = svg.querySelector('.lc-note');
@@ -229,6 +231,17 @@ export function lineChart(el, o) {
     svg,
     highlight(i) { state.hi = i; paint(); },
   };
+}
+
+// Band names that do not fit their band switch to shorter forms ('a|b', tried in order),
+// and are hidden if even the shortest is too long
+function fitBandLabels(svg) {
+  for (const tx of svg.querySelectorAll('.lc-bandlabel')) {
+    const room = +tx.dataset.room;
+    const shorter = tx.dataset.short ? tx.dataset.short.split('|') : [];
+    while (tx.getComputedTextLength() > room && shorter.length) tx.textContent = shorter.shift();
+    if (tx.getComputedTextLength() > room) tx.remove();
+  }
 }
 
 // ---------- export ----------

@@ -3,7 +3,7 @@
 import { lineChart, downloadCSV, downloadPNG } from './linechart.js';
 import { regionMap } from './tilemap.js';
 import { PRESIDENTS } from './parser.js';
-import { t, term, surveyLabel, shortSurveyLabel, ymLabel, monthName, yearName, fmtNum, applyStatic } from './i18n.js';
+import { t, term, shortName, surveyLabel, shortSurveyLabel, ymLabel, monthName, yearName, fmtNum, applyStatic } from './i18n.js';
 
 const $ = (s) => document.querySelector(s);
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -219,7 +219,7 @@ function presidentBands(list) {
     if (i < 0) return null;
     const x0 = new Date(PRESIDENTS[i][1]);
     const x1 = PRESIDENTS[i + 1] ? new Date(PRESIDENTS[i + 1][1]) : new Date(8640000000000000);
-    return { label: term(name), x0, x1 };
+    return { label: term(name), short: shortName(name), x0, x1 };
   }).filter(Boolean);
 }
 
