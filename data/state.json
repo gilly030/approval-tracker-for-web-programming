@@ -1,5 +1,5 @@
 {
- "lastSeq": 1668,
+ "lastSeq": 1669,
  "processed": {
   "174": {
    "kind": "none"
@@ -15219,6 +15219,13 @@
     "2026-11-W3"
    ],
    "replaced": []
+  },
+  "1669": {
+   "kind": "other",
+   "issue": null,
+   "month": null,
+   "tables": [],
+   "warnings": 0
   }
  },
  "backfill": {
@@ -15228,5 +15235,5 @@
   "misses": 80
  },
  "reprocess": [],
- "failStreak": 1
+ "failStreak": 0
 }
